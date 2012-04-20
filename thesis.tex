@@ -1,0 +1,154 @@
+%justified final
+%\documentclass[dissertation,justified,copyright,draftimages,final,numbers,sort&compress,gsmodern]{uothesis}
+
+%right ragged final
+%\documentclass[dissertation,copyright,draftimages,final,numbers,sort&compress,gsmodern]{uothesis}
+
+%draftcopy
+%\documentclass[dissertation,copyright,draftimages,draftcopy,numbers,sort&compress,gsmodern]{uothesis}
+
+%committeedraft
+\documentclass[dissertation,copyright,committeedraft,numbers,sort&compress,gsmodern]{uothesis}
+
+\usepackage[english,UKenglish]{babel}
+\usepackage{url}
+\usepackage{fullpage}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{stackrel}
+\usepackage{array}
+\usepackage{amsmath}
+\usepackage{verbatim}
+\usepackage{multirow}
+\usepackage{rotating}
+\usepackage{fancybox}
+\usepackage{pdflscape}
+\usepackage{amsthm}
+\usepackage{blkarray}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+
+%\input{custom_cmds.tex}
+
+\theoremstyle{definition}
+\newtheorem{myexp}{Example}[section]
+\theoremstyle{definition}
+\newtheorem{mydef}{Definition}[section]
+\newtheorem{mythm}{Theorem}[section]
+\newtheorem{mylem}{Lemma}[section]
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+\newcommand\T{\rule{0pt}{2.6ex}}
+\newcommand\B{\rule[-1.2ex]{0pt}{0pt}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+%THESIS FRONT MATTER
+
+%TITLES.
+\covertitle{A Graph-based Approach For \\Semantic Data Mining}
+\abstracttitle{A Graph-based Approach For Semantic Data Mining}
+
+%AUTHOR
+\author{Haishan Liu}
+
+%DEPARTMENT
+\narrowdepartment{Dept. of Computer and Information Science}
+
+\department{Department of Computer and Information Science}
+
+%DEGREE INFORMATION
+\degreetype{Doctor of Philosophy}
+\degreemonth{March}
+\degreeyear{2012}
+
+%COMMITTEE INFORMATION
+\advisor{Dr. Dejing Dou}
+\chair{Dr. Dejing Dou}
+\committee{Dr. Arthur Farley & Inside\\
+    Dr. Allen Malony & Inside\\
+    Dr. Daniel Lowd & Inside\\
+    Dr. Don Tucker & Ouside\\
+    %Don Tucker & Honorary\\
+}
+\graddean{Richard Linton}
+
+%CURRICULUM VITAE
+\include{thesis_cv}
+
+%ACKNOWLEDGEMENTS
+\include{thesis_acknowledgements}
+
+%DEDICATION (optional)
+\include{thesis_dedication}
+
+%ABSTRACT
+\include{thesis_abstract}
+
+%Main Document
+\begin{document}
+\maketitle
+
+%CHAPTERS
+\chapter{INTRODUCTION}
+\label{chap:introduction}
+\input{introduction}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{BACKGROUND}
+\label{chap:background}
+\input{background}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{GRAPH REPRESENTATION}
+\label{chap:representation}
+\input{representation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{SEMANTIC ANNOTATION}
+\label{chap:annotation}
+\input{annotation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{GRAPH-BASED DATA MINING}
+\label{chap:datamining}
+\input{datamining}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\chapter{INCORPORATION OF PRIOR KNOWLEDGE}
+%\label{chap:incorpont}
+%\input{incorpont}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{CASE STUDY}
+\label{chap:casestudy}
+\input{casestudy}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{DISCUSSION AND FUTURE WORK}
+\label{chap:discussion}
+\input{discussion}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%\chapter{CONCLUSION} % and/or future work
+%\label{chap:conclusion}
+%\input{conclusion}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%APPENDICES
+\appendix
+\include{tappendix_1}
+
+%REFERENCES
+\bibliographystyle{unsrtnat}
+\bibliography{haishan,thesis}
+
+\end{document} 

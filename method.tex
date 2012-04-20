@@ -1,0 +1,87 @@
+\section{Preliminary Study --- Hypergraph-based Method For Discovering Semantically Associated Itemsets}
+\label{sec:method}
+In this section, we present our preliminary study for discovering semantically associated itemsets based on hypergraph. The goal of this study is to show that, using graph based formalism, we can obtain interesting patterns that are unable to be captured by traditional methods. Specifically, we propose to construct a hyperedge for each tuple. The relational attributes constitute the universe of vertices in the hypergraph. Given the hypergraph representation of relational structure, our approach starts by first generating semantically associated 2-itemsets. A 2-itemset $\langle i,j \rangle$ is considered semantically associated if the hypergraph-based similarity measure $s(i,j)$ exceeds some threshold. In the following subsections, we propose two similarity measures $s_{CT}$ and $s_{L+}$ based on, respectively, the average commute time distance on hypergraph and the inner-product-based representation of the pseudoinverse of Hypergraph Laplacian. Given discovered semantically associated 2-itemsets, we propose a hypergraph expansion method along with two search strategies, namely, the clique and connected component search, in the resulting graph for finding semantically associated $k$-itemsets ($k>2$).
+
+\subsection{Methods for Generating 2-itemsets}
+In the following we describe two similarity measures that define the strength of bond between a pair of semantically associated items.
+\subsubsection{Average Commute Time Similarity $s_{CT}$}
+
+As already mentioned, the commute-time distance $n(i,j)$ between two nodes $i$ and $j$ has the desirable property of decreasing when the number of paths connecting the two nodes increases and when the length of paths decreases. This is indeed an intuitively satisfying property of the effective resistance of the equivalent electrical network~\cite{Doyle}. The usual shortest-path distance (also called geodesic distance) does not have this property: the shortest-path distance does not capture the fact that strongly connected nodes are closer than weakly connected nodes.
+
+To compute commute-time distance between vertices in a hypergraph, we need to first define the combinatory hypergraph Laplacian $\mathbf{L}$.
+It follows from Zhou et al's formalism of normalized hypergraph Laplacian in Equation~\ref{eq:normalizedHyperL} that:
+\begin{equation}
+\mathbf{L}=\mathbf{D}^{1/2}\mathcal{L}\mathbf{D}^{-1/2}=\mathbf{D}_v-\mathbf{HWD}_e^{-1}\mathbf{H}^T \label{eq:combinatoryHyperL}
+\end{equation}
+
+The average commute time $n(i,j)$ on simple graph can be computed in closed form from the Moore-Penrose pseudoinverse of $\mathbf{L}$ ~\cite{pseudo}, denoted by $\mathbf{L}^+$ with elements $l_{ij}^+=[\mathbf{L}^+]_{ij}$. It can be shown that $n(i,j)$ on hypergraph can be calculated in the same manner. The pseudoinverse $\mathbf{L}^+$ is given by the following equation:
+\begin{equation}
+\mathbf{L}^+=(\mathbf{L} -\mathbf{ee}^T/n)^{-1} + \mathbf{ee}^T/n, \label{eq:pL}
+\end{equation}
+where $\mathbf{e}$ is a column vector made of 1s (i.e., $\mathbf{e}=[1,1,\ldots,1]^T$). The formula for the computation of $n(i,j)$ takes the form of the following equation:
+\begin{equation}
+n(i,j)=V_G(l_{ii}^+ + l_{jj}^+ - 2l_{ij}^+) \label{eq:CT},
+\end{equation}
+where $V_G = tr(\mathbf{D}_v)$ is the volume of the hypergraph. If we define $\mathbf{e}_i$ as the $i$th column of $\mathbf{I}$ (i.e.,
+$
+\mathbf{e}_i=[\stackbin[1]{}{0}, \ldots, \stackbin[i-1]{}{0}, \stackbin[i]{}{1},$
+$ \stackbin[i+1]{}{0}, \ldots, \stackbin[n]{}{0}]^T
+$),
+Equation~\ref{eq:CT} can be transformed to:
+\begin{align}
+n(i,j)=V_G(\mathbf{e}_i-\mathbf{e}_j)^T\mathbf{L}^+(\mathbf{e}_i-\mathbf{e}_j), \label{eq:CT2}
+\end{align}
+Since $n(i,j)$ is a distance, it is straightforward to convert it to a similarity measure $s_{CT}(i,j)$ by normalize it to unit range and subtract from 1.
+
+\subsubsection{Pseudoinverse-based Inner-Product Similarity $s_{L+}$}
+Equation \ref{eq:CT2} can be mapped into a new Euclidean space that preserves the commute time distance:
+\begin{align}
+\notag n(i,j)&=V_G(\mathbf{e}_i-\mathbf{e}_j)^T\mathbf{L}^+(\mathbf{e}_i-\mathbf{e}_j)\\
+\notag &=V_G(\mathbf{x}_i'-\mathbf{x}_j')^T(\mathbf{x}_i'-\mathbf{x}_j')\\
+&=V_G\|\mathbf{x}_i'-\mathbf{x}_j'\|^2, \label{eq:ECTD}
+\end{align}
+where $\mathbf{x}_i'=\mathbf{\Lambda}^{1/2}\mathbf{U}^T\mathbf{e}_i$, $\mathbf{U}$ is an orthonormal matrix made of eigenvectors of $\mathbf{L}^+$ (ordered in decreasing order of corresponding eigenvalue $\lambda_k$) and $\mathbf{\Lambda}=\mathbf{Diag}(\lambda_k)$. In this way, the transformed node vectors $\mathbf{x}_i'$ are exactly separated in the new $n$-dimensional Euclidean space.
+From this definition, it follows that $\mathbf{L}^+ $ is the matrix containing inner products of the transformed vectors $\mathbf{x}_i'$ as shown below:
+\begin{align}
+\notag \mathbf{x}_i'^T\mathbf{x}_j'&=(\mathbf{\Lambda}_i^{1/2}\mathbf{x}_i)^T\mathbf{\Lambda}_j^{1/2}\mathbf{x}_j=\mathbf{x}_i^T\mathbf{\Lambda}\mathbf{x}_j\\
+&=\mathbf{e}_i^T\mathbf{U\Lambda U}^T\mathbf{e}_j=\mathbf{e}_i^T\mathbf{L}^+\mathbf{e}_j=l_{ij}^+.
+\end{align}
+Therefore, $\mathbf{L}^+$ can be considered as a similarity matrix for the nodes---that is
+\begin{equation}
+s_{L^+}(i,j)=l_{ij}^+ \, . \label{eq:sim_L+}
+\end{equation}
+The inner-product-based similarity measures are well-studied for the vector-space model of information retrieval. It has been shown that when computing proximities between documents, inner-product-based measures outperform Euclidean distances~\cite{IR}.
+
+\subsection{Methods for Generating $k$-itemset ($k>2$)}
+Now, we consider finding semantically associated $k$-itemset ($k>2$) from given 2-itemsets.
+As is common in hypergraph theory, we can associate an induced graph $G(H)$ with every hypergraph $H$ by expanding every hyperedge $e$ in $H$ to a clique in $G(H)$. Edges in the induced graph $G(H)$ can be called \emph{subedges} to avoid unnecessary confusion. We can further construct a pruned graph $G'(H)$ from $G(H)$ by applying the following inclusion rule on each subedge: the similarity between the incident nodes of a subedge has to be greater than a user-specified threshold $\theta$. In formal definition, given a hypergraph $H=(V,E)$, the pruned subgraph is $G'(H)=\{V,E'\}$ where
+\begin{align}
+\notag E'=\{&(u,v)\in V^2 \, : \, u \neq v \; \mathrm{and} \; \\
+\notag &u, v \in e \; \mathrm{for} \; \mathrm{some} \; e \in E \; \mathrm{and} \; \\
+\notag &s(u,v) > \theta\}.
+\end{align}
+Given $G'(H)$, finding semantically associated $k$-itemset ($k>2$) can be formulated into two ways: finding cliques or connected components in $G'(H)$.
+
+\subsubsection{Cliques of $G'(H)$}
+Finding cliques in $G'(H)$ corresponds to searching and testing in the powerset of $V$. Given the fact that every subset of a clique is also a clique, this downward-closure property can make efficient clique discovery algorithm possible in a way similar to the Apriori algorithm for finding frequent itemsets
+--- with a ``bottom up" manner, the candidate generation step extends valid $k-1$ length itemsets one item at a time, and groups of candidates are tested against $G'(H)$ to determine if they form cliques. The algorithm terminates when no further successful extensions are found.
+
+\subsubsection{Connected Components of $G'(H)$}
+Complete subgraph (i.e., clique) is a very strong requirement that can limit the approach to restricted cases of semantically associated itemsets. One way to relax this requirement is to find connected components of $G'(H)$, which can be viewed as a closure under semantic association. The number of connected components equals the multiplicity of 0 as an eigenvalue of the Laplacian matrix of $G'(H)$. Although the set of connected components is not downward closed, there is efficient way to find all connected components of a graph in linear time using either breadth-first search or depth-first search. In either case, a search that begins at some particular vertex will find the entire connected component containing the vertex. When the search returns, loop through other vertices and start a new search whenever the loop reaches a vertex that has not already been included in a previously found connected component.
+
+\subsubsection{Ranking of Itemsets}
+Once the semantically associated 2-itemsets and $k$-itemsets are generated, they can be ranked by a quantity indicating the strength of association among items in the set. We tentatively compute this quantity by averaging the total pairwise similarities over the number of subedges of the itemset's corresponding clique or connected component in $G'(H)$.
+
+\subsection{Effective Computation}
+\label{sec:eff_comp}
+In high dimensional data sets, the computations of the Hypergraph Laplacian and the pseudoinverse becomes intractable. We discuss two approaches to mitigate this scalability problem.
+
+To compute Hypergraph Laplacian $\mathbf{L}$ in Equation \ref{eq:combinatoryHyperL} requires multiplication of hypergraph incidence matrices $\mathbf{H}$ and its transpose $\mathbf{H}^T$. Since $\mathbf{H}$ grows in proportion to the size of underlying transaction data (each node corresponds to a column and each hyperedge corresponds to a row), it eventually becomes unable to fit in memory when the size exceeding a certain amount. In this case the computation can still be carried out using a block partitioned matrix product by performing operations only on the submatrices of tractable sizes. Owing to the fact that, in most cases, $|V|$ is much smaller than $|E|$, $\mathbf{H}$ can then be partitioned into $s$ vertical stripes and the square matrix $\mathbf{D}_e$ into $s$ diagonal blocks. The multiplication in Equation \ref{eq:combinatoryHyperL} can be calculated by $\mathbf{HD}_e^{-1}\mathbf{H}^T=\sum_{\gamma=1}^s{\mathbf{H}_\gamma\mathbf{D}_{e\gamma}^{-1}\mathbf{H}_\gamma^T}$. Note that $\mathbf{H}$ is sparse in many applications. This property can be exploited to gain high performance and due to its importance much effort has been devoted to the study resulting a number of libraries and routines from which we can leverage.
+
+As the number of nodes grows, to compute pseudoinverse in closed form using Equation \ref{eq:pL} also becomes intractable. A procedure based on Cholesky factorization to compute $\mathbf{L}^+$ for large sparse matrices~\cite{matrix} is proved useful. It allows to compute $\mathbf{L}^+$ in a column-by-column manner. In particular, the procedure involves the following steps for computing the $i$th column of $\mathbf{L}^+$:
+\begin{enumerate}
+\item Compute the projection $\mathbf{y}_i$ of base vector $\mathbf{e}_i$ on the column space of $\mathbf{L}$.
+\item Find a solution $l_i^{*+}$ of the linear system $\mathbf{Ll}=\mathbf{y}_i$.
+\item Project $l_i^{*+}$ on the row space of $\mathbf{L}$ to get $l_i^+$.
+\end{enumerate}
+Since $\mathbf{L}$ is symmetric, its row space is the same as column space. The projection in step 1 and 2 can be represented by the matrix $(\mathbf{I-ee}^T/n)$. The equation in step 2 can be solved by first solving a reduced linear system: $\mathbf{\hat{L}\hat{l}}=\mathbf{\hat{y}}_i$, where $\mathbf{\hat{L}}$, $\mathbf{\hat{l}}$, and $\mathbf{\hat{y}}$ are obtained respectively by removing the last row from $\mathbf{l}$, $\mathbf{y}$, and last row and column from $\mathbf{L}$. We observe that $\mathbf{\hat{L}}$ is full rank and positive definite and hence is able to be decomposed using the Cholesky factorization, $\mathbf{\hat{L}=RR}^T$. Since $\mathbf{R}$ is lower-triangular, one solution of $\mathbf{\hat{L}\hat{l}}=\mathbf{RR}^T\mathbf{\hat{l}}=\mathbf{\hat{y}}_i$ can be efficiently obtained by two back-substitutions. After solving the reduced linear system, the solution to the original equation in step 2 is therefore $(\mathbf{l}_i^{*+})=[\mathbf{\hat{l}}_i^{*+},0]^T$. With the help of this technique, we are able to analyze datasets of a million rows and 10 thousand columns. 

@@ -1,0 +1,124 @@
+\section{Incorporation of Ontologies}
+
+Graphs are mathematical objects that enjoy wide-spread usage for many tasks, which include the visualization and analysis of data for humans, mathematical reasoning, and the implementation as a data structure for developing data mining algorithms. Besides the common graph-theoretic model of RDF as labeled, directed multi-graphs, Hayes has established that RDF can be also represented as hypergraphs (bipartite graphs)~\cite{GraphModelRDF}. This result constitutes an important aspect of the theoretical basis of this paper and is discussed in sections below. We propose to use the graph-based representation for RDF as a combined information source of both domain knowledge and data for mining semantic associations.
+
+We distinguish paths in the RDF bipartite graph by assigning weights to those paths that represent different semantic relationships such as class subsumption, part\_of, and other general or domain--specific properties.
+
+\begin{mydef}
+\emph{\textbf{(Data model for the combined RDF bipartite graph)}} The unified RDF bipartite graph of both data and ontology is defined as $G=\langle V_v \cup V_s, E \rangle$, where $V_v$ denotes value nodes corresponding to RDF components (subject, predicate, or object), and $V_s$ denotes statement nodes corresponding to RDF statements. More specifically, statement nodes can be further divided according to whether they are from data or ontology, i.e., $V_s=V_d \cup V_o$; the value nodes can be divided according to whether they represent rows or attributes in the data, i.e. $V_d=V_r \cup V_a$. The graph $G$ can be represented in a biadjacency matrix $\mathbf{M}$, where $\mathbf{M}(i,j)$ is non-zero if there is an edge between $\langle V_{v_i}, V_{s_j} \rangle$. For an unweighted graph, the value can be 0/1, while for a weighted graph, any non-negative value.
+\end{mydef}
+
+The biadjacency matrix $\mathbf{M}$ can be split into vertical stripes by statement nodes $V_s$. For example, according to Figure~\ref{fig:hypergraph-combined}(B), the bipartite graph corresponding to lower 8 RDF statements representing the underlying transaction table can be modeled as the matrix $\mathbf{M}_d$ in Equation~\ref{eq:Md} (RDF statement nodes are labeled $s_1\dots s_8$ respectively); and the bipartite graph corresponding to upper 4 statements (labeled $s_9\dots s_{12}$) representing the subsumption hierarchy in the ontology can be modeled as the matrix $\mathbf{M}_o$ in Equation~\ref{eq:Mo}.
+
+To obtain the biadjacency matrix $\mathbf{M}$ of the combined RDF bipartite graph in Figure~\ref{fig:hypergraph-combined}, we can simply concatenate $\mathbf{M}_d$ and $\mathbf{M}_o$ horizontally: $\mathbf{M}=\left[\mathbf{M}_d~\mathbf{M}_o\right]$. In general, If there are $k$ different semantic relationships in the ontology, $\mathbf{M}_o$ can be further divided into more vertical stripes $\mathbf{M}_{o_i}, i=1\dots k$, where $\mathbf{M}_{o_i}$ may represent, for example, the ``part\_of" lattice. Each $\mathbf{M}_{o_i}$ is  distinguished from another by the respective weight. In this case, $\mathbf{M}$ is the horizontal concatenation of all the weighted vertical stripes as shown in Equation~\ref{eq:horzcat}. After the concatenation, $\mathbf{M}$ can be represented as the form shown in Equation~\ref{striped_M}.
+
+%horizontal concatenation
+\begin{equation}\label{eq:horzcat}
+\mathbf{M} = \bigg[w_d\mathbf{M}_d ~~ w_{o_1}\mathbf{M}_{o_1} ~~ w_{o_2}\mathbf{M}_{o_2} ~~ \dots\bigg]
+\end{equation}
+
+\begin{equation}\label{eq:Md}
+\mathbf{M}_d=\begin{blockarray}{cccccc}
+                  ~     &  s_1  &  s_2  &  s_3  & \dots &  s_8  \cr
+            \begin{block}{c[ccccc]}
+                 r_1    &   1   &   1   &   0   &\multirow{4}{*}{\dots} &   0   \cr
+                 r_2    &   0   &   0   &   1   &       &   0   \cr
+                 r_3    &   0   &   0   &   0   &       &   0   \cr
+                 r_4    &   0   &   0   &   0   &       &   1   \cr
+                 %\cline{1-6}
+                  A     &   1   &   0   &   1   &\multirow{4}{*}{\dots} &   0   \cr
+                  B     &   0   &   1   &   0   &       &   0   \cr
+                  C     &   0   &   0   &   0   &       &   0   \cr
+                  D     &   0   &   0   &   0   &       &   1   \cr
+                  E     &   0   &   0   &   0   &       &   0   \cr
+            \end{block}
+        \end{blockarray}
+\end{equation}
+\begin{equation}\label{eq:Mo}
+\mathbf{M}_o=\begin{blockarray}{ccccc}
+            \begin{block}{c[cccc]}
+                  ~     &  s_9  & s_{10}& s_{11}& s_{12}\cr
+                 r_1    &   0   &   0   &   0   &   0   \cr
+                 r_2    &   0   &   0   &   0   &   0   \cr
+                 r_3    &   0   &   0   &   0   &   0   \cr
+                 r_4    &   0   &   0   &   0   &   0   \cr
+%                 \cline{1-5}
+                  A     &   1   &   0   &   0   &   0   \cr
+                  B     &   0   &   1   &   0   &   0   \cr
+                  C     &   1   &   1   &   1   &   0   \cr
+                  D     &   0   &   0   &   0   &   1   \cr
+                  E     &   0   &   0   &   1   &   1   \cr
+            \end{block}
+        \end{blockarray}
+\end{equation}
+
+
+
+
+\begin{equation}
+\label{striped_M}
+\mathbf{M}=\begin{blockarray}{ccccc}
+                ~ & ds & os_1 & os_2 & \dots \\
+            \begin{block}{c[c|c|c|c]}
+                r   &   \mathbf{M}_{dr}  &   \mathbf{0}   &   \mathbf{0}   &   \dots \\
+                \cline{2-5}
+                a   &   \mathbf{M}_{da}  &   \mathbf{O}_1 &   \mathbf{O}_2 &   \dots \\
+            \end{block}
+        \end{blockarray}
+\end{equation}
+
+By developing the unified representation for both data and domain knowledge, and utilizing ontology annotations, such as our results~\cite{LePendu2010}, we can produce one RDF hypergraph, which serves as the basis for perform semantic data mining in a systematic way. Given this, the main research challenge is how to utilize the data and ontology together for semantic data mining. In this paper, we focus on one fundamental data mining tasks, namely, the {\em association mining}. With additional information from ontology (domain knowledge), the unified RDF hypergraphs will enable us to discover hidden association between entities, between entities and ontological concepts, and between ontological concepts. Intuitively, these associations are defined in terms of the paths linking the nodes and the node labels should be taken into consideration as they represent different semantics.
+
+
+
+\subsection{Similarity Ranking by Random Walk with Restart}
+
+Similar to the relevance score~\cite{SunEtal05}, we believe that two items have a strong semantic association if they are related to many similar objects. We denote the similarity score between entities $e_1$ and $e_2$ by $s(e_1, e_2)$, where $s(e_1,e_2) \in [0, 1]$ and $s(e_1, e_2) = 1 \text{ if } e_1 = e_2$. Now the problem of ranking semantic associations in the unified graph can be described as follows:
+
+Given an attribute node $a$ in the unified graph $G = G_d \cup G_o$ and $a \in G_d \cap G_o$ we want to compute a similarity score $s(a, b)$ for all nodes $b(\neq a) \in G_d \cap G_o$. The result is a one-column vector containing all similarity scores of the entities with respect to $a$~\cite{Chen_tuplerank:ranking}. The motivation is to apply random walks with restart (RWR) from the given node $a$, and use the steady-state probability of each node at convergence as the similarity measure, i.e., the similarity score of node $b$ is defined as the probability of visiting $b$ via a random walk which starts from $a$ and goes back to $a$ with a probability $c$. In more detail, RWR in a bipartite graph works as follows: assume we have a random walker that starts from node $a$. For each step, the walker chooses randomly among the available edges from the current node it stays. After each iteration, with probability $c$, it resets its position back to node $a$. The final steady-state probability that the random walker reach node $b$ is the similarity score of L with respect to $a$: $s(a, b)$. We choose the random walk approach to compute the relevance score because it gives node $b$ high ranking if $b$ and $a$ are connected by many nodes; this is because the random walker has more paths to reach $b$ from $a$. The purpose of the periodic restart of the random walk is to raise the chance that close related nodes are visited more often than other nodes.
+
+In the following, we first propose an algorithm for random walk-based similarity ranking on a unified RDF bipartite graph. The algorithm can be used in such situations as, for example, if users are interested in products that are usually bought together in the same transactions by different customers, or common side effects of the same drugs prescribed to different patients, etc.
+
+Given the biadjacency matrix $\mathbf{M}$ in Equation~\ref{eq:horzcat} for the combined RDF bipartite graph $G$, we can construct the adjacency matrix $\mathbf{A}$ of $G$ as following:
+\[
+\mathbf{A}=\left[
+               \begin{array}{cc}
+                 \mathbf{0}   & \mathbf{M} \\
+                 \mathbf{M}^T & \mathbf{0} \\
+               \end{array}
+             \right]
+\]
+The probability of a random walker taking a particular edge $\langle a,b\rangle$ from a node $a$ while traversing the graph is proportional to the edge weight over the total weight of all outgoing edges from $a$, i.e., $P(a,b)=A(a,b)/\Sigma_{i=1}^{m+n}A(a,i)$. Therefore, the Markov transition matrix $P$ of $G$ is constructed as: $P=normc(A)$, where $normc(A)$ normalizes $A$ such that every column sum up to 1.
+
+First, we transform the input attribute node $a$ into a $(k+n) \times 1$ query vector $\mathbf{q}_a$ with 1 in the $a$-th row and 0 otherwise. Second, we need to compute the $(k+n)\times 1$ stead-state probability vector $\mathbf{u}_a$ over all nodes in $G$. Last we extract the probabilities of the row nodes as the similarity score vectors. Note that $\mathbf{u}_a$ can be computed by an iterated method from the following lemma.
+
+\begin{mylem}\label{lem:pi}
+Let $c$ be the probability of restarting random-walk from the node $a$. Then the steady-state probability vector $\mathbf{u}_a$ satisfies
+\begin{equation}
+\mathbf{u}_a=(1-c)P_A\mathbf{u}_a+c\mathbf{q}_a~.
+\end{equation}
+\end{mylem}
+
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+\begin{algorithm}
+\caption{Calculate Semantic Association}
+\label{alg1}
+\begin{algorithmic}
+\REQUIRE query attribute $a$, bipartite matrix $M$, restarting probability $c$, tolerant threshold $\epsilon$
+\ENSURE $y = x^n$
+\STATE $\mathbf{q}_a \Leftarrow \mathbf{0}$
+\STATE $\mathbf{q}_a(a)=1$ (set $a$-th element of $\mathbf{q}_a$ to 1)
+\WHILE{$|\Delta\mathbf{u}_a| > \epsilon$}
+\STATE \[
+    \mathbf{u}_a = (1-c)  \left[ \begin{array}{c}
+        normc(\mathbf{M})\mathbf{u}_a(k+1:k+n);\\
+        normc(\mathbf{M}^T)\mathbf{u}_a(1:k)
+    \end{array} \right] + c\mathbf{q}_a
+\]
+\ENDWHILE
+\RETURN $\mathbf{u}_a(1:k)$
+\end{algorithmic}
+\end{algorithm}
+
+The iterative update of $\mathbf{u}_a$ in the algorithm (inside the while loop) is modified from Lemma~\ref{lem:pi} while avoiding materializing $\mathbf{A}$ and $\mathbf{P}$ for scalability.
