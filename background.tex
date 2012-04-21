@@ -201,7 +201,7 @@ Formally, a hypergraph $G = (V,E)$, is a pair in which $V$ is the vertex set and
 	   0, & otherwise
 	   \end{array}\right.
 \end{equation}
-Throughout the rest of the paper, the diagonal matrix forms for $\delta(e)$, $w(e)$, $d(v)$ are denoted as $\mathbf{D}_e$, $\mathbf{W} \in \mathbb{R}^{|E|}$, and $\mathbf{D}_v \in \mathbb{Z}^{|V|}$, respectively.
+Throughout the rest of the dissertation, the diagonal matrix forms for $\delta(e)$, $w(e)$, $d(v)$ are denoted as $\mathbf{D}_e$, $\mathbf{W} \in \mathbb{R}^{|E|}$, and $\mathbf{D}_v \in \mathbb{Z}^{|V|}$, respectively.
 
 \section{Graphs in Data Mining}
 \subsection{Graph Representation of Relational Structure}
@@ -238,22 +238,7 @@ The Laplacian matrix $\mathbf{L}$ of a graph is widely used for finding many pro
 
 Various quantities derived from random walk on graph has been used in a number of applications. Fouss et al.~\cite{Fouss06random-walkcomputation} compared twelve scoring algorithms based on graph representation of the database to perform collaborative movie recommendation. Pan et al.~\cite{Pan} developed a similarity measure based on random walk steady state probability to discover correlation between multimedia objects containing data of various modalities. Yen et al.~\cite{Yen05clusteringusing} introduced a new k-means clustering algorithm utilizing the random walk average commute time distance. Zhou et al.~\cite{Zhou:2009:GCB:1687627.1687709} presented a unified framework based on neighborhood random walk to integrate structural and attribute similarities for graph clustering.
 
-\textbf{Random Walk on Hypergraph}
-\label{sec:rw_hyper}
-We can associate each hypergraph with a natural random walk which has the transition rule as
-described in~\cite{Zhou06learningwith}. Given the current position $u \in V$; first choose a hyperedge $e$ over all hyperedges
-incident with $u$ with the probability proportional to $w(e)$; and then choose a vertex $v \in e$
-uniformly at random. Obviously, it generalizes the natural random walk defined on simple
-graphs. Let $\mathbf{P}$ denote the transition probability matrix of this hypergraph random walk.
-Then each entry of $\mathbf{P}$ is
-\[
-p(u,v) = \sum_{e\in E}{w(e)\frac{h(u,e)}{d(u)}\frac{h(v,e)}{\delta(e)}}\, .
-\]
-In matrix notation, $\mathbf{P}=\mathbf{D}_v^{-1}\mathbf{HWD}_e^{-1}\mathbf{H}^T$.
-Zhou et al.~\cite{Zhou06learningwith} define the following normalized hypergraph Laplacian $\mathcal{L}$ based on the random walk model:
-\begin{align}
-\mathcal{L}=\mathbf{I}-\mathbf{\Theta},   ~\mathrm{where}~ \mathbf{\Theta}=\mathbf{D}_v^{-\frac12}\mathbf{HWD}_e^{-1}\mathbf{H}^T\mathbf{D}_v^{-\frac12} \label{eq:normalizedHyperL}.
-\end{align}
+
 
 \begin{comment}
 
