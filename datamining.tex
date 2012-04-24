@@ -21,8 +21,8 @@ The RDF bipartite graph introduced in~\ref{sec:graph-rep-for-rdb} comes to remed
 \caption{\label{fig:hg_and_rg} (a) an example transaction table; (b) the Gaifman graph representation of the table; (c) The hypergraph representation of the table}
 \end{figure*}
 
-
-\subsection{Similarity Measure}
+\section{Hypergraph-based Data Mining}
+\subsection{Graph-based similarity}
 %Sheth et al.~\cite{Sheth05semanticassociation} proposed a formalism for semantic association between entities in an RDF graph. Specifically, the semantic association is defined based on semantic connectivity which indicates if there exists a sequence of interconnected links between two given entities. In our study of semantically associated itemsets in transaction data, the link between entities is essentially the `co-occurrence' relationship. The semantic association according to Sheth et al's definition between transaction items $i_0$ and $i_n$ can be established by identifying a link of the form $i_0, P_c, i_1, P_c, \ldots, i_{n-1}, P_c, i_{n}$, in which $P_c$ denotes the co-occurrence property. The random walk model on hypergraph described in Section~\ref{sec:rw_hyper} formalizes this point of view. Our method for measuring the strength of semantic association is hence based on constructing a hypergraph representation and studying its property with both graph theoretical and spectral analysis techniques.
 
 %Connectivity query between two nodes are essential in numerous mining tasks. Sheth et al.~\cite{Sheth05semanticassociation} defined semantic connectivity in RDF graph as follows. Two entities $e_1$ and $e_n$ are semantically connected if there exists a sequence $e_1, P_1, e_2, P_2, e_3, \ldots, e_{n-1}, P_{n-1}, e_n$ in an RDF graph where $e_i$ are entities and $P_j$ are properties. A sequence of alternating entities and properties represents a semantic path. Fig.~\ref{fig:graphcomp}(B) shows the connectivity between nodes c, a, and e. Paths connecting these nodes are colored in blue.
@@ -44,8 +44,7 @@ The Laplacian matrix $\mathbf{L}$ of a graph is widely used for finding many pro
 
 Various quantities derived from random walk on graph has been used in a number of applications. Fouss et al.~\cite{Fouss06random-walkcomputation} compared twelve scoring algorithms based on graph representation of the database to perform collaborative movie recommendation. Pan et al.~\cite{Pan} developed a similarity measure based on random walk steady state probability to discover correlation between multimedia objects containing data of various modalities. Yen et al.~\cite{Yen05clusteringusing} introduced a new k-means clustering algorithm utilizing the random walk average commute time distance. Zhou et al.~\cite{Zhou:2009:GCB:1687627.1687709} presented a unified framework based on neighborhood random walk to integrate structural and attribute similarities for graph clustering.
 
-\section{Hypergraph-based Data Mining}
-\subsection{Graph-based similarity}
+
 \begin{figure}[tbh]
 \centering
 \includegraphics[width=.4\textwidth]{fig/comm-dist-demo.eps}
