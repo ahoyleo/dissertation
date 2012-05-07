@@ -40,6 +40,8 @@
 \newtheorem{mylem}{Lemma}[section]
 \renewcommand{\algorithmicrequire}{\textbf{Input:}}
 \renewcommand{\algorithmicensure}{\textbf{Output:}}
+%remove the chapter number before section numbers
+\renewcommand*\thesection{\arabic{section}.}
 \newcommand\T{\rule{0pt}{2.6ex}}
 \newcommand\B{\rule[-1.2ex]{0pt}{0pt}}
 \DeclareMathOperator*{\argmin}{arg\,min}
@@ -138,11 +140,11 @@
 \input{discussion}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%\chapter{CONCLUSION} % and/or future work
-%\label{chap:conclusion}
-%\input{conclusion}
-%
+
+\chapter{CONCLUSION} % and/or future work
+\label{chap:conclusion}
+\input{conclusion}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %APPENDICES

@@ -11,14 +11,14 @@ In the synthetic dataset, we generated values for each attribute in such a way t
 \begin{figure*}[tbh]
 \begin{center}
 \begin{tabular}{ccc}
-\includegraphics[scale=0.112]{fig/clusters.eps} &
-\includegraphics[scale=0.112]{fig/clusters4.eps} &
-\includegraphics[scale=0.112]{fig/clusters3.eps} \\
+\includegraphics[scale=0.14]{fig/clusters.eps} &
+\includegraphics[scale=0.14]{fig/clusters4.eps} &
+\includegraphics[scale=0.14]{fig/clusters3.eps} \\
 $a_1$ --- range: [-4.74, 4.74] & $a_3$ --- range: [-4.61, 4.61] & $a_2$ --- range: [-4.02, 4.02] \\
 $\mu$: 0, $\sigma$:2.26 &$\mu$: 0, $\sigma$:2.30 & $\mu$: 0, $\sigma$:2.18 \\
-\includegraphics[scale=0.112]{fig/clusters21.eps} &
-\includegraphics[scale=0.112]{fig/clusters23.eps} &
-\includegraphics[scale=0.112]{fig/clusters22.eps} \\
+\includegraphics[scale=0.14]{fig/clusters21.eps} &
+\includegraphics[scale=0.14]{fig/clusters23.eps} &
+\includegraphics[scale=0.14]{fig/clusters22.eps} \\
 $a_1'$ --- range: [-5.72, 5.72] & $a_3'$ --- range: [-5.24, 5.24] & $a_2'$ --- range: [-4.25, 4.25] \\
 $\mu$: 0, $\sigma$:2.20 & $\mu$: 0, $\sigma$:2.35 & $\mu$: 0, $\sigma$:2.15 \\
 \end{tabular}
@@ -30,7 +30,7 @@ $\mu$: 0, $\sigma$:2.20 & $\mu$: 0, $\sigma$:2.35 & $\mu$: 0, $\sigma$:2.15 \\
 Figure~\ref{fig:syn_pareto} illustrates the Pareto front obtained from matching two synthetic datasets, each having 20 attributes and 5 clusters. Most notably, the gold standard results for both attribute matching and cluster matching are obtained from the left-most point on the Pareto front. In other words, given the decision variables ($X$) corresponding to that point, we obtained 100\% correct matching results. We further observed that in our subsequent tests on other synthetic datasets with varied number of attributes and clusters, the derived Pareto fronts all contain gold standard result, and the point corresponding to the gold standard can always be found towards the minimum end of $f_a$. Given this, we propose the following method to reduce the Pareto-optimal set to a single point corresponding to the most favored choice ($X^*$) in the decision space. The idea is to find the decision with the minimum weighted sum of objective values in the obtained Pareto-optimal set, i.e., $X^*=\stackbin[X]{}{\argmin}~\big[\alpha f_a(X)+\beta f_c(X)\big]$, where $\alpha$ and $\beta$ are weights. We first conducted preliminary experiments to determine the best values for $\alpha$ and $\beta$ (0.8 and 0.2 respectively) and used them in all subsequent experiments. This method works markedly well on the synthetic datasets. For all the tests described in Table~\ref{tbl:scale}, 100\% correct results for both attribute and cluster matchings are obtained (hence we omit the precision in the table).
 \begin{figure}[tb]
 \begin{center}
-\includegraphics[width=0.4\textwidth]{fig/syn_pareto.eps}
+\includegraphics[width=0.6\textwidth]{fig/syn_pareto.eps}
 \end{center}
 \caption{\label{fig:syn_pareto} An example Pareto front obtained from matching two synthetic datasets with 20 attributes and 5 clusters.}
 \end{figure}
@@ -159,28 +159,25 @@ The number of population kept in each generation is an important parameter regar
 
 \begin{table*}[tbh]
 \begin{center}
-\begin{tabular}{l|l|l|l|l|l|l|l}
+\begin{tabular}{l||l|l||l|l}
 \hline
-\multicolumn{2}{c|}{}		&	fixed acidity	&	volatile acidity	&	citric acid	&	residual sugar	&	chlorides	&	free sulfur dioxide	\\
+ & \multicolumn{2}{c||}{mean} & \multicolumn{2}{c}{stdev}\\
+\cline{2-5}
+ & data1 & data2 & data1 & data2\\
 \hline
-\multirow{2}{*}{mean}	&	data1	&	6.86	&	0.28	&	0.34	&	6.35	&	0.05	&	35.58	\\
-	&	data2	&	6.85	&	0.28	&	0.33	&	6.43	&	0.05	&	35.02	\\
 \hline
-\multirow{2}{*}{stdev}	&	data1	&	0.84	&	0.1	&	0.12	&	4.98	&	0.02	&	16.4	\\
-	&	data2	&	0.86	&	0.1	&	0.12	&	5.16	&	0.02	&	17.61	\\
-
-\hline
-\end{tabular}
-\begin{tabular}{l|l|l|l|l|l|l|l}
-\hline
-\multicolumn{2}{c|}{}		&	total sulfur dioxide	&	density	&	pH	&	sulphates	&	alcohol	&	quality	\\
-\hline
-\multirow{2}{*}{mean}	&	data1	&	138.98	&	0.99	&	3.19	&	0.49	&	10.53	&	5.88	\\
-	&	data2	&	137.68	&	0.99	&	3.19	&	0.49	&	10.49	&	5.88	\\
-\hline
-\multirow{2}{*}{stdev}	&	data1	&	41.86	&	0.02	&	0.16	&	0.11	&	1.25	&	0.89	\\
-	&	data2	&	43.18	&	0	&	0.15	&	0.12	&	1.22	&	0.89	\\
-
+fixed acidity & 6.86 & 6.85 & 0.84 & 0.86\\
+volatile acidity & 0.28 & 0.28 & 0.1 & 0.1\\
+citric acid & 0.34 & 0.33 & 0.12 & 0.12\\
+residual sugar & 6.35 & 6.43 & 4.98 & 5.16\\
+chlorides & 0.05 & 0.05 & 0.02 & 0.02\\
+free sulfur diocide & 35.58 & 35.02 & 16.4 & 17.61\\
+total sulfur dioxide & 138.98 & 137.68 & 41.86 & 43.18\\
+density & 0.99 & 0.99 & 0.02 & 0\\
+pH & 3.19 & 3.19 & 0.16 & 0.15\\
+sulphates & 0.49 & 0.49 & 0.11 & 0.12\\
+alcohol & 10.53 & 10.49 & 1.25 & 1.22\\
+quality & 5.88 & 5.88 & 0.89 & 0.89\\
 \hline
 \end{tabular}
 \end{center}
@@ -194,11 +191,14 @@ We then apply the proposed method with MOSA and MOGA as metaheuristics respectiv
 
 \begin{table*}[tbh]
 \begin{center}
-\begin{tabular}{l|l|l|l}
+\begin{tabular}{c || c | c}
 \hline
-MOSA accuracy (\%)	&	MOSA running time (ms)	&	MOGA accuracy (\%)	&	MOGA running time (ms)	\\
+& accuracy (\%)	&	running time (ms)	\\
 \hline
-95.5	&	517	&	92.3	&	3356	\\
+\hline
+MOSA	&	95.5	&	517	\\
+\hline
+MOGA	&	92.3	&	3356\\
 \hline
 \end{tabular}
 \end{center}
@@ -476,24 +476,47 @@ In Table~\ref{tbl:foodmart_comp}, results of items ranked by the strength of sem
 
 \begin{table*}[tbh]\scriptsize
 \begin{center}
-\begin{tabular}{ c c || c c || c c || c c || c c }
+\begin{tabular}{ c c || c c || c c }
 \hline
-\multicolumn{2}{c||}{w/ data only}&\multicolumn{2}{c||}{w/ onto only}&\multicolumn{2}{c||}{$w_o=1$, $w_d=1$}&\multicolumn{2}{c||}{$w_o=10$, $w_d=1$}&\multicolumn{2}{c}{$o_w=20$, $o_d=1$}\\
+\multicolumn{2}{c||}{w/ data only}&\multicolumn{2}{c||}{w/ onto only}&\multicolumn{2}{c||}{$w_o=1$, $w_d=1$}\\
 \hline
-item	&	p(\%)	&	item	&	p(\%)	&	item	&	p(\%)	&	item	&	p(\%)	&	item	&	p(\%)	\\
+item	&	p(\%)	&	item	&	p(\%)	&	item	&	p(\%)	\\
 \hline																			
-Soup	&	0.42	&	PersonalHygiene	&	12.55	&	PersonalHygiene	&	0.74	&	PersonalHygiene	&	3.97	&	 PersonalHygiene	&	 6.27	\\
-Cookies	&	0.41	&	Snack	&	0.86	&	Soup	&	0.41	&	NasalSprays	&	0.41	&	NasalSprays	&	0.5	\\
-NasalSprays	&	0.38	&	Health	&	0.64	&	Cookies	&	0.4	&	Soup	&	0.34	&	Mouthwash	&	0.41	\\
-Popcorn	&	0.32	&	Sponges	&	0.57	&	NasalSprays	&	0.37	&	Cookies	&	0.34	&	Shampoo	&	0.31	\\
-PaperWipes	&	0.29	&	Soap	&	0.57	&	Popcorn	&	0.31	&	Mouthwash	&	0.3	&	Soup	&	0.29	\\
-FrozenVegetables	&	0.29	&	Shampoo	&	0.57	&	FrozenVegetables	&	0.29	&	Popcorn	&	0.25	&	Cookies	&	 0.29	 \\
-PersonalHygiene	&	0.26	&	NasalSprays	&	0.57	&	PaperWipes	&	0.28	&	FrozenVegetables	&	0.24	&	Sponges	&	 0.28	 \\
-DriedFruit	&	0.25	&	Mouthwash	&	0.57	&	DriedFruit	&	0.25	&	PaperWipes	&	0.23	&	Health	&	0.27	 \\
-Milk	&	0.25	&	Conditioner	&	0.57	&	Milk	&	0.25	&	DriedFruit	&	0.22	&	Conditioner	&	0.27	\\
-Mouthwash	&	0.24	&	MealCourse	&	0.54	&	Mouthwash	&	0.23	&	Milk	&	0.21	&	Soap	&	0.25	\\
+Soup	&	0.42	&	PersonalHygiene	&	12.55	&	PersonalHygiene	&	0.74	\\
+Cookies	&	0.41	&	Snack	&	0.86	&	Soup	&	0.41	\\
+NasalSprays	&	0.38	&	Health	&	0.64	&	Cookies	&	0.4	\\
+Popcorn	&	0.32	&	Sponges	&	0.57	&	NasalSprays	&	0.37	\\
+PaperWipes	&	0.29	&	Soap	&	0.57	&	Popcorn	&	0.31	\\
+FrozenVegetables	&	0.29	&	Shampoo	&	0.57	&	FrozenVegetables	&	0.29	 \\
+PersonalHygiene	&	0.26	&	NasalSprays	&	0.57	&	PaperWipes	&	0.28	 \\
+DriedFruit	&	0.25	&	Mouthwash	&	0.57	&	DriedFruit	&	0.25	 \\
+Milk	&	0.25	&	Conditioner	&	0.57	&	Milk	&	0.25	\\
+Mouthwash	&	0.24	&	MealCourse	&	0.54	&	Mouthwash	&	0.23	\\
 \hline
-\multicolumn{2}{c}{(A)}  &   \multicolumn{2}{c}{(B)}  &   \multicolumn{2}{c}{(C)}  &   \multicolumn{2}{c}{(D)}  &  \multicolumn{2}{c}{(E)}  \\
+\multicolumn{6}{c}{~}\\
+\multicolumn{2}{c}{(A)}  &   \multicolumn{2}{c}{(B)}  &   \multicolumn{2}{c}{(C)}  \\
+\multicolumn{6}{c}{~}\\
+\end{tabular}
+
+\begin{tabular}{ c c || c c }
+\hline
+\multicolumn{2}{c||}{$w_o=10$, $w_d=1$}&\multicolumn{2}{c}{$o_w=20$, $o_d=1$}\\
+\hline
+item	&	p(\%)	&	item	&	p(\%)	\\
+\hline																			
+PersonalHygiene	&	3.97	&	 PersonalHygiene	&	6.27	\\
+NasalSprays	&	0.41	&	NasalSprays	&	0.5	\\
+Soup	&	0.34	&	Mouthwash	&	0.41	\\
+Cookies	&	0.34	&	Shampoo	&	0.31	\\
+Mouthwash	&	0.3	&	Soup	&	0.29	\\
+Popcorn	&	0.25	&	Cookies	&	0.29	 \\
+FrozenVegetables	&	0.24	&	Sponges	&	0.28	 \\
+PaperWipes	&	0.23	&	Health	&	0.27	 \\
+DriedFruit	&	0.22	&	Conditioner	&	0.27	\\
+Milk	&	0.21	&	Soap	&	0.25	\\
+\hline
+\multicolumn{4}{c}{~}\\
+\multicolumn{2}{c}{(D)}  &  \multicolumn{2}{c}{(E)}  \\
 \end{tabular}
 \end{center}
 \caption{\label{tbl:foodmart_comp} Foodmart items ranked by the strength of semantic association (i.e., $p(\%)$, the steady-state probability).}
@@ -557,16 +580,16 @@ Before studying the drug-disease association, we carried out a similar test to t
 \hline
 p(\%)	&	item	&	p(\%)	&	item	&	p(\%)	&	item	\\
 \hline
-1.1132	&	pseudoisocytidine	&	1.4687	&	oral form rofecoxib	&	1.3535	&	oral form rofecoxib	\\
-1.1113	&	dimetpramid	&	1.1638	&	rofecoxib 50 mg oral tablet	&	1.0705	&	rofecoxib 50 mg oral tablet	\\
-1.1112	&	quinalphos	&	1.1638	&	rofecoxib 12.5 mg oral tablet	&	1.0705	&	rofecoxib 12.5 mg oral tablet	\\
-1.1103	&	retinol o-fatty-acyltransferase	&	1.1638	&	rofecoxib 25 mg oral tablet	&	1.0705	&	rofecoxib 25 mg oral tablet	 \\
-1.1102	&	trimethylaminobutyrate	&	1.0762	&	cyclooxygenase 2 inhibitors	&	0.8561	&	cyclooxygenase 2 inhibitors	\\
-1.1100	&	fungiqual	&	0.7812	&	duplicate concept	&	0.7952	&	social control policies	\\
-1.1090	&	chemoembolization, therapeutic	&	0.6390	&	rofecoxib 2.5 mg/ml oral suspension	&	0.7922	&	dimetpramid	\\
-1.1088	&	social control policies	&	0.6390	&	rofecoxib 5 mg/ml oral suspension	&	0.7920	&	quinalphos	\\
-1.1088	&	insulin	&	0.5682	&	cyclooxygenase inhibitors	&	0.7917	&	trimethylaminobutyrate	\\
-1.1082	&	2-...hexanoic acid	&	0.5487	&	r [preparations]	&	0.7916	&	pseudoisocytidine	\\
+1.11	&	pseudoisocytidine				&	1.46	&	oral form rofecoxib				&	1.35	&	oral form rofecoxib	\\
+1.11	&	dimetpramid						&	1.16	&	rofecoxib 50 mg oral tablet		&	1.07	&	rofecoxib 50 mg oral tablet	\\
+1.11	&	quinalphos						&	1.16	&	rofecoxib 12.5 mg oral tablet	&	1.07	&	rofecoxib 12.5 mg oral tablet	\\
+1.11	&	retinol o-fatty-acyltransferase	&	1.16	&	rofecoxib 25 mg oral tablet		&	1.07	&	rofecoxib 25 mg oral tablet	 \\
+1.11	&	trimethylaminobutyrate			&	1.07	&	cyclooxygenase 2 inhibitors		&	0.85	&	cyclooxygenase 2 inhibitors	\\
+1.11	&	fungiqual						&	0.78	&	duplicate concept				&	0.79	&	social control policies	\\
+1.10	&	chemoembolization, therapeutic	&	0.63	&	rofecoxib 2.5 oral suspension	&	0.79	&	dimetpramid	\\
+1.10	&	social control policies			&	0.63	&	rofecoxib 5 oral suspension		&	0.79	&	quinalphos	\\
+1.10	&	insulin							&	0.56	&	cyclooxygenase inhibitors		&	0.79	&	trimethylaminobutyrate	\\
+1.10	&	2-...hexanoic acid				&	0.54	&	r [preparations]				&	0.79	&	pseudoisocytidine	\\
 \hline
 \end{tabular}
 \end{center}

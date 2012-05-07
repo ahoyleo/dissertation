@@ -2,13 +2,13 @@
 %\documentclass[dissertation,justified,copyright,draftimages,final,numbers,sort&compress,gsmodern]{uothesis}
 
 %right ragged final
-%\documentclass[dissertation,copyright,draftimages,final,numbers,sort&compress,gsmodern]{uothesis}
+\documentclass[dissertation,copyright,draftimages,final,numbers,sort&compress,gsmodern]{uothesis}
 
 %draftcopy
 %\documentclass[dissertation,copyright,draftimages,draftcopy,numbers,sort&compress,gsmodern]{uothesis}
 
 %committeedraft
-\documentclass[dissertation,copyright,committeedraft,numbers,sort&compress,gsmodern]{uothesis}
+%\documentclass[dissertation,copyright,committeedraft,numbers,sort&compress,gsmodern]{uothesis}
 
 \usepackage[english,UKenglish]{babel}
 \usepackage{hyperref}
@@ -40,6 +40,8 @@
 \newtheorem{mylem}{Lemma}[section]
 \renewcommand{\algorithmicrequire}{\textbf{Input:}}
 \renewcommand{\algorithmicensure}{\textbf{Output:}}
+%remove the chapter number before section numbers
+\renewcommand*\thesection{\arabic{section}.}
 \newcommand\T{\rule{0pt}{2.6ex}}
 \newcommand\B{\rule[-1.2ex]{0pt}{0pt}}
 \DeclareMathOperator*{\argmin}{arg\,min}
@@ -88,7 +90,7 @@
 
 %Main Document
 \begin{document}
-\input{datamining}
+\input{casestudy}
 \bibliographystyle{unsrtnat}
 \bibliography{haishan,thesis}
 
