@@ -66,11 +66,7 @@ Various quantities derived from random walk on graph has been used in a number o
 
 \textbf{Random Walk on Hypergraph}
 \label{sec:rw_hyper}
-We can associate each hypergraph with a natural random walk which has the transition rule as
-described in~\cite{Zhou06learningwith}. Given the current position $u \in V$; first choose a hyperedge $e$ over all hyperedges
-incident with $u$ with the probability proportional to $w(e)$; and then choose a vertex $v \in e$
-uniformly at random. Obviously, it generalizes the natural random walk defined on simple
-graphs. Let $\mathbf{P}$ denote the transition probability matrix of this hypergraph random walk.
+We can associate each hypergraph with a natural random walk which has the transition rule as described in~\cite{Zhou06learningwith}. Given the current position $u \in V$; first choose a hyperedge $e$ over all hyperedges incident with $u$ with the probability proportional to $w(e)$; and then choose a vertex $v \in e$ uniformly at random. Obviously, it generalizes the natural random walk defined on simple graphs. Let $\mathbf{P}$ denote the transition probability matrix of this hypergraph random walk.
 Then each entry of $\mathbf{P}$ is
 \[
 p(u,v) = \sum_{e\in E}{w(e)\frac{h(u,e)}{d(u)}\frac{h(v,e)}{\delta(e)}}\, .
