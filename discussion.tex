@@ -1,5 +1,6 @@
 \section{Hypergraph-based Methods for Clustering and Classification}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+We have presented the graph-based semantic data mining framework for representing both data and ontologies using RDF-bipartite graph and focused on describing the techniques for mining frequent patterns based on such graphs. The details of some case studies that have validated the hypotheses used in designing the framework. In this chapter, we introduce methods to tackle two other important data mining tasks, namely, clustering analysis and classification, based on the RDF-bipartite graph.
 
 \textbf{Classification}:
 In classification, the goal is to find the correct labels for the unlabeled instances given a finite set of labeled instances. In Figure~\ref{fig:bipartitegraph-weighted}, the leftmost partition corresponds to rows in the underlying relational table. Suppose a subset of vertices are labeled (\eg, $r_1$ is labeled $l_1$ and $r_4$ is labeled $l_2$), then the classification problem can be formulated as to discover correct labels for unlabeled vertices (\eg, $r_1$ and $r_3$). Conceptually, the pair of nodes being ``close to'' one another shall share the same labels, which are consistent to one basic principle of  semi-supervised learning. However, the challenge is how can we define the closeness between two nodes. We can still rely on the paths linking them where the path length becomes an important measure as well as the node labels.
@@ -54,4 +55,4 @@ where $I$ is the identity matrix. Here, $D_v$ and $D_e$ are used for computing t
 \begin{equation}
 \notag \sum_{u\in V}(f(u)-y(u))^2=\|f-y\|^2
 \end{equation}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
