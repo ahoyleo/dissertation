@@ -94,7 +94,7 @@ where subjects and objects are represented as nodes, and predicates as edges. Th
 (A) & & (B)\\
 \end{tabular}
 \end{center}
-\caption{\label{fig:graphcomp} An example of nodes connected by different links and some relationship between the links, represented by A) a simple graph, and B) a hypergraph.}
+\caption[A comparison between a simple graph and a hypergraph]{\label{fig:graphcomp} An example of nodes connected by different links and some relationship between the links, represented by A) a simple graph, and B) a hypergraph.}
 \end{figure}
 
 \begin{myexp}[\textbf{Inconsistent representation of RDF directed labeled model}]
@@ -137,7 +137,7 @@ Let the sets $V$ and $E$ are the partitions of $BG$. The node pair $(v_1, e_1)$ 
 \begin{minipage}[c]{0.38\textwidth}\centering
 \includegraphics[width=.7\textwidth]{fig/BG-black.eps}
 \end{minipage}
-\caption{\label{fig:incidence}Incidence matrix representing the hypergraph of figure~\ref{fig:graphcomp}(B) and the corresponding incidence graph.}
+\caption[An example incidence matrix of a hypergraph]{\label{fig:incidence}Incidence matrix representing the hypergraph of figure~\ref{fig:graphcomp}(B) and the corresponding incidence graph.}
 \end{figure}
 
 RDF bipartite graphs have many desirable properties for developing intuitive mining algorithms. Thus, the we propose to use bipartite graphs to represent domain knowledge and data expressed in RDF.
@@ -167,7 +167,7 @@ Figure~\ref{fig:graphcomp-bio} illustrates an example of RDF hypergraph represen
 \begin{minipage}[c]{0.6\textwidth}\centering
 \includegraphics[width=\textwidth]{fig/BG-bio.eps}\\
 \end{minipage}
-\caption{\label{fig:graphcomp-bio} A portion of a zebrafish anatomy ontology represented as a directed labeled graph (A) and a RDF bipartite graph (B)}
+\caption[A comparison between the directed labeled graph and the RDF bipartite graph]{\label{fig:graphcomp-bio} A portion of a zebrafish anatomy ontology represented as a directed labeled graph (A) and a RDF bipartite graph (B)}
 \end{figure}
 
 \section{Graph Representation for Relational Structure}
@@ -226,14 +226,14 @@ $r_m:$	& $v_{m1}$	& $\cdots$  & $v_{mn}$\\
 \begin{minipage}[c]{0.4\linewidth}\centering
 \vspace{0.2cm}\hspace{3.5cm}(B)
 \end{minipage}
-\caption{\label{tbl:nominal-rel} An example of a relational table with nominal features (A) and its corresponding RDF triple form (B).}
+\caption[An example relational table with nominal features and the corresponding RDF]{\label{tbl:nominal-rel} An example of a relational table with nominal features (A) and its corresponding RDF triple form (B).}
 \end{table}
 
 \begin{figure}[tbh]
 \begin{center}
 \includegraphics[width=.5\textwidth]{fig/BG-relational-nominal.eps}
 \end{center}
-\caption{\label{fig:BG-relational-nominal} }
+\caption[The RDF bipartite graph for a nominal-valued table]{\label{fig:BG-relational-nominal} The RDF bipartite graph based on RDF triples in Table~\ref{tbl:nominal-rel} (B).}
 \end{figure}
 
 For relational tables with binary (boolean) features, the RDF representation can be more compact. In some applications, only cells with positive (``1") values are of interest. In this case, an auxiliary predicate can be introduced to link a row and positive cell values in that row.
@@ -381,7 +381,7 @@ $r_m:$ & 0 & 1 & 0 & 0 & 1 & 0 & 0 & 1 \\
 \multicolumn{3}{c}{(C)}\\
 \end{tabular}
 \end{minipage}
-\caption{\label{tbl:nominal-rel-expansion} An example nominal-valued relational table after nominal value expansion. (A) shows the original table where O stands for ``outlook", T for ``temperature" and "H" for humidity. (B) shows the expanded table. (C) shows the corresponding RDF triples derived from (B).}
+\caption[Nominal value expansion for an example relational table and the resulting RDF triples.]{\label{tbl:nominal-rel-expansion} An example nominal-valued relational table after nominal value expansion. (A) shows the original table where O stands for ``outlook", T for ``temperature" and "H" for humidity. (B) shows the expanded table. (C) shows the corresponding RDF triples derived from (B).}
 \end{table}
 
 \section{Combining Data Graphs and Ontology Graphs}
@@ -427,7 +427,7 @@ Edges and statement nodes in Figure~\ref{fig:bipartitegraph-weighted} are depict
 \begin{minipage}[c]{0.4\linewidth}\centering
 \vspace{0.2cm}\hspace{4cm}(B)
 \end{minipage}
-\caption{\label{fig:onto-and-data} An example of a binary-valued relational table (B) about five concepts (``A"--``E"), and the ontological relationship among these concepts shown as a directed graph (A).}
+\caption[A example relational table and a domain ontology]{\label{fig:onto-and-data} An example of a binary-valued relational table (B) about five concepts (``A"--``E"), and the ontological relationship among these concepts shown as a directed graph (A).}
 \end{figure}
 
 \begin{figure}[tbh]
@@ -452,14 +452,14 @@ Edges and statement nodes in Figure~\ref{fig:bipartitegraph-weighted} are depict
 (A) & (B)\\
 \end{tabular}
 \end{center}
-\caption{\label{fig:hypergraph-combined} The RDF bipartite graph representation (A) given triples shown in (B) based on the information described in Figure~\ref{fig:onto-and-data}.}
+\caption[The RDF bipartite graph for the combined representation of both the data and the ontology]{\label{fig:hypergraph-combined} The RDF bipartite graph representation (A) given triples shown in (B) based on the information described in Figure~\ref{fig:onto-and-data}.}
 \end{figure}
 
 \begin{figure}[tbh]
 \begin{center}
 \includegraphics[width=.6\textwidth]{fig/hypergraph_mining-bipartite-weighted.eps}
 \end{center}
-\caption{\label{fig:bipartitegraph-weighted} This figure show that, grouping the nodes according to whether they are row elements or column elements in Figure~\ref{fig:onto-and-data} (B), the bipartite graph shown in Figure~\ref{fig:hypergraph-combined} (A) can be further transformed to a tripartite graph.}
+\caption[Transforming the RDF bipartite graph to suit mining need]{\label{fig:bipartitegraph-weighted} This figure shows that, grouping the nodes according to whether they are row elements or column elements in Figure~\ref{fig:onto-and-data} (B), the bipartite graph shown in Figure~\ref{fig:hypergraph-combined} (A) can be further transformed to a tripartite graph.}
 \end{figure}
 
 \subsection{Representing Different Kinds of Ontological Semantics}
@@ -477,5 +477,5 @@ Figure~\ref{fig:hypergraph_mining-comp} shows an example of RDF bipartite graph 
 \begin{center}
 \includegraphics[width=.65\textwidth]{fig/hypergraph_mining-comp.eps}
 \end{center}
-\caption{\label{fig:hypergraph_mining-comp} }
+\caption[An example RDF bipartite graph that represents various semantic relationships]{\label{fig:hypergraph_mining-comp} An example RDF bipartite graph that represents various semantic relationships.}
 \end{figure}
