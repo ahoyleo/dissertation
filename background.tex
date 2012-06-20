@@ -174,7 +174,7 @@ The following example illustrates this point of view.
 (A) & (B)\\
 \end{tabular}
 \end{center}
-\caption{\label{fig:graphcomp} An example of nodes connected by different links and some relationship between the links, represented by A) a simple graph, and B) a hypergraph.}
+\caption[An example of the simple graph compared to the hypergraph representation.]{\label{fig:graphcomp} An example of nodes connected by different links and some relationship between the links, represented by A) a simple graph, and B) a hypergraph.}
 \end{figure}
 
 In this example, two different levels of information are expressed. At the data level, the following statements describe the relationship between nodes representing people: $\langle a~ col~ b\rangle$, $\langle b~ coa~ c\rangle$, $\langle a~ inf~ d\rangle$ and $\langle d~ fri~ e\rangle$. At the schema level, another statement asserting that $coa$ is a sub-property of $col$: $\langle coa~ subP~ col\rangle$. In this case, $col$ and $coa$ become both nodes and edges in the directed labeled graph, causing the inconsistency (as depicted in Fig.~\ref{fig:graphcomp}(A). One way to overcome this is to model RDF as a hypergraph.
@@ -211,7 +211,7 @@ An object set endowed with pairwise relationships can be naturally illustrated a
 \begin{center}
 \includegraphics[width=.8\textwidth]{fig/hg_and_rg1.eps}
 \end{center}
-\caption{\label{fig:hg_and_rg} (a) an example transaction table; (b) the Gaifman graph representation of the table; (c) The hypergraph representation of the table}
+\caption[An example of simple graph vs. hypergraph for representing a relational table.]{\label{fig:hg_and_rg} (a) an example transaction table; (b) the Gaifman graph representation of the table; (c) The hypergraph representation of the table}
 \end{figure*}
 
 A natural way to remedy the ambiguity is to represent the relational data as a \emph{hypergraph}~\cite{Hypergraph}. A hypergraph is a generalization of traditional graph. An edge in the hypergraph, called hyperedge, can connect more than two vertices. In other words, every hyperedge is an arbitrary nonempty subset of vertices. It is obvious that a simple graph is a special kind of hypergraph with each hyperedge containing only two vertices. In this paper, we propose to employ hypergraphs to model relational structure for finding semantically associated itemsets. Specifically, we propose to construct a hyperedge for each tuple. The relational attributes constitute the universe of vertices in the hypergraph. In this representation, each hyperedge has an exact one-to-one correspondent tuple (see Figure~\ref{fig:hg_and_rg}(c), for example).

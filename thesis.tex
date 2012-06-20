@@ -2,13 +2,13 @@
 %\documentclass[dissertation,justified,copyright,draftimages,final,numbers,sort&compress,gsmodern]{uothesis}
 
 %right ragged final
-%\documentclass[dissertation,copyright,draftimages,final,numbers,sort&compress,gsmodern]{uothesis}
+\documentclass[dissertation,copyright,draftimages,final,numbers,sort&compress,gsmodern]{uothesis}
 
 %draftcopy
 %\documentclass[dissertation,copyright,draftimages,draftcopy,numbers,sort&compress,gsmodern]{uothesis}
 
 %committeedraft
-\documentclass[dissertation,copyright,committeedraft,numbers,sort&compress,gsmodern]{uothesis}
+%\documentclass[dissertation,copyright,committeedraft,numbers,sort&compress,gsmodern]{uothesis}
 
 \usepackage[english,UKenglish]{babel}
 \usepackage{hyperref}
@@ -33,11 +33,10 @@
 %\input{custom_cmds.tex}
 
 \theoremstyle{definition}
-\newtheorem{myexp}{Example}[section]
-\theoremstyle{definition}
-\newtheorem{mydef}{Definition}[section]
-\newtheorem{mythm}{Theorem}[section]
-\newtheorem{mylem}{Lemma}[section]
+\newtheorem{mydef}{Definition}[chapter]
+\newtheorem{myexp}[mydef]{Example}
+\newtheorem{mythm}{Theorem}[chapter]
+\newtheorem{mylem}{Lemma}[chapter]
 \renewcommand{\algorithmicrequire}{\textbf{Input:}}
 \renewcommand{\algorithmicensure}{\textbf{Output:}}
 %remove the chapter number before section numbers
@@ -122,6 +121,11 @@
 \input{datamining}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{GRAPH-BASED DATA MINING WITH ONTOLOGIES}
+\label{chap:miningWithOnto}
+\input{dataminingWithOnto}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %\chapter{INCORPORATION OF PRIOR KNOWLEDGE}
 %\label{chap:incorpont}
@@ -129,9 +133,9 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{CASE STUDY}
-\label{chap:casestudy}
-\input{casestudy}
+%\chapter{CASE STUDY}
+%\label{chap:casestudy}
+%\input{casestudy}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -155,4 +159,4 @@
 \bibliographystyle{unsrtnat}
 \bibliography{haishan,thesis}
 
-\end{document}
+\end{document} 

@@ -8,7 +8,7 @@ Semantic annotation is crucial in realizing semantic data mining by bridging for
 \begin{center}
 \includegraphics[width=\textwidth, trim=0 7cm 0 6cm, clip=true]{fig/thesis-semantic-annotation-workflow.eps}
 \end{center}
-\caption{\label{fig:annotation-workflow} Data stored in different sources (e.g., relational databases, spreadsheets, texts etc) are semantically annotated. The output is in RDF format where elements of data are linked to formal semantic descriptions in ontologies. Annotated data and ontologies together are then represented in a unified graph representation for subsequent analysis in semantic data mining.}
+\caption[Semantic annotation in the workflow of semantic data mining.]{\label{fig:annotation-workflow} Data stored in different sources (e.g., relational databases, spreadsheets, texts etc) are semantically annotated. The output is in RDF format where elements of data are linked to formal semantic descriptions in ontologies. Annotated data and ontologies together are then represented in a unified graph representation for subsequent analysis in semantic data mining.}
 \end{figure}
 
 \section{Automatic Annotation by Semantic Search}
@@ -144,7 +144,7 @@ where $NF(C, C') = max \big[sim(C, C), \,sim(C', C')\big]$.
 \begin{center}
 \includegraphics[width=0.4\textwidth]{fig/density_profile.eps}
 \end{center}
-\caption{\label{fig:density_profile} Two clusterings $C=\{c_1, c_2\}$ and $C'=\{c_1', c_2'\}$. Two attributes $X$ (attribute 1) and $Y$ (attribute 2) are discretized into 2 bins each. See~\cite{Bae2010} for details.}
+\caption[An example of cluster density profiles]{\label{fig:density_profile} Two clusterings $C=\{c_1, c_2\}$ and $C'=\{c_1', c_2'\}$. Two attributes $X$ (attribute 1) and $Y$ (attribute 2) are discretized into 2 bins each. See~\cite{Bae2010} for details.}
 \end{figure}
 
 \subsection{The Multi-Objective Simulated Annealing Framework}
@@ -276,3 +276,213 @@ Given $x_a^{(n)}$, derive $x_c^{(n)}$:
 \end{align}
 
 To calculate $\pi$ that satisfies equations~\ref{eq:gen_xa} and \ref{eq:gen_xc}, rather than iterating through all possible permutations, we can consider the equation as a minimum-cost assignment problem. Table~\ref{tbl:sim_mat}(A), for example, illustrates a distance table between two attribute sets $A$ and $A'$. Matching of the two sets can be considered as an assignment problem where the goal is to find an assignment of elements in $\{A_i\}$ to those in $\{A_i'\}$ that yields the minimum total distance without assigning each $A_i$ more than once. This problem can be efficiently solved by the Hungarian Method in polynomial time of $O(K_{min}^3)$~\cite{Kuhn1955}. It is worth noting that by formulating the problem as the assignment problem, we assume the matching between two sets to be a one-to-one function.
+
+\section{Case Studies}
+\label{sec:experiment}
+Because we are interested in understanding the property of the Pareto front obtained by our method, we conducted a series of experiments to highlight tradeoffs of the objectives functions. First, to illustrate the proposed method is indeed capable of determining matchings between numeric-typed attributes and clusters, we synthesized a dataset simulating some extreme conditions under which previous methods are ineffective. Also, from the results obtained on the synthetic dataset, we empirically study tradeoffs between the two objective functions. Then, to evaluate the scalability of the method, we carry out a series of tests on a set of data with varied sizes. Finally, encouraged by these results, we applied our methods to actual neuroscience ERP (event-related potentials) data to highlight the applicability of our method to the neuroscience domain.
+
+\subsection{Synthetic Dataset}
+\label{sec:syn_exp}
+\subsubsection{Data Generation:}
+
+In the synthetic dataset, tables are generated in such a way that each attribute is consisted of several Gaussians with distinct mean and standard deviation, and for one attribute in the source table, there exists exactly one attribute in the target table whose Gaussians possess the same configuration (hence they match each other). However if the attribute is viewed as a single distribution, as is typical in previous methods, its mean and standard deviation would be indistinguishable from those of other attributes in the same table. For example, Figure~\ref{fig:syndata} illustrates the value distributions of three attributes ($a_1, a_2,$ and $a_3$) from one dataset and their corresponding counterparts ($a_1', a_2',$ and $a_3'$) from another.
+
+\begin{figure*}[tbh]
+\begin{center}
+\begin{tabular}{ccc}
+\includegraphics[scale=0.112]{fig/clusters.eps} &
+\includegraphics[scale=0.112]{fig/clusters4.eps} &
+\includegraphics[scale=0.112]{fig/clusters3.eps} \\
+$a_1$ --- range: [-4.74, 4.74] & $a_3$ --- range: [-4.61, 4.61] & $a_2$ --- range: [-4.02, 4.02] \\
+$\mu$: 0, $\sigma$:2.26 &$\mu$: 0, $\sigma$:2.30 & $\mu$: 0, $\sigma$:2.18 \\
+\includegraphics[scale=0.112]{fig/clusters21.eps} &
+\includegraphics[scale=0.112]{fig/clusters23.eps} &
+\includegraphics[scale=0.112]{fig/clusters22.eps} \\
+$a_1'$ --- range: [-5.72, 5.72] & $a_3'$ --- range: [-5.24, 5.24] & $a_2'$ --- range: [-4.25, 4.25] \\
+$\mu$: 0, $\sigma$:2.20 & $\mu$: 0, $\sigma$:2.35 & $\mu$: 0, $\sigma$:2.15 \\
+\end{tabular}
+\end{center}
+\caption[Synthetic data generation.]{\label{fig:syndata} Scatter plots of data instances from three sample attributes in one synthetic dataset (upper frame) and those of their corresponding attributes from another (lower frame) are illustrated to show their respective value distributions.}
+\end{figure*}
+
+\subsubsection{Results:}
+Figure~\ref{fig:syn_pareto} illustrates the Pareto front obtained from matching two synthetic datasets, each having 20 attributes and 5 clusters. Most notably, the gold standard results for both attribute matching and cluster matching are obtained from the left-most point on the Pareto front. In other words, given the decision variables ($X$) corresponding to that point, we obtained 100\% correct matching results. We further observed that in our subsequent tests on other synthetic datasets with varied number of attributes and clusters, the derived Pareto fronts all contain the gold standard result, and the point corresponding to the gold standard can always be found towards the minimum end of $f_a$. Given this, we propose the following method to reduce the Pareto-optimal set to a single point corresponding to the most favored choice ($X^*$) in the decision space. The idea is to find the decision with the minimum weighted sum of objective values in the obtained Pareto-optimal set, i.e., $X^*=\stackbin[X]{}{\argmin}~\big[\alpha f_a(X)+\beta f_c(X)\big]$, where $\alpha$ and $\beta$ are weights. We first conducted preliminary experiments to determine the best values for $\alpha$ and $\beta$ (0.8 and 0.2 respectively) and used them in all subsequent experiments. This method works markedly well on the synthetic datasets. For all the tests described in Table~\ref{tbl:scale}, 100\% correct results for both attribute and cluster matchings are obtained (hence we omit the precision in the table).
+\begin{figure}[tb]
+\begin{center}
+\includegraphics[width=0.4\textwidth]{fig/syn_pareto.eps}
+\end{center}
+\caption[An example Pareto front.]{\label{fig:syn_pareto} An example Pareto front obtained from matching two synthetic datasets with 20 attributes and 5 clusters.}
+\end{figure}
+
+\subsubsection{Running Time:}
+We systematically altered the number of attributes and clusters present in the data and conducted a series of tests to show the scalability of the proposed method. The running time under different configurations is reported in Table~\ref{tbl:scale}. The time is calculated by averaging over 5 runs of each test (on a 2.53GHz dual-core CPU with 4 gigabytes memory), each run having 1000 iterations in the simulated annealing process. The main computationally expensive part of the annealing process is the generation of new candidate solution phase (function $G$) in which an assignment problem is solved using the Hungarian method. The complexity of the Hungarian method is cubic and is already the most efficient algorithm for solving the assignment problem (e.g., a brute force algorithm has a factorial complexity). Fortunately, rarely is the case that the number of attributes or clusters is large in real-world scenarios where the proposed technique is needed. For reasonable configurations in most practical applications, the computation time is within a tractable range as shown in table~\ref{tbl:scale}.
+\begin{table}[tbh]
+\begin{center}
+\begin{tabular}{r|r|r}
+\hline
+\# attributes & \# clusters & time (sec)\\
+\hline
+5   &   20  &   0.28\\
+20  &   20  &   1.81\\
+20  &   40  &   7.04\\
+20  &   60  &   17.80\\
+40  &   20  &   4.66\\
+40  &   40  &   11.74\\
+40  &   60  &   25.93\\
+60  &   20  &   10.95\\
+60  &   40  &   20.70\\
+60  &   60  &   37.35\\
+100 &   100 &   172.23\\
+\hline
+\end{tabular}
+\end{center}
+\caption[Running time.]{\label{tbl:scale} Running time of the annealing process on synthetic datasets with varied configurations of attribute and cluster sizes. The time is obtained by averaging over results of 5 runs of each test.}
+\end{table}
+
+\subsection{Neuroscience Dataset}
+\subsubsection{Data Acquisition:}
+%The difficulty is especially pronounced in many scientific domains where there have been an increasing interest in nationwide and worldwide inter-institute collaboration. An example of such collaborative project is research in experimental event-related brain potential (ERP) analysis carried out at the NEMO (Neural Electromagnetic Ontologies) consortium laboratories. The heterogeneity among participating groups hinders meaningful meta-analysis despite the large number of studies in the field.
+
+To address the problems of attribute and cluster matching in a real-world neuroscience application, we used a set of realistic simulated ERP (event-related potentials) datasets, which were designed to support evaluation of ERP analysis methods~\cite{FrishkoffEtal07}. The datasets were specifically designed to simulate heterogeneous data from different groups of subjects under different conditions (via distinct simulated brain activities), as well as distinct measurement methods (spatial and temporal metrics) and distinct patterns (reflecting two different pattern decomposition techniques). Real ERP data arise from superposition of latent scalp-surface electrophysiological patterns, each reflecting the activity of a distinct cortical network that cannot be reconstructed from the scalp-measured data with any certainty. Thus, real ERP data are not appropriate for evaluation of ERP pattern mapping. By contrast, simulated ERP data are derived from known source patterns and therefore provide the necessary gold standard for evaluation of our proposed methods.
+
+The raw data for this study consist of 80 simulated event-related potentials (ERPs), in which each ERP comprises simulated measurement data for a particular subject ($n$ = 40). The 40 simulated subjects are randomly divided into two 20-subject groups, SG1 and SG2, each containing 40 ERPs (20 subjects in 2 experimental conditions). Each ERP consists of a superposition of 5 latent varying spatiotemporal patterns. These patterns were extracted from the two datasets, SG1 and SG2, using two techniques: temporal Principal Components Analysis (tPCA) and spatial Independent Components Analysis (sICA), two data decomposition techniques widely used in ERP research~\cite{Dien2010}. To quantify the spatiotemporal characteristics of the extracted patterns, two alternative metric sets, m1 and m2, were applied to the two tPCA and the two sICA derived datasets. For a complete explanation of these alternative metrics, please see Appendix in~\cite{FrishkoffEtal07}.
+
+In summary, the simulated ERP data generation process yielded eight test datasets in total, reflecting a 2 (attribute sets) $\times$ 2 (subject groups) $\times$ 2 (decomposition methods) factorial design. Therefore, for each attribute sets there are 4 datasets generated from different combinations of subject groups and decomposition methods, resulting $4 \times 4 = 16$ cases for the studies of attribute matching and cluster matching. The reason to include such variabilities was to test the robustness of our matching method to different sources of heterogeneities across the different datasets. Within all test datasets, 5 major ERP spatiotemporal patterns are present. They are P100, N100, N3, MFN, and P300. These patterns can be identified in the datasets by clustering analysis. Pretending that the latent patterns underlying discovered clusters are unknown, we hope to match clusters across datasets to recover the fact that the same patterns are present in all datasets.
+
+\subsubsection{Results:}
+%Figure~\ref{fig:nemo_exp} illustrates the Pareto fronts derived by the proposed method on each of the 16 test cases.
+We applied the weighted sum method as the post-process step after obtaining the Pareto-optimal solutions to determine the most favored choice using the parameters ($\alpha$ and $\beta$) discovered in the preliminary experiments on synthetic datasets (cf. Section~\ref{sec:syn_exp}). The accuracy of attribute matching and cluster matching along with the number of points in the Pareto front are listed in Table~\ref{tbl:nemo_perf} (all these results are obtained by taking average from 5 runs for each test case).
+
+%\begin{figure*}[tb]
+%\begin{center}
+%\includegraphics[width=1.\textwidth]{nemo_exp2.eps}
+%\end{center}
+%\caption{\label{fig:nemo_exp} Pareto fronts obtained from the 16 test cases of the neuroscience dataset.}
+%\end{figure*}
+
+It can be observed from the results in Table~\ref{tbl:nemo_perf} that more different factors involved in the acquisition of the two datasets for matching can negatively affect the matching performance. For example, in test case 1, the two datasets are drawn from the same subject group (SG1) and preprocessed using the same decomposition method (sICA); whereas in test case 4, the subject groups and decomposition methods are all different, resulting in greater variability and hence the performance is less satisfactory.
+
+It is worth noting that our method greatly outperforms a baseline method called WS (see Figure~\ref{fig:perf_comp}) that determines attribute matching based on data distribution at the whole attribute level, which is typical in previous systems such as SemInt~\cite{Li00semint:a}. In this figure we also demonstrate the accuracy of the segmented statistics characterization with expert-labeled patterns, meaning that the data is partitioned and aligned in the most accurate way, which marks the best achievable attribute matching performance. But it is not feasible because, as mentioned in~Section~\ref{sec:intro}, manually recognizing patterns (partitioning data) and aligning them across datasets requires a priori knowledge of attributes in the datasets which is exactly what the problem of attribute matching tries to discover (the circular causality problem). On the other hand, our method does not require human involvement (except the specification of the number of clusters (patterns) present in the data in order to run the clustering analysis) in determining both the attribute matching and cluster matching and is able to achieve close-to-optimal results.
+
+\begin{figure*}[tb]
+\begin{center}
+\includegraphics[width=1.\textwidth]{fig/perf_comp.eps}
+\end{center}
+\caption[Performance of MOSA on the neuroscience dataset.]{\label{fig:perf_comp} A comparison of the attribute matching accuracy of three methods on the 16 test cases of the neuroscience dataset. The three methods being compared are matching based on whole-attribute statistics (WS), segmented attribute statistics without knowing a priori cluster matching (SS-u), and segmented attribute statistics with expert-aligned clusterings (SS).}
+\end{figure*}
+
+
+\begin{table*}[tbh]
+\begin{center}
+\begin{tabular}{l|l|l|l|l|l}
+\hline
+Test case & Source params & Target params & $~~~P_a~~~$ & $~~~P_c~~~$ & $|\Sigma|$\\
+\hline
+1		&	$\langle$	SG1, sICA, m1	$\rangle$	&	$\langle$	SG1, sICA, m2	$\rangle$	&		13/13	&	5/5	&	5	 \\
+2		&	$\langle$	SG1, sICA, m1	$\rangle$	&	$\langle$	SG2, sICA, m2	$\rangle$	&		13/13	&	5/5	&	6	 \\
+3		&	$\langle$	SG1, sICA, m1	$\rangle$	&	$\langle$	SG1, tPCA, m2	$\rangle$	&		10/13	&	5/5	&	6	 \\
+4		&	$\langle$	SG1, sICA, m1	$\rangle$	&	$\langle$	SG2, tPCA, m2	$\rangle$	&		7/13	&	3/5	&	8	 \\
+5		&	$\langle$	SG2, sICA, m1	$\rangle$	&	$\langle$	SG1, sICA, m2	$\rangle$	&		11/13	&	3/5	&	7	 \\
+6		&	$\langle$	SG2, sICA, m1	$\rangle$	&	$\langle$	SG2, sICA, m2	$\rangle$	&		13/13	&	5/5	&	7	 \\
+7		&	$\langle$	SG2, sICA, m1	$\rangle$	&	$\langle$	SG1, tPCA, m2	$\rangle$	&		10/13	&	5/5	&	6	 \\
+8		&	$\langle$	SG2, sICA, m1	$\rangle$	&	$\langle$	SG2, tPCA, m2	$\rangle$	&		9/13	&	2/5	&	8	 \\
+9		&	$\langle$	SG1, tPCA, m1	$\rangle$	&	$\langle$	SG1, sICA, m2	$\rangle$	&		7/13	&	5/5	&	4	 \\
+10		&	$\langle$	SG1, tPCA, m1	$\rangle$	&	$\langle$	SG2, sICA, m2	$\rangle$	&		8/13	&	5/5	&	6	 \\
+11		&	$\langle$	SG1, tPCA, m1	$\rangle$	&	$\langle$	SG1, tPCA, m2	$\rangle$	&		11/13	&	5/5	&	6	 \\
+12		&	$\langle$	SG1, tPCA, m1	$\rangle$	&	$\langle$	SG2, tPCA, m2	$\rangle$	&		7/13	&	3/5	&	5	 \\
+13		&	$\langle$	SG2, tPCA, m1	$\rangle$	&	$\langle$	SG1, sICA, m2	$\rangle$	&		7/13	&	3/5	&	5	 \\
+14		&	$\langle$	SG2, tPCA, m1	$\rangle$	&	$\langle$	SG2, sICA, m2	$\rangle$	&		9/13	&	5/5	&	6	 \\
+15		&	$\langle$	SG2, tPCA, m1	$\rangle$	&	$\langle$	SG1, tPCA, m2	$\rangle$	&		10/13	&	3/5	&	8	 \\
+16		&	$\langle$	SG2, tPCA, m1	$\rangle$	&	$\langle$	SG2, tPCA, m2	$\rangle$	&		8/13	&	3/5	&	8	 \\
+\hline
+\end{tabular}
+\end{center}
+\caption[A comparison between MOSA and MOGA performances.]{\label{tbl:nemo_perf} Matching performance of the proposed method with MOSA on the 16 test cases from the neuroscience dataset. The source and target parameter configuration of the data acquisition process of each test case are shown. $P_a$ and $P_c$ denote the accuracy of attribute matching and cluster matching respectively. $\Sigma$ is the number of points in the obtained Pareto-front. The quantities listed in the table are obtained by averaging over 5 runs of each test.}
+\end{table*}
+
+\subsection{Comparison with Multi-Objective Genetic Algorithm}
+The concept of Genetic Algorithm (GA) was developed by Holland and his colleagues~\cite{Holland1992}. GA is first inspired by the evolutionary process in which weak and unfit species within their environment are faced with extinction and stronger ones have greater opportunities to pass their genes to next generation. Comparing to Simulated Annealing, Genetic Algorithm often offers a different perspective in the field of numerical optimization. Starts from a number of random generated population, cross over and evolve; GA has the ability to search in parallel around different and often fully scattered instances in the solution space, in contrast to the ``single thread" search in Simulated Annealing. In this paper, we also implemented the Multi-Objective Genetic Algorithm (MOGA) as the metaheuristics to solve the dual matching problem.
+
+%For the crossover operation in our MOGA implementation, we go through all the attributes (clusters) in a random sequence, if the matching of one attribute in both parents is not used, we keep the matching from either one of its parents with 50\% probability; if the matching of one of the two parent is used, we keep the matching from another parent; or if the matching of both parents are used already, we random choose one matching from the rest used matching attribute.
+
+To compare the performance between GA and SA, we first carry out an experiment on the same set of neuroscience data, as shown in Table~\ref{tbl:moga_neuro}. The iteration parameters of both algorithms are tuned so that the convergence time are about the same. The performance are then compared under such setting. We manually examine the Pareto front derived in each test case and find the solution that is closest to the gold standard and the accuracy of which is reported in Table~\ref{tbl:moga_neuro} (averaged over 5 independent runs).
+
+\begin{table*}[tbh]
+\begin{center}
+\begin{tabular}{l|l|l|l}
+\hline
+Test Case	&	$P_a$ (\%)	&	$P_c$ (\%) &   $\Sigma$    \\
+\hline
+1	&	100	&	100	  &   9\\
+2	&	98.2	&	96.6	&   10\\
+3	&	53.4	&	98.0	 &  9\\
+4	&	53.3	&	98.0	&   11\\
+5	&	100	&	98.2	&    5\\
+6	&	71.2	&	96.0	&   6\\
+7	&	59.4	&	94.4	&   6\\
+8	&	59.7	&	98.8	&   6\\
+9	&	25.2	&	100.0	&6 \\
+10	&	38.5	&	100.0	& 5\\
+11	&	77.7	&	99.2	&  7\\
+12	&	69.2	&	100.0	& 9\\
+13	&	38.7	&	100.0	& 9\\
+14	&	40.3	&	98.8	&  11\\
+15	&	45.0	&	96.0	&  8\\
+16	&	84.6	&	98.8	&  16\\
+\hline
+\end{tabular}
+\end{center}
+\caption[The performance of MOGA on the neuroscience dataset.]{\label{tbl:moga_neuro} Matching performance of the proposed method with MOGA on the 16 test cases from the neuroscience dataset. The source and target parameter configuration of each test case is the same as in Table~\ref{tbl:nemo_perf}.}
+\end{table*}
+
+The number of population kept in each generation is an important parameter regarding the complexity and performance in MOGA. Intuitively, the more instances we keep, the broader the search space we can explore in each generation. Table~\ref{tbl:moga_neuro} shows the result with the number of population set to 4. We have also tested other settings and found out that the accuracy in most cases increase with the number of population but in rare cases the performance deteriorates. The overall performance of MOGA is comparable to that of MOSA but appears to be less robust. It is worth noting that the metaheuristics (MOSA and MOGA) we employed in the experiments are simple algorithms. More modern and sophisticated methods that explore various fitness assignment procedure, elitism, or diversification approaches will be very likely to improve the performance.
+
+
+\begin{table*}[tbh]
+\begin{center}
+\begin{tabular}{l|l|l|l|l|l|l|l}
+\hline
+\multicolumn{2}{c|}{}		&	fixed acidity	&	volatile acidity	&	citric acid	&	residual sugar	&	chlorides	&	 free sulfur dioxide	\\
+\hline
+\multirow{2}{*}{mean}	&	data1	&	6.86	&	0.28	&	0.34	&	6.35	&	0.05	&	35.58	\\
+	&	data2	&	6.85	&	0.28	&	0.33	&	6.43	&	0.05	&	35.02	\\
+\hline
+\multirow{2}{*}{stdev}	&	data1	&	0.84	&	0.1	&	0.12	&	4.98	&	0.02	&	16.4	\\
+	&	data2	&	0.86	&	0.1	&	0.12	&	5.16	&	0.02	&	17.61	\\
+
+\hline
+\end{tabular}
+\begin{tabular}{l|l|l|l|l|l|l|l}
+\hline
+\multicolumn{2}{c|}{}		&	total sulfur dioxide	&	density	&	pH	&	sulphates	&	alcohol	&	quality	\\
+\hline
+\multirow{2}{*}{mean}	&	data1	&	138.98	&	0.99	&	3.19	&	0.49	&	10.53	&	5.88	\\
+	&	data2	&	137.68	&	0.99	&	3.19	&	0.49	&	10.49	&	5.88	\\
+\hline
+\multirow{2}{*}{stdev}	&	data1	&	41.86	&	0.02	&	0.16	&	0.11	&	1.25	&	0.89	\\
+	&	data2	&	43.18	&	0	&	0.15	&	0.12	&	1.22	&	0.89	\\
+
+\hline
+\end{tabular}
+\end{center}
+\caption[Statistics of the Wine Quality dataset.]{\label{tbl:wine_stat} Summary of the statistical characteristics of attributes in the Wine Quality dataset.}
+\end{table*}
+
+\subsubsection{Wine Quality Dataset}
+In order to further validate our method, we implement our method also on a real-world wine quality dataset~\cite{CorCer09} which is available through the UCI machine learning repository\footnote[1]{\url{http://archive.ics.uci.edu/ml/datasets/Wine+Quality}}. This dataset has 12 attributes and 4898 records. We apply uniform sampling to split it into two equal-sized subsets. The attributes are anonymized and randomly reordered in each subset to generate artificial heterogeneity.
+
+We then apply the proposed method with MOSA and MOGA as metaheuristics respectively. The test is focused on attribute matching because the gold standard is known while the gold standard of cluster matching is unknown. Table~\ref{tbl:wine_stat} summarizes the statistics for each attributes in the dataset. For both MOSA and MOGA derived Pareto optimal solutions, we manually select the one that is closest to the gold-standard matching (e.g., the solution with 10 out 12 attributes matched correctly). Each metaheuristics is invoked 5 times and the matching accuracy is averaged over these runs. The performance for attribute matching is shown in Table~\ref{tbl:wine_res}. The result demonstrate a markedly high accuracy for both MOSA and MOGA. It is worth noting that in most runs the Pareto fronts derived from MOSA and MOGA contain the gold standard matching (hence the high accuracy). It suggests a strategy to reduce the Pareto front in the matching problem by running MOSA or MOGA repeatedly after some times and only those ``stable" points that appear more than certain proportion of the times are considered to be presented to decision makers.
+
+\begin{table*}[tbh]
+\begin{center}
+\begin{tabular}{l|l|l|l}
+\hline
+MOSA accuracy (\%)	&	MOSA running time (ms)	&	MOGA accuracy (\%)	&	MOGA running time (ms)	\\
+\hline
+95.5	&	517	&	92.3	&	3356	\\
+\hline
+\end{tabular}
+\end{center}
+\caption[The performances of MOSA and MOGA on the Wine Quality dataset.]{\label{tbl:wine_res} Performance of the proposed method with MOSA and MOGA as metaheuristics respectively on the Wine Quality dataset.}
+\end{table*}
+

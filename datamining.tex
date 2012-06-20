@@ -1,4 +1,4 @@
-\section{Overview}
+\section{Method}
 By developing the unified representation for both data and domain knowledge, and utilizing ontological annotations, we can produce one RDF hypergraph, which serves as the basis for semantic data mining. Given this, the main research challenge is how to utilize the data and ontology together for semantic data mining. In this dissertation, we focus on one important data mining tasks, the {\em frequent pattern mining}, to showcase the utility of RDF hypergraphs.
 
 \subsection{Frequent Pattern Mining}
@@ -21,8 +21,8 @@ Take the simple graph in Fig.~\ref{fig:graphcomp}(B) for example, suppose given 
 \item The more paths connecting two nodes, the closer they are.
 \item The shorter the paths, the closer they are.
 \end{enumerate}
-In other words, the more ``short" connections between two given nodes, the more similar those nodes are. 
-To this end, we propose to employ the following quantities as the candidate similarity measure since both of them have the desired property. They are, namely, the \emph{commute time distance} based similarity measure from the random walk model on hypergraph, and the inner product similarity based on the \emph{pseudoinverse of the hypergraph Laplacian}. 
+In other words, the more ``short" connections between two given nodes, the more similar those nodes are.
+To this end, we propose to employ the following quantities as the candidate similarity measure since both of them have the desired property. They are, namely, the \emph{commute time distance} based similarity measure from the random walk model on hypergraph, and the inner product similarity based on the \emph{pseudoinverse of the hypergraph Laplacian}.
 Several measures derived from random walk on graphs have been shown to possess such desired property. In the following example, we quantitatively show the property of commute time distance, which characterizes the expected number of steps to take a round trip between a starting node and a target node.
 
 \begin{figure}[tbh]
@@ -50,10 +50,10 @@ Index	&	1	&	2	&	3	&	4	&	5	&	1	&	2	&	3	&	4	&	5	\\
 \hline\hline
 \end{tabular}
 \end{minipage}
-\caption{\label{fig:cd-demo}}
+\caption{\label{fig:cd-demo} A Comparison between the Euclidean distance and the commute time distance.}
 \end{figure}
 
-Figure~\ref{fig:cd-demo} shows a graph of five nodes with a specific edge configuration (the so called ``lollipop graph''). The Euclidean distance between each pair of nodes are shown in the left-hand side of the corresponding table above and the respective commute time distance are shown on the righ-hand side. It can be seen that node 1 and node 3 are equally close to node 2 in terms of their Euclidean distances. However, node 2 and 3 are considered much closer under commute time distance because they are within a much more densely connected subgraph. This shows that, unlike Euclidean distance and shortest path distance, commute distance between two nodes captures both the length of paths between them and their local neighborhood densities. We believe such property makes the commute time distance a suitable measure for graph-based data mining algorithms. We also explore other random walk-based measures including the pseudoinverse of the Laplacian matrix and the stationary probability that are closely related to commute time distance. In the following, we first describe random walk on simple graph and then introduce the extension to hypergraph. The details of hypergraph-based similarity measures are described in the subsequent sections. 
+Figure~\ref{fig:cd-demo} shows a graph of five nodes with a specific edge configuration (the so called ``lollipop graph''). The Euclidean distance between each pair of nodes are shown in the left-hand side of the corresponding table above and the respective commute time distance are shown on the righ-hand side. It can be seen that node 1 and node 3 are equally close to node 2 in terms of their Euclidean distances. However, node 2 and 3 are considered much closer under commute time distance because they are within a much more densely connected subgraph. This shows that, unlike Euclidean distance and shortest path distance, commute distance between two nodes captures both the length of paths between them and their local neighborhood densities. We believe such property makes the commute time distance a suitable measure for graph-based data mining algorithms. We also explore other random walk-based measures including the pseudoinverse of the Laplacian matrix and the stationary probability that are closely related to commute time distance. In the following, we first describe random walk on simple graph and then introduce the extension to hypergraph. The details of hypergraph-based similarity measures are described in the subsequent sections.
 %These methods are described in detail in the following sections and trade-offs between them are studied.
 
 \subsubsection{Random Walk}
@@ -78,7 +78,7 @@ Zhou et al.~\cite{Zhou06learningwith} define the following normalized hypergraph
 \end{align}
 
 \section{Mining Semantically Associated Itemsets without Ontologies}
-In this section, we present our study for discovering semantically associated itemsets based on hypergraph without incorporating domain knowledge in ontologies. The goal of this study is to show that, using graph based formalism, we can obtain interesting patterns that are unable to be captured by traditional methods. 
+In this section, we present our study for discovering semantically associated itemsets based on hypergraph without incorporating domain knowledge in ontologies. The goal of this study is to show that, using graph based formalism, we can obtain interesting patterns that are unable to be captured by traditional methods.
 
 If a mining task does not involve the usage of ontologies and focuses only on data in tables, we can use an alternative hypergraph representation that is more compact than the RDF bipartite graph to model the data. The process to generate such hypergraph is called \emph{RDF hypergraph coarsening} as described in Definition~\ref{def:hg-coarsen}.
 
@@ -87,7 +87,7 @@ If a mining task does not involve the usage of ontologies and focuses only on da
 \begin{figure}[tbh]
 \centering
 \includegraphics[width=\textwidth]{fig/hypergraph-coarsening.eps}
-\caption{\label{fig:hypergraph-coarsening} .}
+\caption{\label{fig:hypergraph-coarsening} An example hypergraph coarsening process.}
 \end{figure}
 
 \begin{mydef}[\textbf{RDF hypergraph coarsening}]
@@ -105,7 +105,7 @@ Given the method for RDF hypergraph coarsening, we propose to construct a coarse
 \begin{center}
 \includegraphics[width=.8\textwidth]{fig/hg_and_rg1.eps}
 \end{center}
-\caption{\label{fig:hg_and_rg} (a) an example transaction table; (b) the Gaifman graph representation of the table; (c) The hypergraph representation of the table}
+\caption[The simple graph vs. hypergraph for representing a relational table.]{\label{fig:hg_and_rg} (a) an example transaction table; (b) the Gaifman graph representation of the table; (c) The hypergraph representation of the table}
 \end{figure*}
 
 \subsubsection{Methods for Generating 2-itemsets}
@@ -191,125 +191,244 @@ Complete subgraph (i.e., clique) is a very strong requirement that can limit the
 \subsubsection{Ranking of Itemsets}
 Once the semantically associated 2-itemsets and $k$-itemsets are generated, they can be ranked by a quantity indicating the strength of association among items in the set. We tentatively compute this quantity by averaging the total pairwise similarities over the number of subedges of the itemset's corresponding clique or connected component in $G'(H)$.
 
-\section{Mining Semantically Associated Itemsets with the Incorporation of Ontologies}
+\section{Case Studies}
+\label{experiment}
+Because we are interested in understanding the differences between the $s_{CT}$ and $s_{L+}$ similarity measures for generating semantically associated itemsets, we conducted a series of experiments to highlight their tradeoffs.  First, to illustrate the power of hypergraphs in finding associations via linking items, we synthesized a dataset for the \emph{fish oil} example.  Next, to illustrate the tradeoffs between the two methods, we evaluated both methods against a commonly used \emph{shopping cart} dataset.  Finally, encouraged by these results, we applied these methods to actual \emph{electronic health records} to highlight their scalability and applicability to the medical domain.
 
-To enable the incorporation of ontologies in mining semantically asociated itemsets, we use the RDF bipartite representation described in Chapter~\ref{chap:representation}. We distinguish paths in the RDF bipartite graph by assigning weights to those paths that represent different semantic relationships such as class subsumption, part\_of, and other general or domain--specific properties.
+%In this section, we empirically evaluate the effectiveness and efficiency of the proposed methods. We use both low-dimensional and high-dimensional data sets in the experiments.
 
-The RDF bipartite graph as a combined representation for both data and ontology is defined as $G=\langle V_v \cup V_s, E \rangle$, where $V_v$ denotes value nodes corresponding to RDF components (subject, predicate, or object), and $V_s$ denotes statement nodes corresponding to RDF statements. More specifically, statement nodes can be further divided according to whether they are from data or ontology, i.e., $V_s=V_d \cup V_o$; the value nodes can be divided according to whether they represent rows or attributes in the data, i.e. $V_d=V_r \cup V_a$. The graph $G$ can be represented in a biadjacency matrix $\mathbf{M}$, where $\mathbf{M}(i,j)$ is non-zero if there is an edge between $\langle V_{v_i}, V_{s_j} \rangle$. For an unweighted graph, the value can be 0/1, while for a weighted graph, any non-negative value.
+\subsection{Fish Oil}
+\subsubsection{Dataset}
+As mentioned in Section~\ref{sec:introduction}, \emph{fish oil} and \emph{Raynaud's syndrome} have been shown by Swanson~\cite{swanson87} to be linked together indirectly via various \emph{blood changes}.  He found these associations from examining biomedical texts.  As a proof of concept, we replicated this situation by synthesizing a table of 50 rows, which is about the same scale as in Swanson's experiment.  Each row represents a set of terms generated to represent biomedical text.   Each set of terms was specifically generated so that \emph{fish oil} and \emph{Raynaud's syndrome} never appear together. The column headers include \emph{fish oil, blood changes}, \emph{Raynaud's syndrome}.  Six other random variables acted as noise.  We then applied the $s_{CT}$, $s_{L+}$ to the dataset. Specifically, we set a threshold for first generating top-15 2-itemsets using either similarity measure. Based on the generated 2-itemsets we used clique search to generate $(k>2)$-itemsets.
 
-The biadjacency matrix $\mathbf{M}$ can be split into vertical stripes by statement nodes $V_s$. For example, according to Figure~\ref{fig:hypergraph-combined}(B), the bipartite graph corresponding to lower 8 RDF statements representing the underlying transaction table can be modeled as the matrix $\mathbf{M}_d$ in Equation~\ref{eq:Md} (RDF statement nodes are labeled $s_1\dots s_8$ respectively); and the bipartite graph corresponding to upper 4 statements (labeled $s_9\dots s_{12}$) representing the subsumption hierarchy in the ontology can be modeled as the matrix $\mathbf{M}_o$ in Equation~\ref{eq:Mo}.
+%The goal of the synthetic data experiment is to show proof-of-concept of proposed method for discovering semantically associated itemsets by emulating the setting in Swanson's landmark paper [] published in 1987, in which he hypothesized that dietary fish oil could probably be used to treat Raynaud's syndrome by identifying, in some literature, associations between fish oil and blood change and, in some other literature, Raynaud's syndrome and blood change. The synthetic dataset is a relational table of 50 rows, just about the same scale as Swanson's experiment. Each row represents key terms (indicated by column headers) extracted from some imaginary biomedical publication (essentially a boolean bag-of-word representation in information extraction). The column headers include \texttt{fish\_oil, blood\_change}, \texttt{Raynaud\_syndrome} and six other random variables acted as noise. It is specifically made so that \texttt{fish\_oil} and \texttt{Raynaud\_syndrom} never occur together in the same row, corresponding to the setting of Swanson's experiment where no literature covers the association between those two.
 
-To obtain the biadjacency matrix $\mathbf{M}$ of the combined RDF bipartite graph in Figure~\ref{fig:hypergraph-combined}, we can simply concatenate $\mathbf{M}_d$ and $\mathbf{M}_o$ horizontally: $\mathbf{M}=\left[\mathbf{M}_d~\mathbf{M}_o\right]$. In general, If there are $k$ different semantic relationships in the ontology, $\mathbf{M}_o$ can be further divided into more vertical stripes $\mathbf{M}_{o_i}, i=1\dots k$, where $\mathbf{M}_{o_i}$ may represent, for example, the ``part\_of" lattice. Each $\mathbf{M}_{o_i}$ is  distinguished from another by the respective weight. In this case, $\mathbf{M}$ is the horizontal concatenation of all the weighted vertical stripes as shown in Equation~\ref{eq:horzcat}. After the concatenation, $\mathbf{M}$ can be represented as the form shown in Equation~\ref{striped_M}.
+\subsubsection{Results}
+The hypergraph approach finds significant links between \emph{fish oil} and \emph{Raynaud's syndrome}, as demonstrated particularly well by the $s_{CT}$ method as shown in Table~\ref{tbl:syn}. Even the triplet was discovered by the clique search technique.  Most notably, because their co-occurrence is zero, the association would never be discovered by traditional frequent itemset techniques such as the Apriori algorithm~\cite{apriori}.
 
-%horizontal concatenation
-\begin{equation}\label{eq:horzcat}
-\mathbf{M} = \bigg[w_d\mathbf{M}_d ~~ w_{o_1}\mathbf{M}_{o_1} ~~ w_{o_2}\mathbf{M}_{o_2} ~~ \dots\bigg]
-\end{equation}
-\begin{minipage}[c]{0.5\textwidth}\centering
-\begin{equation}\label{eq:Md}
-\mathbf{M}_d=\begin{blockarray}{cccccc}
-                  ~     &  s_1  &  s_2  &  s_3  & \dots &  s_8  \cr
-            \begin{block}{c[ccccc]}
-                 r_1    &   1   &   1   &   0   &\multirow{4}{*}{\dots} &   0   \cr
-                 r_2    &   0   &   0   &   1   &       &   0   \cr
-                 r_3    &   0   &   0   &   0   &       &   0   \cr
-                 r_4    &   0   &   0   &   0   &       &   1   \cr
-                 %\cline{1-6}
-                  A     &   1   &   0   &   1   &\multirow{4}{*}{\dots} &   0   \cr
-                  B     &   0   &   1   &   0   &       &   0   \cr
-                  C     &   0   &   0   &   0   &       &   0   \cr
-                  D     &   0   &   0   &   0   &       &   1   \cr
-                  E     &   0   &   0   &   0   &       &   0   \cr
-            \end{block}
-        \end{blockarray}
-\end{equation}
-\end{minipage}
-\begin{minipage}[c]{0.5\textwidth}\centering
-\begin{equation}\label{eq:Mo}
-\mathbf{M}_o=\begin{blockarray}{ccccc}
-            \begin{block}{c[cccc]}
-                  ~     &  s_9  & s_{10}& s_{11}& s_{12}\cr
-                 r_1    &   0   &   0   &   0   &   0   \cr
-                 r_2    &   0   &   0   &   0   &   0   \cr
-                 r_3    &   0   &   0   &   0   &   0   \cr
-                 r_4    &   0   &   0   &   0   &   0   \cr
-%                 \cline{1-5}
-                  A     &   1   &   0   &   0   &   0   \cr
-                  B     &   0   &   1   &   0   &   0   \cr
-                  C     &   1   &   1   &   1   &   0   \cr
-                  D     &   0   &   0   &   0   &   1   \cr
-                  E     &   0   &   0   &   1   &   1   \cr
-            \end{block}
-        \end{blockarray}
-\end{equation}
-\end{minipage}
+The $s_{L+}$ method also picks-up the association, but it was fairly weak:  the association is ranked 23rd among all 2-itemsets (column 3 in Table~\ref{tbl:syn} lists the ranking of the $s_{CT}$ results given by the $s_{L+}$).  However, as our next evaluations suggest, the $s_{L+}$ demonstrates other favorable qualities.
+\begin{table}
+\begin{center}
+\begin{tabular}{r |@{ } r |@{ } r | l }
+  \hline
+  % after \\: \hline or \cline{col1-col2} \cline{col3-col4} ...
+$\mathbf{s_{CT}}$  & $\mathbf{s_{L+}}$ rank    &\textbf{Freq}&   \textbf{Itemset}\\
+  \hline\hline
+0.83	&2&	25	&	$\langle$\emph{ blood\_change,	fish\_oil }$\rangle$\\
+0.83	&1&	25	&	$\langle$\emph{ blood\_change,	Raynaud\_synd }$\rangle$\\
+\textbf{0.79}	&\textbf{--}&	\textbf{0}	    &	$\langle$\emph{ \textbf{blood\_change,	fish\_oil,	Raynaud\_synd} }$\rangle$\\
+0.76	&--&	10	&	$\langle$\emph{ blood\_change,	fish\_oil,	f }$\rangle$\\
+0.76	&7&	16	&	$\langle$\emph{ blood\_change,	f }$\rangle$\\
+0.76	&6&	16	&	$\langle$\emph{ blood\_change,	d }$\rangle$\\
+0.76	&3&	16	&	$\langle$\emph{ blood\_change,	b }$\rangle$\\
+%18.58	&	0	    &	$\langle$\emph{ blood\_change,	fish\_oil,	Raynaud\_synd,	a,	b,	c,	d,	e,	f }$\rangle$\\
+0.75	&9&	15	&	$\langle$\emph{ blood\_change,	a }$\rangle$\\
+0.75	&4&	15	&	$\langle$\emph{ blood\_change,	e }$\rangle$\\
+0.73	&10&	14	&	$\langle$\emph{ blood\_change,	c }$\rangle$\\
+\textbf{0.72}	&\textbf{23}&	\textbf{0}	    &	$\langle$\emph{ \textbf{fish\_oil,	Raynaud\_synd} }$\rangle$\\
+0.70	&10&	10	&	$\langle$\emph{ fish\_oil,	f }$\rangle$\\
+0.70	&--&	10	&	$\langle$\emph{ fish\_oil,	d }$\rangle$\\
+0.70	&9&	9	&	$\langle$\emph{ fish\_oil,	b }$\rangle$\\
+0.68	&20&	6   	&	$\langle$\emph{ Raynaud\_synd,	f }$\rangle$\\
+  \hline
+\end{tabular}
+\end{center}
+\caption[Top semantically associated itemsets on the synthetic dataset.]{\label{tbl:syn} Top semantically associated itemsets generated by $s_{CT}$ from the Synthetic Fish Oil dataset.}
+\end{table}
 
 
-\begin{equation}
-\label{striped_M}
-\mathbf{M}=\begin{blockarray}{ccccc}
-                ~ & ds & os_1 & os_2 & \dots \\
-            \begin{block}{c[c|c|c|c]}
-                r   &   \mathbf{M}_{dr}  &   \mathbf{0}   &   \mathbf{0}   &   \dots \\
-                \cline{2-5}
-                a   &   \mathbf{M}_{da}  &   \mathbf{O}_1 &   \mathbf{O}_2 &   \dots \\
-            \end{block}
-        \end{blockarray}
-\end{equation}
+%We apply both $sim_{CT}$ and $sim_{L+}$ to generate semantically associated 2-itemsets and use the clique expansion to generate $(k>2)$-itemsets. Specifically, we set a threshold for first generating top-15 2-itemsets using either similarity measure, and use the derived 2-itemsets to prune the induced subgraph of the hypergraph model of the data. We then search for cliques in the resulting subgraph as $k$-itemsets. The final result obtained by $sim_CT$ is shown in table~\ref{tbl:syn} ordered according to the mean similarity score over the clique. We observe that the hypothetical itemsets $\langle$\emph{ \texttt{blood\_change,	fish\_oil,	 Raynaud\_synd} }$\rangle$ and $\langle$\emph{ \texttt{fish\_oil,	Raynaud\_synd} }$\rangle$ all appear in this top list according to $sim_{CT}$. The frequency of their co-occurrence is zero, therefore never will they be considered as traditional frequent itemsets. The result obtained by $sim_{L+}$ is not shown because the $\langle$\emph{ \texttt{fish\_oil,	Raynaud\_synd} }$\rangle$ is ranked 23th among all 2-itemsets thus following below the threshold. Despite that $sim_{L+}$ fail to rank the desired itemsets high enough, it still assigns a non-zero score to it. We will soon see the effect of $sim_{L+}$ on real datasets demonstrating its capability to capture some unique pattern. The synthetic data experiment shows that the proposed method is indeed capable of discovering semantically associated itemsets by utilizing indirect connections through linking items.
 
-By developing the unified representation for both data and domain knowledge, and utilizing ontology annotations, such as our results~\cite{LePendu2010}, we can produce one RDF hypergraph, which serves as the basis for perform semantic data mining in a systematic way. Given this, the main research challenge is how to utilize the data and ontology together for semantic data mining. In this paper, we focus on one fundamental data mining tasks, namely, the {\em association mining}. With additional information from ontology (domain knowledge), the unified RDF hypergraphs will enable us to discover hidden association between entities, between entities and ontological concepts, and between ontological concepts. Intuitively, these associations are defined in terms of the paths linking the nodes and the node labels should be taken into consideration as they represent different semantics.
+
+\subsection{Shopping Cart}
+\subsubsection{Dataset}
+To better understand how the $s_{CT}$ method compares against the $s_{L+}$ method, we tested them on a business shopping cart dataset.  This dataset contains purchase information on 100 grocery items (represented by boolean column headers) for 2,127 shopping orders (corresponding to tuples). We applied $s_{L+}$ and $s_{CT}$ and set a threshold to include top-100 2-itemsets, based on which we subsequently used clique search to generate $(k>2)$ itemsets. The top-10 2-itemset results and ($k>2$)-itemsets corresponding to maximum cliques generated by $s_{CT}$ and $s_{+}$ are reported in Table~\ref{tbl:foodmart_ct} and \ref{tbl:foodmart_pl} respectively.
+
+% this data set is interesting because... why? it is used by many in classrooms? it is just the right size?  it is easily understandable?  what?  give a motivation of somekind for choosing it xxx
 
 
 
-\subsection{Similarity Ranking by Random Walk with Restart}
+\subsubsection{Results}
+Unlike the experiment on the fish oil dataset, We do not have specific hypothesis to validate in this test. After examining the results from both measures, we can only conclude they make intuitive sense. However, we observe that the difference between the $s_{CT}$ and $s_{L+}$ becomes more significant in this experiment. The $s_{CT}$ tends to include itemsets with high support and the effect of indirect links is less pronounced. On the other hand, $s_{L+}$ promotes items with support values towards the lower end. We also observe one drawback of the $s_{CT}$ that the result is centered around items with large frequencies (i.e., many direct links to other nodes) and hence in a sense limiting the information (most itemsets are about \emph{cheese}, \emph{soup} and \emph{cookie}). By contrast, the $s_{L+}$ produces more diversified itemsets.
 
-Similar to the relevance score~\cite{SunEtal05}, we believe that two items have a strong semantic association if they are related to many similar objects. We denote the similarity score between entities $e_1$ and $e_2$ by $s(e_1, e_2)$, where $s(e_1,e_2) \in [0, 1]$ and $s(e_1, e_2) = 1 \text{ if } e_1 = e_2$. Now the problem of ranking semantic associations in the unified graph can be described as follows:
+Finally we tested our methods on the dataset of electronic health records of real patients. This dataset is different from the above two datasets not only in scale but also in practical importance as described in the following.
+% state in very clear sentence what the conclusion is, what is the take-home message you want them to see? xxx
 
-Given an attribute node $a$ in the unified graph $G = G_d \cup G_o$ and $a \in G_d \cap G_o$ we want to compute a similarity score $s(a, b)$ for all nodes $b(\neq a) \in G_d \cap G_o$. The result is a one-column vector containing all similarity scores of the entities with respect to $a$~\cite{Chen_tuplerank:ranking}. The motivation is to apply random walks with restart (RWR) from the given node $a$, and use the steady-state probability of each node at convergence as the similarity measure, i.e., the similarity score of node $b$ is defined as the probability of visiting $b$ via a random walk which starts from $a$ and goes back to $a$ with a probability $c$. In more detail, RWR in a bipartite graph works as follows: assume we have a random walker that starts from node $a$. For each step, the walker chooses randomly among the available edges from the current node it stays. After each iteration, with probability $c$, it resets its position back to node $a$. The final steady-state probability that the random walker reach node $b$ is the similarity score of L with respect to $a$: $s(a, b)$. We choose the random walk approach to compute the relevance score because it gives node $b$ high ranking if $b$ and $a$ are connected by many nodes; this is because the random walker has more paths to reach $b$ from $a$. The purpose of the periodic restart of the random walk is to raise the chance that close related nodes are visited more often than other nodes.
+% why is this interesting? what should we have learned? xxx
 
-In the following, we first propose an algorithm for random walk-based similarity ranking on a unified RDF bipartite graph. The algorithm can be used in such situations as, for example, if users are interested in products that are usually bought together in the same transactions by different customers, or common side effects of the same drugs prescribed to different patients, etc.
+%finally, lead-in to final experiment... we finally did this last experiment because:  1) its huge, 2) its important to people to solve xxx
 
-Given the biadjacency matrix $\mathbf{M}$ in Equation~\ref{eq:horzcat} for the combined RDF bipartite graph $G$, we can construct the adjacency matrix $\mathbf{A}$ of $G$ as following:
-\[
-\mathbf{A}=\left[
-               \begin{array}{cc}
-                 \mathbf{0}   & \mathbf{M} \\
-                 \mathbf{M}^T & \mathbf{0} \\
-               \end{array}
-             \right]
-\]
-The probability of a random walker taking a particular edge $\langle a,b\rangle$ from a node $a$ while traversing the graph is proportional to the edge weight over the total weight of all outgoing edges from $a$, i.e., $P(a,b)=A(a,b)/\Sigma_{i=1}^{m+n}A(a,i)$. Therefore, the Markov transition matrix $P$ of $G$ is constructed as: $P=normc(A)$, where $normc(A)$ normalizes $A$ such that every column sum up to 1.
+\begin{table}
+\begin{center}
+\begin{tabular}{l|l | l | l }
+  \hline
+  % after \\: \hline or \cline{col1-col2} \cline{col3-col4} ...
+&$\mathbf{s_{CT}}$       &\textbf{Freq}&   \textbf{Itemset}\\
+  \hline\hline
+\multirow{10}{*}{2-itemsets}& 0.74	&	39	&$\langle$\emph{	Cheese,	Soup	}$\rangle$\\
+&0.73	&	32	&$\langle$\emph{	Cheese,	Dried Fruit	}$\rangle$\\
+&0.72	&	36	&$\langle$\emph{	Dried, Fruit	Soup	}$\rangle$\\
+&0.72	&	38	&$\langle$\emph{	Cookies,	Soup	}$\rangle$\\
+&0.71	&	24	&$\langle$\emph{	Cheese,	Cookies	}$\rangle$\\
+&0.70	&	30	&$\langle$\emph{	Cookies,	Dried Fruit	}$\rangle$\\
+&0.68	&	31	&$\langle$\emph{	Cheese,	Preserves	}$\rangle$\\
+&0.67   &	24	&$\langle$\emph{	Cheese,	Wine	}$\rangle$\\
+&0.67	&	21	&$\langle$\emph{	Preserves,	Soup	}$\rangle$\\
+&0.67	&	28	&$\langle$\emph{	Soup,	Wine	}$\rangle$\\
+%102.7534	&	21	&$\langle$\emph{	Cheese,	Nuts	}$\rangle$\\
+\hline
+\parbox{1cm}{$(k$$>$2$)$-itemsets}&0.64 &	0	&\parbox{6cm}{$\langle$\emph{ Canned Vegetables, Cheese, Cookies, Dried Fruit, Frozen Vegetables, Nuts, Preserves, Soup, Wine }$\rangle$}\\
+  \hline
+\end{tabular}
+\end{center}
+\caption[Top $s_{CT}$ results on the shopping cart dataset.]{\label{tbl:foodmart_ct} Top semantically associated itemsets generated by $s_{CT}$ from the shopping cart dataset.}
+\end{table}
 
-First, we transform the input attribute node $a$ into a $(k+n) \times 1$ query vector $\mathbf{q}_a$ with 1 in the $a$-th row and 0 otherwise. Second, we need to compute the $(k+n)\times 1$ stead-state probability vector $\mathbf{u}_a$ over all nodes in $G$. Last we extract the probabilities of the row nodes as the similarity score vectors. Note that $\mathbf{u}_a$ can be computed by an iterated method from the following lemma.
+\begin{table}
+\begin{center}
+\begin{tabular}{l|l| l | l }
+  \hline
+  % after \\: \hline or \cline{col1-col2} \cline{col3-col4} ...
+&$\mathbf{s_{L+}}$       &\textbf{Freq}&   \textbf{Itemset}\\
+  \hline\hline
+\multirow{10}{*}{2-itemsets}& 10.17	&	3	&$\langle$\emph{	Sardines,	Conditioner	}$\rangle$\\
+&8.17	&	6	&$\langle$\emph{	Toothbrushes,	Nasal Sprays	}$\rangle$\\
+&6.70	&	6	&$\langle$\emph{	Yogurt,	Anchovies	}$\rangle$\\
+&6.25	&	5	&$\langle$\emph{	Sports Magazines,	Cottage Cheese	}$\rangle$\\
+&5.82	&	5	&$\langle$\emph{	Tofu,	Sour Cream	}$\rangle$\\
+&5.79	&	3	&$\langle$\emph{	Toothbrushes,	Acetominifen	}$\rangle$\\
+&4.77	&	4	&$\langle$\emph{	Sauces,	Nasal Sprays	}$\rangle$\\
+&4.46	&	3	&$\langle$\emph{	Sports Magazines,	Gum	}$\rangle$\\
+&4.43	&	4	&$\langle$\emph{	Sunglasses,	Paper Dishes	}$\rangle$\\
+&4.05	&	5	&$\langle$\emph{	Tofu,	Canned Fruit	}$\rangle$\\
+  \hline
+\multirow{3}{*}{\parbox{1cm}{$(k$$>$2$)$-itemsets}}&4.51	&	2	&$\langle$\emph{	Canned Fruit,	Sour Cream,	Tofu	 }$\rangle$\\
+&2.01	&	1	&$\langle$\emph{	Batteries,	Cereal,	Cooking Oil	}$\rangle$\\
+&1.75	&	5	&$\langle$\emph{	Canned Vegetables,	Nuts,	Waffles	}$\rangle$\\
+\hline
+\end{tabular}
+\end{center}
+\caption[Top $s_{L+}$ results on the shopping cart dataset.]{\label{tbl:foodmart_pl} Top semantically associated itemsets generated by $s_{L+}$ from the shopping cart dataset.}
+\end{table}
 
-\begin{mylem}\label{lem:pi}
-Let $c$ be the probability of restarting random-walk from the node $a$. Then the steady-state probability vector $\mathbf{u}_a$ satisfies
-\begin{equation}
-\mathbf{u}_a=(1-c)P_A\mathbf{u}_a+c\mathbf{q}_a~.
-\end{equation}
-\end{mylem}
+\subsection{Electronic Health Records}
+\subsubsection{Dataset}
+In our final evaluation, we analyzed the electronic health records of real patients. Applying methods like the ones we have described to this kind of data is particularly relevant because of recent legislation aimed at increasing the meaningful use of electronic health records. Discovering meaningful semantically associated itemsets among the set of drugs and diseases identified in the patient's clinical note is a critical step toward identifying combinations of drug classes and co-morbidities, or risk-factors and co-morbidities that are common in patients with a certain outcome (for example, those suffering from myocardial infarction), toward building predictive risk models, as well as toward providing probable hypotheses about the possible causes of that outcome.  %The main challenge is that roughly 80\% of the clinical electronic medical data is found in free-text narrative (e.g., doctor's notes).
 
-\renewcommand{\algorithmicrequire}{\textbf{Input:}}
-\renewcommand{\algorithmicensure}{\textbf{Output:}}
-\begin{algorithm}
-\caption{Calculate Semantic Association}
-\label{alg1}
-\begin{algorithmic}
-\REQUIRE query attribute $a$, bipartite matrix $M$, restarting probability $c$, tolerant threshold $\epsilon$
-\ENSURE $y = x^n$
-\STATE $\mathbf{q}_a \Leftarrow \mathbf{0}$
-\STATE $\mathbf{q}_a(a)=1$ (set $a$-th element of $\mathbf{q}_a$ to 1)
-\WHILE{$|\Delta\mathbf{u}_a| > \epsilon$}
-\STATE \[
-    \mathbf{u}_a = (1-c)  \left[ \begin{array}{c}
-        normc(\mathbf{M})\mathbf{u}_a(k+1:k+n);\\
-        normc(\mathbf{M}^T)\mathbf{u}_a(1:k)
-    \end{array} \right] + c\mathbf{q}_a
-\]
-\ENDWHILE
-\RETURN $\mathbf{u}_a(1:k)$
-\end{algorithmic}
-\end{algorithm}
+We obtained the set of drugs and diseases for each patient's clinical note by using a new tool, the \emph{Annotator Workflow}, developed at the National Center for Biomedical Ontology (NCBO).  The patient notes are from Stanford Hospital's Clinical Data Warehouse (STRIDE).  These records archive over 17-years worth of patient data comprising of 1.6 million patients, 15 million encounters, 25 million coded ICD9 diagnoses, and a combination of pathology, radiology, and transcription reports totaling over 9 million clinical notes (i.e., unstructured text).
 
-The iterative update of $\mathbf{u}_a$ in the algorithm (inside the while loop) is modified from Lemma~\ref{lem:pi} while avoiding materializing $\mathbf{A}$ and $\mathbf{P}$ for scalability.
+%In addition to having obvious data-mining applications, the workflow has been used by biomedical researchers to build semantic-search applications, such as the NCBO Resource Index~\cite{jonquet11}, which won the Semantic Web Challenge\footnote{\url{http://challenge.semanticweb.org/}} in 2010. The annotation process utilizes the vast NCBO BioPortal ontology library~\cite{bioportal} to extract information by using a lexicon of over one million terms generated from the relevant ontologies, such as SNOMED-CT, RxNORM, and MedDRA. Furthermore, it also incorporates negation detection --- the ability to discern whether a term is negated with the context of the narrative (e.g., lack of valvular dysfunction). Finally, it uses mappings between terms across ontologies~\cite{ghazvinian09}, which forms a rich knowledge graph %(Figure~\ref{fig:collapse})
+%or mega-thesaurus, to normalize the lexicon by reducing the feature set from over one million to merely 11,107 unique drugs and 3,594 unique diseases.
 
+From this set of 1.6 million patients, we extracted a cohort of patients that suffered from kidney failure.  Out of those records, we applied our algorithms to all previous records in the patient's timeline, looking at just the set of drugs.  Therefore, at a very simplistic level, the experiment result shows that semantically associated itemsets in this context could possibly represent sets of drugs that could lead toward kidney failure when used in combination.
+
+%\begin{figure*}[tbh]
+%\centering
+%\includegraphics[width=.8\textwidth]{fig/collapse2.eps}
+%%\vskip -0.75em
+%\caption{The \textbf{knowledge graph}:  The knowledge graph formed by the relationships in drug and disease ontologies and the mappings between terms belonging to different ontologies. The figure shows a subsection of a disease hierarchy (red) and a drug hierarchy (blue) from the mega-thesaurus at BioPortal. Each node represents a class. The numbers (M=538,638 and N=535,410) show the total number of different terms from the mega-thesarus. The numbers (m=2,966 and n=11,107) in the inner circles show the count of classes that remain after collapsing along various relationships (e.g., synonymy, ingredient\_of, has\_tradename, is\_a) across all ontologies. The normalization resulting from collapsing the terms in clinical notes to such a knowledge graph results in a significant reduction in computation complexity.}
+%\label{fig:collapse}
+%%\vskip -0.75em
+%\end{figure*}
+
+%As a result of applying this tool to the patient records from STRIDE, we created a bit-map of roughly 9 million rows and 15 thousand columns.  Each row represents a patient note.  Each column represents either a drug or a disease (or a class of drug or class of disease).  The bit (1 or 0) represents either the presence or absence of a non-negated mention of the drug or disease in the note.  Each note (i.e., row) is linked to a patient identifier, a relative timestamp, and the patient's age\footnote{All ages approaching 90 are appropriately masked for privacy as required by law.} at the time so that the patient's timeline-view is preserved.  Other demographic data such as ethnicity and race were not used for this study.
+
+\subsubsection{Results}
+The cohort dataset described above contains 467791 rows (corresponding to patients' clinical notes) and 10167 columns (corresponding to annotated terms appeared in the notes). With the help of the techniques described in Section~\ref{sec:eff_comp}, we are able to compute $L^+$ in a tractable amount of time (Equation~\ref{eq:combinatoryHyperL} and \ref{eq:pL} are calculated within 4 hours on a Quad-Core AMD Opteron(tm) Processor with 8 gigabyte memory), based on which we can efficiently derive the $s_{L+}$ itemsets. However, the calculation of $s_{CT}$ on this scale is intractable because an exact computation of all pair-wise $s_{CT}$ requires to fill in a $|V|\times|V|$ similarity table. In order to ameliorate the computational cost, we exploit domain knowledge to identify 582 terms of particular interest and then apply both $s_{CT}$ and $s_{L+}$ on the reduced dataset. The results are shown in Table~\ref{tbl:ncbo_ct} and \ref{tbl:ncbo_lp} respectively, where we list top-10 2-itemsets and all ($k>$2)-itemsets corresponding to the maximum clique.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{l|c|c }
+\hline
+&\multicolumn{2}{c}{Support} \\
+\hline
+              & Shopping cart  &  Electronic health\\
+\hline
+$\mathbf{s_{CT}}$    & 0.58  & 0.82 \\
+\hline
+$\mathbf{s_{L+}}$    & 0.32  & 0.06 \\
+\hline
+\end{tabular}
+\end{center}
+\caption[A comparison between $s_{CT}$ and $s_{L+}$.]{\label{tbl:kendall} The Kendall-$\tau$ score between rankings of itemsets generated by $s_{CT}$, $s_{L+}$ and support in the two experiments.}
+\end{table}
+
+\begin{table}
+\begin{center}
+\begin{tabular}{l|l |l |l }
+  \hline
+  % after \\: \hline or \cline{col1-col2} \cline{col3-col4} ...
+&$\mathbf{s_{CT}}$      &\textbf{Freq}&   \textbf{Itemset}\\
+  \hline\hline
+\multirow{10}{*}{2-itemsets}& 0.80	&	39204		&$\langle$\emph{	Calcium Chloride,	Amiloride	}$\rangle$\\
+&0.77	&	29325		&$\langle$\emph{	Calcium Chloride,	Aspirin	}$\rangle$\\
+&0.76	&	28644		&$\langle$\emph{	Calcium Chloride,	Probenecid	}$\rangle$\\
+&0.73	&	24805		&$\langle$\emph{	Calcium Chloride,	Furosemide	}$\rangle$\\
+&0.72	&	34271		&$\langle$\emph{	Calcium Chloride,	Calcium	}$\rangle$\\
+&0.71	&	21481		&$\langle$\emph{	Calcium Chloride,	Disulfiram	}$\rangle$\\
+&0.70	&	16814		&$\langle$\emph{	Calcium Chloride,	Amphetamine	}$\rangle$\\
+&0.66	&	19850		&$\langle$\emph{	Calcium Chloride,	Prednisone	}$\rangle$\\
+&0.65	&	12231		&$\langle$\emph{	Aspirin,	Amiloride	}$\rangle$\\
+&0.65	&	12106		&$\langle$\emph{	Probenecid,	Amiloride	}$\rangle$\\
+  \hline
+\parbox{1cm}{$(k$$>$2$)$-itemsets}&0.56	&	0	&	\parbox{6cm}{$\langle$\emph{	Calcium Chloride, Disul-firam, Amphetamine, Aceta-minophen, Calcium, Aspirin, Probenecid, Amiloride, Prednisone, Furosemide	}$\rangle$}\\
+\hline
+\end{tabular}
+\end{center}
+\caption[Top $s_{CT}$ results on the kidney failure cohort dataset.]{\label{tbl:ncbo_ct} Top semantically associated itemsets generated by $s_{CT}$ from the kidney failure cohort of the electronic health dataset.}
+\end{table}
+
+
+\begin{table}
+\begin{center}
+\begin{tabular}{l |l | l | l }
+  \hline
+  % after \\: \hline or \cline{col1-col2} \cline{col3-col4} ...
+&$\mathbf{s_{L+}}$      &\textbf{Freq}&   \textbf{Itemset}\\
+  \hline\hline
+\multirow{10}{*}{2-itemsets}&	0.820	&	354	&$\langle$\emph{	sevoflurane,	remifentanil	}$\rangle$\\
+&	0.691	&	978	&$\langle$\emph{	frovatriptan,	almotriptan	}$\rangle$\\
+&	0.633	&	693	&$\langle$\emph{	Etomidate,	Rocuronium	}$\rangle$\\
+&	0.496	&	234	&$\langle$\emph{	Atazanavir,	Pyrimethamine	}$\rangle$\\
+&	0.420	&	3004	&$\langle$\emph{	ciclesonide,	Fluorometholone	}$\rangle$\\
+&	0.377	&	231	&$\langle$\emph{	naratriptan,	Mefenamic Acid	}$\rangle$\\
+&	0.373	&	1792	&$\langle$\emph{	ciclesonide,	Vincristine	}$\rangle$\\
+&	0.332	&	92	&$\langle$\emph{	Rocuronium,	sevoflurane	}$\rangle$\\
+&	0.325	&	1368	&$\langle$\emph{	tazarotene,	halobetasol propionate	}$\rangle$\\
+&	0.322	&	506	&$\langle$\emph{	Buprenorphine,	alosetron	}$\rangle$\\
+  \hline
+\parbox{1cm}{$(k$$>$2$)$-itemsets}&	0.131	&	701	&\parbox{6cm}{$\langle$\emph{	Ketorolac, Flurbiprofen, Ketorolac, Etodolac, Sulindac, Piroxicam, Ketoprofen	}$\rangle$}\\
+\hline
+\end{tabular}
+\end{center}
+\caption[Top $s_{L+}$ results on the kidney failure cohort dataset.]{\label{tbl:ncbo_lp} Top semantically associated itemsets generated by $s_{L+}$ from the kidney failure cohort of the electronic health dataset.}
+\end{table}
+It is clear that, continuing the trend shown in the FoodMart analysis, the $s_{CT}$ result becomes increasingly concordant with the support-based method. For illustrating this point of view, we calculate the Kendall-$\tau$ score between the ranking of itemsets generated by $s_{CT}$, $s_{L+}$, and support as shown in Table~\ref{tbl:kendall}. We observe from the table that as the $s_{CT}$ converges to support, the $s_{L+}$ becomes even more distinct from it. The result is that the itemsets discovered by $s_{CT}$ contain mostly general terms that are repeatedly found in the patients' notes. Although the association is reasonable but hardly interesting. On the contrary, the $s_{L+}$ result is not affected by the dimension of data as well as the presence of items with massive support. It identifies itemsets of relatively low support but more closely bonded by indirect links.
+
+To demonstrate the scalability of the method based on the $s_{L+}$, we also conducted the same analysis on the data of the whole cohort after 2010. The data consisted 1 million rows and 10 thousand columns. We were able to produce the $s_{L+}$ based 2-itemsets in 6 hours. The top results are shown in Table~\ref{tbl:ncbo_lp_whole}.
+
+The discovered $s_{L+}$ itemsets provide much valuable insights on the possible interrelationship between drugs. Some of them has been studied in the literature. For example, \emph{sevoflurane/remifentanil} can be used for anaesthesia; \emph{frovatriptan} and \emph{almotriptan} are both oral treatment of migraine headache; \emph{Etomidate} and \emph{Rocuronium} can be used for rapid sequence intubation; etc. This area of research is still very new and there are no good gold standards to compare our results against.  However, for single-item drugs that lead to kidney failure, SIDER\footnote{\url{http://sideeffects.embl.de/se/C0035078/all}} database lists drugs and their side-effects.  Most notably, multi-itemsets are difficult to identify, but our methods have found not only \emph{Ketoprofen} but it has also group other drugs like it (see the ($k>2$)-itemset shown in Table~\ref{tbl:ncbo_lp}, all of the items are anti-inflammatories). Our results are a matter of on-going evaluation with medical experts.
+
+
+\begin{table}
+\begin{center}
+\begin{tabular}{l | l }
+  \hline
+  % after \\: \hline or \cline{col1-col2} \cline{col3-col4} ...
+$\mathbf{s_{L+}}$      &   \textbf{Itemset}\\
+  \hline\hline
+0.0301	&$\langle$\emph{	White faced hornet venom, Yellow hornet venom		}$\rangle$\\
+0.0195	&$\langle$\emph{	Trichloroacetic Acid, Trichloroacetate		}$\rangle$\\
+0.0108	&$\langle$\emph{	Cloxacillin Sodium, benzathine cloxacillin		}$\rangle$\\
+0.0101	&$\langle$\emph{	Methacycline, Methacycline hydrochloride		}$\rangle$\\
+0.01	&$\langle$\emph{	Entamoebiasis, Hepatic, Liver Abscess, Amebic		}$\rangle$\\
+0.0086	&$\langle$\emph{	butenafine, Butenafine hydrochloride		}$\rangle$\\
+0.0085	&$\langle$\emph{	Acetone, Cantharidin		}$\rangle$\\
+0.0085	&$\langle$\emph{	ethyl cellulose, Cantharidin		}$\rangle$\\
+0.0085	&$\langle$\emph{	ethyl cellulose, Acetone		}$\rangle$\\
+0.0085	&$\langle$\emph{	Poloxamer 407, Eucalyptol		}$\rangle$\\
+  \hline
+\end{tabular}
+\end{center}
+\caption[Top $s_{L+}$ results on the whole electronic health dataset.]{\label{tbl:ncbo_lp_whole} Top semantically associated itemsets generated by $s_{L+}$ from the whole electronic health dataset after 2010. The dataset contains 1 million rows and 10k columns.}
+\end{table}

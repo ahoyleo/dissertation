@@ -1,0 +1,296 @@
+
+\section{Method}
+%Mining Semantically Associated Itemsets with the Incorporation of Ontologies
+
+To enable the incorporation of ontologies in mining semantically asociated itemsets, we use the RDF bipartite representation described in Chapter~\ref{chap:representation}. We distinguish paths in the RDF bipartite graph by assigning weights to those paths that represent different semantic relationships such as class subsumption, part\_of, and other general or domain--specific properties.
+
+The RDF bipartite graph as a combined representation for both data and ontology is defined as $G=\langle V_v \cup V_s, E \rangle$, where $V_v$ denotes value nodes corresponding to RDF components (subject, predicate, or object), and $V_s$ denotes statement nodes corresponding to RDF statements. More specifically, statement nodes can be further divided according to whether they are from data or ontology, i.e., $V_s=V_d \cup V_o$; the value nodes can be divided according to whether they represent rows or attributes in the data, i.e. $V_d=V_r \cup V_a$. The graph $G$ can be represented in a biadjacency matrix $\mathbf{M}$, where $\mathbf{M}(i,j)$ is non-zero if there is an edge between $\langle V_{v_i}, V_{s_j} \rangle$. For an unweighted graph, the value can be 0/1, while for a weighted graph, any non-negative value.
+
+The biadjacency matrix $\mathbf{M}$ can be split into vertical stripes by statement nodes $V_s$. For example, according to Figure~\ref{fig:hypergraph-combined}(B), the bipartite graph corresponding to lower 8 RDF statements representing the underlying transaction table can be modeled as the matrix $\mathbf{M}_d$ in Equation~\ref{eq:Md} (RDF statement nodes are labeled $s_1\dots s_8$ respectively); and the bipartite graph corresponding to upper 4 statements (labeled $s_9\dots s_{12}$) representing the subsumption hierarchy in the ontology can be modeled as the matrix $\mathbf{M}_o$ in Equation~\ref{eq:Mo}.
+
+To obtain the biadjacency matrix $\mathbf{M}$ of the combined RDF bipartite graph in Figure~\ref{fig:hypergraph-combined}, we can simply concatenate $\mathbf{M}_d$ and $\mathbf{M}_o$ horizontally: $\mathbf{M}=\left[\mathbf{M}_d~\mathbf{M}_o\right]$. In general, If there are $k$ different semantic relationships in the ontology, $\mathbf{M}_o$ can be further divided into more vertical stripes $\mathbf{M}_{o_i}, i=1\dots k$, where $\mathbf{M}_{o_i}$ may represent, for example, the ``part\_of" lattice. Each $\mathbf{M}_{o_i}$ is  distinguished from another by the respective weight. In this case, $\mathbf{M}$ is the horizontal concatenation of all the weighted vertical stripes as shown in Equation~\ref{eq:horzcat}. After the concatenation, $\mathbf{M}$ can be represented as the form shown in Equation~\ref{striped_M}.
+
+%horizontal concatenation
+\begin{equation}\label{eq:horzcat}
+\mathbf{M} = \bigg[w_d\mathbf{M}_d ~~ w_{o_1}\mathbf{M}_{o_1} ~~ w_{o_2}\mathbf{M}_{o_2} ~~ \dots\bigg]
+\end{equation}
+\begin{minipage}[c]{0.5\textwidth}\centering
+\begin{equation}\label{eq:Md}
+\mathbf{M}_d=\begin{blockarray}{cccccc}
+                  ~     &  s_1  &  s_2  &  s_3  & \dots &  s_8  \cr
+            \begin{block}{c[ccccc]}
+                 r_1    &   1   &   1   &   0   &\multirow{4}{*}{\dots} &   0   \cr
+                 r_2    &   0   &   0   &   1   &       &   0   \cr
+                 r_3    &   0   &   0   &   0   &       &   0   \cr
+                 r_4    &   0   &   0   &   0   &       &   1   \cr
+                 %\cline{1-6}
+                  A     &   1   &   0   &   1   &\multirow{4}{*}{\dots} &   0   \cr
+                  B     &   0   &   1   &   0   &       &   0   \cr
+                  C     &   0   &   0   &   0   &       &   0   \cr
+                  D     &   0   &   0   &   0   &       &   1   \cr
+                  E     &   0   &   0   &   0   &       &   0   \cr
+            \end{block}
+        \end{blockarray}
+\end{equation}
+\end{minipage}
+\begin{minipage}[c]{0.5\textwidth}\centering
+\begin{equation}\label{eq:Mo}
+\mathbf{M}_o=\begin{blockarray}{ccccc}
+            \begin{block}{c[cccc]}
+                  ~     &  s_9  & s_{10}& s_{11}& s_{12}\cr
+                 r_1    &   0   &   0   &   0   &   0   \cr
+                 r_2    &   0   &   0   &   0   &   0   \cr
+                 r_3    &   0   &   0   &   0   &   0   \cr
+                 r_4    &   0   &   0   &   0   &   0   \cr
+%                 \cline{1-5}
+                  A     &   1   &   0   &   0   &   0   \cr
+                  B     &   0   &   1   &   0   &   0   \cr
+                  C     &   1   &   1   &   1   &   0   \cr
+                  D     &   0   &   0   &   0   &   1   \cr
+                  E     &   0   &   0   &   1   &   1   \cr
+            \end{block}
+        \end{blockarray}
+\end{equation}
+\end{minipage}
+
+
+\begin{equation}
+\label{striped_M}
+\mathbf{M}=\begin{blockarray}{ccccc}
+                ~ & ds & os_1 & os_2 & \dots \\
+            \begin{block}{c[c|c|c|c]}
+                r   &   \mathbf{M}_{dr}  &   \mathbf{0}   &   \mathbf{0}   &   \dots \\
+                \cline{2-5}
+                a   &   \mathbf{M}_{da}  &   \mathbf{O}_1 &   \mathbf{O}_2 &   \dots \\
+            \end{block}
+        \end{blockarray}
+\end{equation}
+
+By developing the unified representation for both data and domain knowledge, and utilizing ontology annotations, such as our results~\cite{LePendu2010}, we can produce one RDF hypergraph, which serves as the basis for perform semantic data mining in a systematic way. Given this, the main research challenge is how to utilize the data and ontology together for semantic data mining. In this paper, we focus on one fundamental data mining tasks, namely, the {\em association mining}. With additional information from ontology (domain knowledge), the unified RDF hypergraphs will enable us to discover hidden association between entities, between entities and ontological concepts, and between ontological concepts. Intuitively, these associations are defined in terms of the paths linking the nodes and the node labels should be taken into consideration as they represent different semantics.
+
+
+
+\subsection{Similarity Ranking by Random Walk with Restart}
+
+Similar to the relevance score~\cite{SunEtal05}, we believe that two items have a strong semantic association if they are related to many similar objects. We denote the similarity score between entities $e_1$ and $e_2$ by $s(e_1, e_2)$, where $s(e_1,e_2) \in [0, 1]$ and $s(e_1, e_2) = 1 \text{ if } e_1 = e_2$. Now the problem of ranking semantic associations in the unified graph can be described as follows:
+
+Given an attribute node $a$ in the unified graph $G = G_d \cup G_o$ and $a \in G_d \cap G_o$ we want to compute a similarity score $s(a, b)$ for all nodes $b(\neq a) \in G_d \cap G_o$. The result is a one-column vector containing all similarity scores of the entities with respect to $a$~\cite{Chen_tuplerank:ranking}. The motivation is to apply random walks with restart (RWR) from the given node $a$, and use the steady-state probability of each node at convergence as the similarity measure, i.e., the similarity score of node $b$ is defined as the probability of visiting $b$ via a random walk which starts from $a$ and goes back to $a$ with a probability $c$. In more detail, RWR in a bipartite graph works as follows: assume we have a random walker that starts from node $a$. For each step, the walker chooses randomly among the available edges from the current node it stays. After each iteration, with probability $c$, it resets its position back to node $a$. The final steady-state probability that the random walker reach node $b$ is the similarity score of L with respect to $a$: $s(a, b)$. We choose the random walk approach to compute the relevance score because it gives node $b$ high ranking if $b$ and $a$ are connected by many nodes; this is because the random walker has more paths to reach $b$ from $a$. The purpose of the periodic restart of the random walk is to raise the chance that close related nodes are visited more often than other nodes.
+
+In the following, we first propose an algorithm for random walk-based similarity ranking on a unified RDF bipartite graph. The algorithm can be used in such situations as, for example, if users are interested in products that are usually bought together in the same transactions by different customers, or common side effects of the same drugs prescribed to different patients, etc.
+
+Given the biadjacency matrix $\mathbf{M}$ in Equation~\ref{eq:horzcat} for the combined RDF bipartite graph $G$, we can construct the adjacency matrix $\mathbf{A}$ of $G$ as following:
+\[
+\mathbf{A}=\left[
+               \begin{array}{cc}
+                 \mathbf{0}   & \mathbf{M} \\
+                 \mathbf{M}^T & \mathbf{0} \\
+               \end{array}
+             \right]
+\]
+The probability of a random walker taking a particular edge $\langle a,b\rangle$ from a node $a$ while traversing the graph is proportional to the edge weight over the total weight of all outgoing edges from $a$, i.e., $P(a,b)=A(a,b)/\Sigma_{i=1}^{m+n}A(a,i)$. Therefore, the Markov transition matrix $P$ of $G$ is constructed as: $P=normc(A)$, where $normc(A)$ normalizes $A$ such that every column sum up to 1.
+
+First, we transform the input attribute node $a$ into a $(k+n) \times 1$ query vector $\mathbf{q}_a$ with 1 in the $a$-th row and 0 otherwise. Second, we need to compute the $(k+n)\times 1$ stead-state probability vector $\mathbf{u}_a$ over all nodes in $G$. Last we extract the probabilities of the row nodes as the similarity score vectors. Note that $\mathbf{u}_a$ can be computed by an iterated method from the following lemma.
+
+\begin{mylem}\label{lem:pi}
+Let $c$ be the probability of restarting random-walk from the node $a$. Then the steady-state probability vector $\mathbf{u}_a$ satisfies
+\begin{equation}
+\mathbf{u}_a=(1-c)P_A\mathbf{u}_a+c\mathbf{q}_a~.
+\end{equation}
+\end{mylem}
+
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+\begin{algorithm}
+\caption{Calculate Semantic Association}
+\label{alg1}
+\begin{algorithmic}
+\REQUIRE query attribute $a$, bipartite matrix $M$, restarting probability $c$, tolerant threshold $\epsilon$
+\ENSURE $y = x^n$
+\STATE $\mathbf{q}_a \Leftarrow \mathbf{0}$
+\STATE $\mathbf{q}_a(a)=1$ (set $a$-th element of $\mathbf{q}_a$ to 1)
+\WHILE{$|\Delta\mathbf{u}_a| > \epsilon$}
+\STATE \[
+    \mathbf{u}_a = (1-c)  \left[ \begin{array}{c}
+        normc(\mathbf{M})\mathbf{u}_a(k+1:k+n);\\
+        normc(\mathbf{M}^T)\mathbf{u}_a(1:k)
+    \end{array} \right] + c\mathbf{q}_a
+\]
+\ENDWHILE
+\RETURN $\mathbf{u}_a(1:k)$
+\end{algorithmic}
+\end{algorithm}
+
+The iterative update of $\mathbf{u}_a$ in the algorithm (inside the while loop) is modified from Lemma~\ref{lem:pi} while avoiding materializing $\mathbf{A}$ and $\mathbf{P}$ for scalability.
+
+
+\section{Mining Semantic Association with Ontologies}
+In this section, we evaluate the combined RDF bipartite graph for discovering semantic associations. We conducted a series of experiments to highlight the effect of the incorporation of ontologies in the mining framework, and to explore the impact of different ratios of weights assigned to various kinds of relationships in the graphs. First, to illustrate the power of combined RDF bipartite graph in finding semantic associations while taking into account seamlessly the ontological information, we evaluated our methods against a commonly used \emph{shopping cart} dataset together with a manually created ontology describing the subsumption hierarchy for grocery items.  Then, encouraged by the result, we applied our method to actual \emph{electronic health records} to highlight its scalability and applicability to the medical domain. The sizes of the datasets are specified in Table~\ref{tbl:exp_overview}.
+
+\begin{table}[tbh]\scriptsize
+\begin{center}
+\begin{tabular}{c|c|c|c}
+\hline
+    & \# data stmts & \# isa stmts & \# other stmts* \\
+    \hline
+  Shopping cart     &  8,481       & 127       &    0\\
+  Electronic health &  10,000,257  & 1,048,604 &    43780\\
+  \hline
+\end{tabular}
+\end{center}
+\caption[Overview of the test cases.]{\label{tbl:exp_overview} Dataset overview (``stmts" stands for RDF statements). *In the electronic healths test, we explore the ``may\_treat" relationship between drugs and diseases defined in the National Drug File.}
+\end{table}
+
+
+\subsection{Shopping Cart}
+\subsubsection{Dataset}
+The shopping cart dataset contains purchase information on 100 grocery items (represented by boolean column headers) for 2,127 shopping orders (corresponding to tuples) from a Foodmart. We first construct an RDF bipartite graph from the dataset by transforming the table to 8481 RDF statements. Then we manually create an ontology to organize the grocery items into a subsumption hierarchy. In this process, we introduce 28 internal nodes (the 100 grocery items appeared in the data are mostly at the leaf level) and thus derive a total of 127 RDF statements. As the size of this dataset is fairly small, the calculation of similarity ranking for a given term is fast. In the following we highlight the effect of incorporation of ontology by comparing results obtained with and without ontologies.
+
+
+\subsubsection{Results}
+In Table~\ref{tbl:foodmart_comp}, results of items ranked by the strength of semantic association given a query term ``Toothbrush" under various combinations of parameters are demonstrated side-by-side for comparison. First, we observe that without using ontology, performing random walk with restart on the data graph (Table~\ref{tbl:foodmart_comp}.A) starting from ``toothbrush" yields similar results to those reported in our previous work~\cite{LiuEtal11} based on random walk commute time similarity. Items ranked high in this setting where only the data graph is considered are typically either hub nodes (with many edges linking to other items) or frequently co-occur with the query item (many edges connecting them). Second, applying the same similarity ranking method solely on the ontology graph (Table~\ref{tbl:foodmart_comp}.B) gives a list of association based on the graph-configuration of the ontological structure (in this case, the rdfs:subClassOf lattice). The items that are considered most similar to the query term ``Toothbrush" is its immediate parent class ``PersonalHygiene," followed by some most derived classes at the same level of ``PersonalHygiene" and then siblings of ``Toothbrush" itself. Next, Table~\ref{tbl:foodmart_comp}.C--E demonstrate the results of mining on the combined graph with different ratios of weights assigned to ontology edges and data edges respectively. It is obvious that these results can be seen as a mix of the data-only and ontology-only results with various emphasis on the data or ontology. We can observe that when $w_o/w_d=20$ where $w_o$ is weight of ontology edge (i.e., rdfs:subClassOf) and $w_d$ is the weight of data edge, the ontology and data appear to have equal significance in determining the ranking. In a rough sense, it conforms to the ratio of the size of ontology graph and data graph as well (see Table~\ref{tbl:exp_overview}). In reality, the appropriate ratio for the edge weights is not only dependent on the size of graphs but also the graph configuration (depth, average degree, etc). Moreover, specifying the ratio of prior knowledge in ontologies and inductive evidences in data that one wants to employ for discovering new patterns is a highly empirical process. Multiple pilot trials may need to be carried out for the optimal ratio before it is applied to the real application.
+
+\begin{table*}[tbh]\scriptsize
+\begin{center}
+\begin{tabular}{ c c || c c || c c }
+\hline
+\multicolumn{2}{c||}{w/ data only}&\multicolumn{2}{c||}{w/ onto only}&\multicolumn{2}{c||}{$w_o=1$, $w_d=1$}\\
+\hline
+item	&	p(\%)	&	item	&	p(\%)	&	item	&	p(\%)	\\
+\hline																			
+Soup	&	0.42	&	PersonalHygiene	&	12.55	&	PersonalHygiene	&	0.74	\\
+Cookies	&	0.41	&	Snack	&	0.86	&	Soup	&	0.41	\\
+NasalSprays	&	0.38	&	Health	&	0.64	&	Cookies	&	0.4	\\
+Popcorn	&	0.32	&	Sponges	&	0.57	&	NasalSprays	&	0.37	\\
+PaperWipes	&	0.29	&	Soap	&	0.57	&	Popcorn	&	0.31	\\
+FrozenVegetables	&	0.29	&	Shampoo	&	0.57	&	FrozenVegetables	&	0.29	 \\
+PersonalHygiene	&	0.26	&	NasalSprays	&	0.57	&	PaperWipes	&	0.28	 \\
+DriedFruit	&	0.25	&	Mouthwash	&	0.57	&	DriedFruit	&	0.25	 \\
+Milk	&	0.25	&	Conditioner	&	0.57	&	Milk	&	0.25	\\
+Mouthwash	&	0.24	&	MealCourse	&	0.54	&	Mouthwash	&	0.23	\\
+\hline
+\multicolumn{6}{c}{~}\\
+\multicolumn{2}{c}{(A)}  &   \multicolumn{2}{c}{(B)}  &   \multicolumn{2}{c}{(C)}  \\
+\multicolumn{6}{c}{~}\\
+\end{tabular}
+
+\begin{tabular}{ c c || c c }
+\hline
+\multicolumn{2}{c||}{$w_o=10$, $w_d=1$}&\multicolumn{2}{c}{$o_w=20$, $o_d=1$}\\
+\hline
+item	&	p(\%)	&	item	&	p(\%)	\\
+\hline																			
+PersonalHygiene	&	3.97	&	 PersonalHygiene	&	6.27	\\
+NasalSprays	&	0.41	&	NasalSprays	&	0.5	\\
+Soup	&	0.34	&	Mouthwash	&	0.41	\\
+Cookies	&	0.34	&	Shampoo	&	0.31	\\
+Mouthwash	&	0.3	&	Soup	&	0.29	\\
+Popcorn	&	0.25	&	Cookies	&	0.29	 \\
+FrozenVegetables	&	0.24	&	Sponges	&	0.28	 \\
+PaperWipes	&	0.23	&	Health	&	0.27	 \\
+DriedFruit	&	0.22	&	Conditioner	&	0.27	\\
+Milk	&	0.21	&	Soap	&	0.25	\\
+\hline
+\multicolumn{4}{c}{~}\\
+\multicolumn{2}{c}{(D)}  &  \multicolumn{2}{c}{(E)}  \\
+\end{tabular}
+\end{center}
+\caption[Top results on the Foodmart dataset.]{\label{tbl:foodmart_comp} Foodmart items ranked by the strength of semantic association (i.e., $p(\%)$, the steady-state probability).}
+\end{table*}
+
+Note that without filtering the ranked semantic associations on the combined graph, the list will include items that never appear in the transactional data. It is because typically the semantic annotation process links table attributes to their most specific matching concept in the ontology which are close to the leaf level. The incorporation of ontology is to aid the mining process, therefore including in the result those internal items (e.g., ``PersonalHygiene") that never appear in the data is counterintuitive. To overcome this, we can simply filter out those items exclusive to the ontology. Table~\ref{tbl:foodmart_comp2} shows an example where the query term is ``soup" and both test settings yield rankings taking value on the same set of items.
+
+%Finally we tested our methods on the dataset of electronic health records of real patients. This dataset is different from the above two datasets not only in scale but also in practical importance as described in the following.
+% state in very clear sentence what the conclusion is, what is the take-home message you want them to see? xxx
+
+% why is this interesting? what should we have learned? xxx
+
+%finally, lead-in to final experiment... we finally did this last experiment because:  1) its huge, 2) its important to people to solve xxx
+
+\begin{table*}[tbh]\scriptsize
+\begin{center}
+\begin{tabular}{ c c | c c || c c | c c }
+\hline
+\multicolumn{4}{c||}{w/ data only}  &   \multicolumn{4}{c}{w/ onto only}\\
+\hline
+item	&	p(\%)	&	item	&	p(\%)	&	item	&	p(\%)	&	item	&	p(\%)	\\
+\hline
+Cheese	&	0.38	&	Preserves	&	0.19	&	TVDinner	&	0.46	&	Sponges	&	0.06	\\
+Cookies	&	0.32	&	Juice	&	0.17	&	Pizza	&	0.46	&	Soap	&	0.06	\\
+DriedFruit	&	0.32	&	Lightbulbs	&	0.17	&	Pasta	&	0.46	&	Shampoo	&	0.06	\\
+Wine	&	0.24	&	PaperWipes	&	0.16	&	HotDogs	&	0.46	&	NasalSprays	&	0.06	\\
+CannedVegetables	&	0.23	&	Pizza	&	0.16	&	Hamburger	&	0.46	&	Mouthwash	&	0.06	\\
+FrozenVegetables	&	0.23	&	Nuts	&	0.16	&	FrenchFries	&	0.46	&	Conditioner	&	0.06	\\
+Cereal	&	0.22	&	Popcorn	&	0.16	&	DeliSalads	&	0.46	&	Ibuprofen	&	0.06	\\
+Milk	&	0.22	&	Chips	&	0.16	&	DeliMeats	&	0.46	&	ColdRemedies	&	0.06	\\
+ChocolateCandy	&	0.19	&	Eggs	&	0.16	&	Sunglasses	&	0.07	&	Aspirin	&	0.06	\\
+Waffles	&	0.19	&	TVDinner	&	0.15	&	Toothbrushes	&	0.06	&	Acetominifen	&	0.06	\\					 
+\hline
+\end{tabular}
+\end{center}
+\caption[Top results on the Foodmart dataset excluding concepts only in the ontology.]{\label{tbl:foodmart_comp2} Semantically associated items by filtering out those items exclusive to the Foodmart ontology.}
+\end{table*}
+
+
+\subsection{Electronic Health Records}
+\subsubsection{Dataset}
+In our second evaluation, we analyzed the electronic health records of real patients. The patient clinical note data are from Stanford Hospital's Clinical Data Warehouse (STRIDE). These records archive over 17-years worth of patient data comprising of 1.6 million patients, 15 million encounters, 25 million coded ICD9 diagnoses, and a combination of pathology, radiology, and transcription reports totaling over 9 million clinical notes (i.e., unstructured text).
+We obtained the set of drugs and diseases for each patient's clinical note by using a new tool, the \emph{Annotator Workflow}, developed at the National Center for Biomedical Ontology (NCBO), which annotates clinical text from electronic health record systems and extracts disease and drug mentions from the electronic health records.
+
+%In addition to having obvious data-mining applications, the workflow has been used by biomedical researchers to build semantic-search applications, such as the NCBO Resource Index~\cite{jonquet11}, which won the Semantic Web Challenge\footnote{\url{http://challenge.semanticweb.org/}} in 2010. The annotation process utilizes the vast NCBO BioPortal ontology library~\cite{bioportal} to extract information by using a lexicon of over one million terms generated from the relevant ontologies, such as SNOMED-CT, RxNORM, and MedDRA. Furthermore, it also incorporates negation detection --- the ability to discern whether a term is negated with the context of the narrative (e.g., lack of valvular dysfunction). Finally, it uses mappings between terms across ontologies~\cite{ghazvinian09}, which forms a rich knowledge graph %(Figure~\ref{fig:collapse})
+%or mega-thesaurus, to normalize the lexicon by reducing the feature set from over one million to merely 11,107 unique drugs and 3,594 unique diseases.
+
+From this set of 1.6 million patients, we extracted a subset whose clinical notes mention the terms of interest (including both drugs and diseases, such as vioxx and myocardial infraction).  Out of those annotated records, we vectorize texts and turned them into a huge bag-of-word representation, from which a RDF bipartite graph is constructed (including 10 million RDF statements, see Table~\ref{tbl:exp_overview}). we applied our algorithms to all previous records in the patient's timeline, looking at just the set of drugs and their semantically related diseases.  Therefore, at a very simplistic level, the experiment result shows that strong semantically associated items in this context could possibly represent sets of drugs that could lead toward certain diseases.
+
+One strength of the Annotator is the highly comprehensive and interlinked lexicon that it uses. It can incorporate the entire NCBO BioPortal ontology library of over 250 ontologies to identify biomedical concepts from text using a dictionary of terms generated from those ontologies. Terms from these ontologies are linked together via mappings. For this study, we specifically configured the workflow to use a subset of those ontologies that are most relevant to clinical domains, including Unified Medical Language System (UMLS) terminologies such as SNOMED-CT, the National Drug File (NDFRT) and RxNORM, as well as ontologies like the Human Disease Ontology. The resulting set of ontologies contains 1 million subsumption statements.
+To highlight the capability of our method for incorporating multiple types of relationships, we also explore the ``may\_treat" relationship between drugs and diseases defined in NDFRT, for example, Thiabendazole may\_treat Larva Migrans. Since we are interested in learning the interaction between drugs and diseases, may\_treat is naturally a better indicator relationship to include while mining semantic associations than the subsumption relationship. Our results below prove this point.
+
+
+\subsubsection{Results}
+Before studying the drug-disease association, we carried out a similar test to that on the shopping cart dataset, in which we focus on studying the drug-drug and disease-disease association. To this purpose, we combine the subsumption hierarchy in the ontology graph with the data graph. Table~\ref{tbl:health_comp} shows the ranked semantic association for the query term ``ROFECOXIB" (an active ingredient of some anti-inflammatory drugs) given different configuration of graphs. Without any preprocessing and prior knowledge about how the clinical notes are prescribed, the incorporation of subsumption relationship can be seen as a mean for denoising and enhancement of the data. Given the ratio of the size of the ontology to the size of data, the ontology in this test is more dominant in determining the ranking than in the shopping cart experiment. One can gradually change the ratio of $w_o$ to $w_d$ to strike a balance and achieve the optimal result.
+\begin{table*}[tbh]\scriptsize
+\begin{center}
+\begin{tabular}{ c  c || c  c || c  c  }
+\hline
+\multicolumn{2}{c||}{w/ data only}			&	\multicolumn{2}{c||}{$w_o=1, w_d=1$}			&	\multicolumn{2}{c}{$w_o=1, w_d=2$}		 \\
+\hline
+p(\%)	&	item	&	p(\%)	&	item	&	p(\%)	&	item	\\
+\hline
+1.11	&	pseudoisocytidine				&	1.46	&	oral form rofecoxib				&	1.35	&	oral form rofecoxib	\\
+1.11	&	dimetpramid						&	1.16	&	rofecoxib 50 mg oral tablet		&	1.07	&	rofecoxib 50 mg oral tablet	\\
+1.11	&	quinalphos						&	1.16	&	rofecoxib 12.5 mg oral tablet	&	1.07	&	rofecoxib 12.5 mg oral tablet	\\
+1.11	&	retinol o-fatty-acyltransferase	&	1.16	&	rofecoxib 25 mg oral tablet		&	1.07	&	rofecoxib 25 mg oral tablet	 \\
+1.11	&	trimethylaminobutyrate			&	1.07	&	cyclooxygenase 2 inhibitors		&	0.85	&	cyclooxygenase 2 inhibitors	\\
+1.11	&	fungiqual						&	0.78	&	duplicate concept				&	0.79	&	social control policies	 \\
+1.10	&	chemoembolization, therapeutic	&	0.63	&	rofecoxib 2.5 oral suspension	&	0.79	&	dimetpramid	\\
+1.10	&	social control policies			&	0.63	&	rofecoxib 5 oral suspension		&	0.79	&	quinalphos	\\
+1.10	&	insulin							&	0.56	&	cyclooxygenase inhibitors		&	0.79	&	trimethylaminobutyrate	 \\
+1.10	&	2-...hexanoic acid				&	0.54	&	r [preparations]				&	0.79	&	pseudoisocytidine	\\
+\hline
+\end{tabular}
+\end{center}
+\caption[Top results on the electronic health dataset.]{\label{tbl:health_comp}Results of Health items ranked by the strength of semantic association.}
+\end{table*}
+
+Table~\ref{tbl:health_exp} illustrates the rankings of three associations (one per row) under different settings. The first element in the pair is the query item, which are all active ingredients of some prescription drugs, and the ranking shown in the table is for the second item, which are diseases. For example, arthritis is ranked as the 527th semantically associated item to ROFECOXIB according to similarity ranking based only on data graph. All these item pairs are actually backed by known relationships, i.e., as a golden standard, we know the semantic associations between them should be strong.
+
+
+\begin{table*}[tbh]\scriptsize
+\begin{center}
+\begin{tabular}{ c || c  c || c  c || c  c }
+\hline
+        &   \multicolumn{2}{c||}{w/ data only}  &   \multicolumn{2}{c||}{w/ data and ``isa"} & \multicolumn{2}{c}{w/ data and ``may\_treat"}\\
+\hline
+                        	&   p(\%)   &   rank    &   p(\%)    &   rank    &   p(\%)    &    rank    \\
+\hline
+$\langle ROFECOXIB, arthritis\rangle$  &   0.006   &   527     &   0.004    &   632     &   0.51     &     13     \\
+$\langle valdecoxib, arthritis\rangle$  &   0.007   &   613     &   0.005    &   695     &   0.63     &     17     \\
+$\langle troglitazone, diabetes\rangle$  &   0.006   &   478     &   0.005    &   514     &   0.44     &     11     \\
+\hline
+\end{tabular}
+\end{center}
+\caption{\label{tbl:health_exp}Rankings of three semantic associations in health data under different settings.}
+\end{table*}
+
+We first observe that the ranking based on data graph alone is fairly high already, consider there are approximately 1 million distinct terms in the ontology. However, the results based on the combination of data and subsumption (``isa") graph are worse. It is because the subsumption hierarchy for drugs and diseases are largely separate structures. While on the one hand, the incorporation of subsumption relationship boosts the association within closely related drugs and diseases, it on the other hand in fact obfuscate the association between drugs and diseases across their respective subsumption hierarchies. On the other hand, the association between these pairs can be exactly captured by the NDFRT ``may\_treat" relationship (e.g., NDFRT explicitly defines that ROFECOXIB may\_treat arthritis). Therefore, when the ``may\_treat" graph is incorporated into the mining process, the ranking for the association is greatly boosted.
+
+We believe this result demonstrates the power of domain knowledge in data mining. Using the proposed combined RDF bipartite graph for both data and ontology, the incorporation of domain knowledge can be achieved by simply encoding it in the ontology and choose appropriately relevant part of the ontology that best suits the mining task. 
