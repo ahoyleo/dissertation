@@ -2,7 +2,7 @@
 \section{Method}
 %Mining Semantically Associated Itemsets with the Incorporation of Ontologies
 
-To enable the incorporation of ontologies in mining semantically asociated itemsets, we use the RDF bipartite representation described in Chapter~\ref{chap:representation}. We distinguish paths in the RDF bipartite graph by assigning weights to those paths that represent different semantic relationships such as class subsumption, part\_of, and other general or domain--specific properties.
+To enable the incorporation of ontologies in mining semantically associated itemsets, we use the RDF bipartite representation described in Chapter~\ref{chap:representation}. We distinguish paths in the RDF bipartite graph by assigning weights to those paths that represent different semantic relationships such as class subsumption, part\_of, and other general or domain--specific properties.
 
 The RDF bipartite graph as a combined representation for both data and ontology is defined as $G=\langle V_v \cup V_s, E \rangle$, where $V_v$ denotes value nodes corresponding to RDF components (subject, predicate, or object), and $V_s$ denotes statement nodes corresponding to RDF statements. More specifically, statement nodes can be further divided according to whether they are from data or ontology, i.e., $V_s=V_d \cup V_o$; the value nodes can be divided according to whether they represent rows or attributes in the data, i.e. $V_d=V_r \cup V_a$. The graph $G$ can be represented in a biadjacency matrix $\mathbf{M}$, where $\mathbf{M}(i,j)$ is non-zero if there is an edge between $\langle V_{v_i}, V_{s_j} \rangle$. For an unweighted graph, the value can be 0/1, while for a weighted graph, any non-negative value.
 
@@ -105,7 +105,7 @@ Let $c$ be the probability of restarting random-walk from the node $a$. Then the
 \label{alg1}
 \begin{algorithmic}
 \REQUIRE query attribute $a$, bipartite matrix $M$, restarting probability $c$, tolerant threshold $\epsilon$
-\ENSURE $y = x^n$
+\ENSURE similarity vector $\mathbf{u}_a(1:k)$
 \STATE $\mathbf{q}_a \Leftarrow \mathbf{0}$
 \STATE $\mathbf{q}_a(a)=1$ (set $a$-th element of $\mathbf{q}_a$ to 1)
 \WHILE{$|\Delta\mathbf{u}_a| > \epsilon$}
@@ -151,44 +151,44 @@ In Table~\ref{tbl:foodmart_comp}, results of items ranked by the strength of sem
 
 \begin{table*}[tbh]\scriptsize
 \begin{center}
-\begin{tabular}{ c c || c c || c c }
+\begin{tabular}{ c c || c c | c c }
 \hline
-\multicolumn{2}{c||}{w/ data only}&\multicolumn{2}{c||}{w/ onto only}&\multicolumn{2}{c||}{$w_o=1$, $w_d=1$}\\
+\multicolumn{2}{c||}{ranked by co-frequency}&\multicolumn{2}{c|}{w/ data only}&\multicolumn{2}{c}{w/ onto only}\\
 \hline
-item	&	p(\%)	&	item	&	p(\%)	&	item	&	p(\%)	\\
-\hline																			
-Soup	&	0.42	&	PersonalHygiene	&	12.55	&	PersonalHygiene	&	0.74	\\
-Cookies	&	0.41	&	Snack	&	0.86	&	Soup	&	0.41	\\
-NasalSprays	&	0.38	&	Health	&	0.64	&	Cookies	&	0.4	\\
-Popcorn	&	0.32	&	Sponges	&	0.57	&	NasalSprays	&	0.37	\\
-PaperWipes	&	0.29	&	Soap	&	0.57	&	Popcorn	&	0.31	\\
-FrozenVegetables	&	0.29	&	Shampoo	&	0.57	&	FrozenVegetables	&	0.29	 \\
-PersonalHygiene	&	0.26	&	NasalSprays	&	0.57	&	PaperWipes	&	0.28	 \\
-DriedFruit	&	0.25	&	Mouthwash	&	0.57	&	DriedFruit	&	0.25	 \\
-Milk	&	0.25	&	Conditioner	&	0.57	&	Milk	&	0.25	\\
-Mouthwash	&	0.24	&	MealCourse	&	0.54	&	Mouthwash	&	0.23	\\
+item	&	freq	&	item	&	p(\%)	&	item	&	p(\%)	\\
+\hline											
+PaperWipes	&	8	&	Soup	&	0.42	&	PersonalHygiene	&	12.55	\\
+Popcorn	&	7	&	Cookies	&	0.41	&	Snack	&	0.86	\\
+Soup	&	6	&	NasalSprays	&	0.38	&	Health	&	0.64	\\
+NasalSprays	&	6	&	Popcorn	&	0.32	&	Sponges	&	0.57	\\
+Cookies	&	6	&	PaperWipes	&	0.29	&	Soap	&	0.57	\\
+Spices	&	5	&	FrozenVegetables	&	0.29	&	Shampoo	&	0.57	\\
+Soda	&	4	&	PersonalHygiene	&	0.26	&	NasalSprays	&	0.57	\\
+Shrimp	&	4	&	DriedFruit	&	0.25	&	Mouthwash	&	0.57	\\
+FlavoredDrinks	&	4	&	Milk	&	0.25	&	Conditioner	&	0.57	\\
+Dips	&	4	&	Mouthwash	&	0.24	&	MealCourse	&	0.54	\\
 \hline
 \multicolumn{6}{c}{~}\\
 \multicolumn{2}{c}{(A)}  &   \multicolumn{2}{c}{(B)}  &   \multicolumn{2}{c}{(C)}  \\
 \multicolumn{6}{c}{~}\\
 \end{tabular}
 
-\begin{tabular}{ c c || c c }
+\begin{tabular}{ c c | c c | c c }
 \hline
-\multicolumn{2}{c||}{$w_o=10$, $w_d=1$}&\multicolumn{2}{c}{$o_w=20$, $o_d=1$}\\
+\multicolumn{2}{c|}{$w_o=1$, $w_d=1$}&\multicolumn{2}{c|}{$w_o=10$, $w_d=1$}&\multicolumn{2}{c}{$o_w=20$, $o_d=1$}\\
 \hline
-item	&	p(\%)	&	item	&	p(\%)	\\
-\hline																			
-PersonalHygiene	&	3.97	&	 PersonalHygiene	&	6.27	\\
-NasalSprays	&	0.41	&	NasalSprays	&	0.5	\\
-Soup	&	0.34	&	Mouthwash	&	0.41	\\
-Cookies	&	0.34	&	Shampoo	&	0.31	\\
-Mouthwash	&	0.3	&	Soup	&	0.29	\\
-Popcorn	&	0.25	&	Cookies	&	0.29	 \\
-FrozenVegetables	&	0.24	&	Sponges	&	0.28	 \\
-PaperWipes	&	0.23	&	Health	&	0.27	 \\
-DriedFruit	&	0.22	&	Conditioner	&	0.27	\\
-Milk	&	0.21	&	Soap	&	0.25	\\
+item	&	p(\%)	&	item	&	p(\%)	&	item	&	p(\%)	\\
+				\hline							
+PersonalHygiene	&	0.74	&	PersonalHygiene	&	3.97	&	PersonalHygiene	&	6.27	\\
+Soup	&	0.41	&	NasalSprays	&	0.41	&	NasalSprays	&	0.5	\\
+Cookies	&	0.4	&	Soup	&	0.34	&	Mouthwash	&	0.41	\\
+NasalSprays	&	0.37	&	Cookies	&	0.34	&	Shampoo	&	0.31	\\
+Popcorn	&	0.31	&	Mouthwash	&	0.3	&	Soup	&	0.29	\\
+FrozenVegetables	&	0.29	&	Popcorn	&	0.25	&	Cookies	&	0.29	\\
+PaperWipes	&	0.28	&	FrozenVegetables	&	0.24	&	Sponges	&	0.28	\\
+DriedFruit	&	0.25	&	PaperWipes	&	0.23	&	Health	&	0.27	\\
+Milk	&	0.25	&	DriedFruit	&	0.22	&	Conditioner	&	0.27	\\
+Mouthwash	&	0.23	&	Milk	&	0.21	&	Soap	&	0.25	\\
 \hline
 \multicolumn{4}{c}{~}\\
 \multicolumn{2}{c}{(D)}  &  \multicolumn{2}{c}{(E)}  \\
@@ -208,26 +208,26 @@ Note that without filtering the ranked semantic associations on the combined gra
 
 \begin{table*}[tbh]\scriptsize
 \begin{center}
-\begin{tabular}{ c c | c c || c c | c c }
+\begin{tabular}{ c c c | c c c || c c c | c c c }
 \hline
-\multicolumn{4}{c||}{w/ data only}  &   \multicolumn{4}{c}{w/ onto only}\\
+\multicolumn{6}{c||}{w/ data only}  &   \multicolumn{6}{c}{w/ onto only}\\
 \hline
-item	&	p(\%)	&	item	&	p(\%)	&	item	&	p(\%)	&	item	&	p(\%)	\\
-\hline
-Cheese	&	0.38	&	Preserves	&	0.19	&	TVDinner	&	0.46	&	Sponges	&	0.06	\\
-Cookies	&	0.32	&	Juice	&	0.17	&	Pizza	&	0.46	&	Soap	&	0.06	\\
-DriedFruit	&	0.32	&	Lightbulbs	&	0.17	&	Pasta	&	0.46	&	Shampoo	&	0.06	\\
-Wine	&	0.24	&	PaperWipes	&	0.16	&	HotDogs	&	0.46	&	NasalSprays	&	0.06	\\
-CannedVegetables	&	0.23	&	Pizza	&	0.16	&	Hamburger	&	0.46	&	Mouthwash	&	0.06	\\
-FrozenVegetables	&	0.23	&	Nuts	&	0.16	&	FrenchFries	&	0.46	&	Conditioner	&	0.06	\\
-Cereal	&	0.22	&	Popcorn	&	0.16	&	DeliSalads	&	0.46	&	Ibuprofen	&	0.06	\\
-Milk	&	0.22	&	Chips	&	0.16	&	DeliMeats	&	0.46	&	ColdRemedies	&	0.06	\\
-ChocolateCandy	&	0.19	&	Eggs	&	0.16	&	Sunglasses	&	0.07	&	Aspirin	&	0.06	\\
-Waffles	&	0.19	&	TVDinner	&	0.15	&	Toothbrushes	&	0.06	&	Acetominifen	&	0.06	\\					 
+item	&	p(\%)	&	freq	&	item	&	p(\%)	&	freq	&	item	&	p(\%)	&	freq	&	item	&	freq	&	p(\%)	\\
+\hline																							
+Cheese	&	0.38	&	98	&	Preserves	&	0.19	&	65	&	TVDinner	&	0.46	&	40	&	Sponges	&	21	&	0.06	\\
+Cookies	&	0.32	&	96	&	Juice	&	0.17	&	47	&	Pizza	&	0.46	&	46	&	Soap	&	0	&	0.06	\\
+DriedFruit	&	0.32	&	87	&	Lightbulbs	&	0.17	&	47	&	Pasta	&	0.46	&	29	&	Shampoo	&	34	&	0.06	\\
+Wine	&	0.24	&	63	&	PaperWipes	&	0.16	&	55	&	HotDogs	&	0.46	&	30	&	NasalSprays	&	21	&	0.06	\\
+CannedVegetables	&	0.23	&	67	&	Pizza	&	0.16	&	46	&	Hamburger	&	0.46	&	19	&	Mouthwash	&	28	&	0.06	 \\
+FrozenVegetables	&	0.23	&	79	&	Nuts	&	0.16	&	60	&	FrenchFries	&	0.46	&	37	&	Conditioner	&	12	&	0.06	 \\
+Cereal	&	0.22	&	56	&	Popcorn	&	0.16	&	39	&	DeliSalads	&	0.46	&	31	&	Ibuprofen	&	18	&	0.06	\\
+Milk	&	0.22	&	53	&	Chips	&	0.16	&	46	&	DeliMeats	&	0.46	&	37	&	ColdRemedies	&	33	&	0.06	\\
+ChocolateCandy	&	0.19	&	16	&	Eggs	&	0.16	&	51	&	Sunglasses	&	0.07	&	12	&	Aspirin	&	22	&	0.06	\\
+Waffles	&	0.19	&	51	&	TVDinner	&	0.15	&	40	&	Toothbrushes	&	0.06	&	13	&	Acetominifen	&	12	&	0.06	 \\
 \hline
 \end{tabular}
 \end{center}
-\caption[Top results on the Foodmart dataset excluding concepts only in the ontology.]{\label{tbl:foodmart_comp2} Semantically associated items by filtering out those items exclusive to the Foodmart ontology.}
+\caption[Top results on the Foodmart dataset excluding concepts only in the ontology.]{\label{tbl:foodmart_comp2} Semantically associated items  for the query term ``Soup", by filtering out those items exclusive to the Foodmart ontology.}
 \end{table*}
 
 

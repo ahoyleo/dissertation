@@ -1,0 +1,58 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\begin{document}
+- Clarify the contribution and scope of the dissertation
+
+- Introduction should cover most aspects presented in the later chapters (i.e., method and evaluation). It should also be structured to cover contributions from broad to specifics. Unsupported claims should also be refined.
+
+- In the background chapter, elaborate why the works surveyed are relevant, establish the connections and clarify the contribution of the proposed work
+
+- In the representation chapter, clarify what's new in the proposed method comparing to previous ones.
+
+- For the shopping cart dataset, add more explanations for the result, clarify the usefulness of the method.
+
+- For the experiment on electronic health dataset with ontologies, try to present the result with regard to the following setting: data only, may\_treat only, data plus may\_treat.
+
+2.  Give some intuitive description of L+.. perhaps figure out what it is doing (other than the equation) ad indicating that.. which will give insights into why it gives different results that CT.
+We have shown in Equation 5.6 that 
+\[
+n(i,j)=V_G(l^+_{ii}+l^+_{jj}-2l^+_{ii})\notag
+\]
+
+\begin{equation}
+s_{CT}(i,j)=n(i,j)=V_G(\mathbf{e}_i-\mathbf{e}_j)^T\mathbf{L}^+(\mathbf{e}_i-\mathbf{e}_j)
+\label{eq:ectd}
+\end{equation}
+If we make the following transformation to the unit node vector:
+$\mathbf{e}_i=\mathbf{Ux}_i$ ,and $\mathbf{x}_i'=\mathbf{\Lambda}^{1/2}\mathbf{x}_i$, where $\mathbf{U}$ is an orthonormal matrix made of the eigenvectors of $\mathbf{L+}$ ordered in decreasing order of corresponding eigenvalue $\lambda_k$, and $\mathbf{\Lambda}=diag(\lambda_k)$. Equation~\ref{eq:ectd} can be rewritten as:
+\begin{equation}
+n(i,j)=V_G||\mathbf{x}_i'-\mathbf{x}_j'||^2
+\label{eq:ectd_embed}
+\end{equation}
+
+As is shown in~\cite{}, elements of the pseudoinverse of the Laplacian matrix are the inner products of the transformed node vectors, \begin{equation}
+l_{ij}^{+}=\mathbf{x}_i'^T\mathbf{x}_j'.
+\label{eq:innerprod}
+\end{equation}
+
+Because raw commute times reflect the stationary distribution, popular states will crowd near the origin regardless of dissimilarity, so raw Euclidean distance is unsuitable for most application. However, the angle between t
+
+he embedding vectors factors out the centrality of popular states. More importantly, its cosine measures the correlation between these two states's travel times to the rest of the graph--how similar their roles are in a random walk. E.g., if two states are perfectly correlated, then jumping instantaneously from one to the other would not change the statistics of the random walk over the remaining states.
+$\mathbf{U}$ is widely used in spectral clustering to approximate the best normalized cut, where vertices in graphs are mapped on rows in $\mathbf{U}$. Note that following from equation~\ref{eq:ectd_embed}, the calculation of commute time distance can be viewed as an embedding of the graph where vertices are mapped on the matrix $(\mathbf{\Lambda})^{1/2}\mathbf{U}$. That is, compared to the entries of yi, the entries of zi are additionally scaled by the inverse eigenvalues of L.
+
+\begin{align}
+l_{ij}^{+}&=\mathbf{x}_i'^T\mathbf{x}_j'\notag\\
+&\varpropto\cos\angle(\mathbf{x}_i', \mathbf{x}_j').
+\label{eq:innerprod}
+\end{align}
+
+The inner product similarity alleviates to some extent the bias of commute time similarity towards high degree nodes. This point can be illustrated by comparing the component $||\mathbf{x}_i'-\mathbf{x}_j'||^2$ in $s_{CT}$ and $\mathbf{x}_i'^T\mathbf{x}_j'$ in $s_{L+}$. Skewed graph with nodes having very large degrees yields skewed values in certain dimensions of $x_i'$ or $x_j'$, making $||\mathbf{x}_i'-\mathbf{x}_j'||^2$ inevitable large, but this is not necessarily the case for $\mathbf{x}_i'^T\mathbf{x}_j'$. For example, if two words are mentioned a lot in a text corpus, the expected time for a random walker to hit either from any word will be low, thus they will have a small mutual commute time. But if they are usually mentioned together with different words, the angle between them may be large, implying decorrelation or anticorrelation. To completely factor out artifacts of skewed distribution or biased sampling, the cosine correlations may be used.
+
+
+%Similarly, with a movie database described below we find that the horror thriller Silence of the Lambs” to the children's film Free Willy have a smaller than average mutual commute time because both were box-office successes, yet the angle between them is larger than average because there was little overlap in their audiences.
+
+
+For data that is relatively uniform (the out degree distribution of the graph does not follow a skewed distribution), the commute distance actually appears useful. However, for realistic data where the degree distribution follows a Zipf or power-law relationship, the commute distance displays a bias toward high degree nodes. This is due to the fact that high degree nodes will have a much higher stationary probability (probability that a random walk will be at the high degree node at any given time) and consequently all the distances are skewed toward the largest nodes.
+
+\end{document}

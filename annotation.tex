@@ -1,4 +1,3 @@
-%At the same time, research in the area of the Semantic Web has led to quite mature standards for modeling and codifying knowledge. Today, Semantic Web ontologies become a key technology for intelligent knowledge processing, providing a framework for sharing conceptual models about a domain. There are already powerful tools available for capturing and management of ontological knowledge~\cite{DuineveldEtal00}\cite{Knublauch04theprotege}. Moreover, the large and continuously growing amount of interlinked Semantic Web data has become a perfect match for novel data mining methods that employ link analysis due to their focus on relations between objects in addition to features/attributes of objects~\cite{KieferEtal2009}. Therefore, we propose to exploit the advances of the Semantic Web technologies to formally represent domain knowledge including structured collection of prior information, inference rules, knowledge enriched datasets etc, and thus develop frameworks for systematic incorporation of domain knowledge in an intelligent data mining environment. We call this technology the \emph{semantic data mining}.
 Annotation in general (traditionally) is a summary made of information in some source such as document, online record, image, video and so forth. With the emergence and development of the Semantic Web, there have been increasing demands for \emph{semantic annotation}, a kind of meta-data derived based upon specific knowledge about the world, rather than indifferent to any ontological commitments. In other words, semantic annotation aims at assigning to the basic element of information links to formal semantic descriptions~\cite{KiryakovEtal04}. Such elements should constitute the semantics of their source, for example, named entities in a document, certain part of an image depicting someone's head portrait.
 
 Semantic annotation is crucial in realizing semantic data mining by bridging formal semantics in Semantic Web meta-data with data. The majority of data underpinning a wide spectrum of data mining applications are stored in various formats, including structured sources such as relational databases (RDB) with their proven track record of scalability and reliability, or semi-structured sources such as spreadsheets with their advantage of low maintenance and cheaper overheads, or even unstructured sources such as text corpus. The problem of how to impart knowledge encoded in Semantic Web ontologies to all sorts of data becomes a major challenge in realizing the semantic data mining. We believe \emph{semantic annotation} is the solution to this challenge. It aims at assigning semantic descriptions to elements of data. To ease the burden of common users that are not familiar with the Semantic Web, we develop a learning-based semantic search algorithm to suggest appropriate semantic descriptions for annotation.
@@ -21,95 +20,8 @@ Similar idea has been adopted in annotating spreadsheets as well. Existing sprea
 
 We argue that mapping RDB or spreadsheet to linked data (e.g., RDF) without referencing to existing semantic descriptions does not lend itself well to aiding semantic data mining. The automatically constructed self-contained local ontology may be applicable to describe a specific dataset but is most likely too rough to capture the full domain semantics that is necessary to express meaningful domain knowledge. Moreover, with the advent of the Semantic Web and pervasive connectivity, an increasing number of ontologies has been made widely available for reuse. These ontologies are created by thorough knowledge engineering process and should serve as better models for annotation. However, on the other hand, the sheer number of Semantic Web ontologies and lack of effective search functionality can lead to a huge hidden barrier for common users. Choosing proper Semantic Web ontologies and terms (classes and properties) requires familiarity with appropriate ontologies and the terms they define. There is very few system that is able to provide automatic suggestions. To solve this problem, we propose a learning-based semantic search algorithm to suggest proper Semantic Web terms and ontologies for annotation given semantically related words and general domain and context information.
 
+In order to suggest suitable Semantic Web terms and ontologies for users to annotate their data, we propose a learning-based semantic search algorithm. We first submit a list of terms appeared in the schema of (semi-)structured data to our semantic search algorithm and then use the returned results for annotation. In a fully automatic setting, the search algorithm is configured to return the top-1 hit; while in an interactive setting, the search algorithm returns ordered top-k search results for users to decide. Previous semantic search algorithms leverage a variety of measures, including lexical and structural similarities (see details below) to rank Semantic Web documents according to how likely they can be semantically matched to the search terms. However, using any single measure alone may not be sufficient to achieve the optimal result. We propose to combine various measures to a weighted feature-based search model, where the weights are learned from training data. We believe the incorporation of learning techniques will improve the semantic search result. We have built a prototypical system for gathering training data for two algorithms: logistic regression and subgradient descent. The evaluation of such method is a matter of ongoing research.
 
-%
-%The TopBraid Composer [6] Semantic Web development system can extract
-%class and instances information from spreadsheets and these can be further manipulated
-%and transformed using additional tools in the suite.
-%One limitation of the approaches described above is that the RDF schema
-%used for one row or a group of rows is quite simple, usually having the shape of a
-%star in which all property edges come out from a single center ¨C the ID resource.
-%This works well for normalized database tables, but is not flexible enough for
-%general purpose spreadsheets. Another limitation in the above approaches is that
-%one fixed RDF schema is applied to all rows of a table.
-
-
-
-\subsection{Proposed Learning-based Semantic Search Algorithm}
-In order to suggest suitable Semantic Web terms and ontologies for users to annotate their data, we propose a learning-based semantic search algorithm. We first submit a list of terms appeared in the schema of (semi-)structured data to our semantic search algorithm and then use the returned results for annotation. In a fully automatic setting, the search algorithm is configured to return the top-1 hit; while in an interactive setting, the search algorithm returns ordered top-k search results for users to decide. Previous semantic search algorithms leverage a variety of measures, including lexical and structural similarities (see details below) to rank Semantic Web documents according to how likely they can be semantically matched to the search terms. However, using any single measure alone may not be sufficient to achieve the optimal result. We propose to combine various measures to a weighted feature-based search model, where the weights are learned from training data. We believe the incorporation of learning techniques will improve the semantic search result.
-
-\subsubsection{Feature-based Semantic Search Model.}
-\label{FeatureModel}
-Consider a set of ontologies $\mathbf{O}=\{O_1...O_m\}$ returned as the search result for a specific search term. Let
-$\mathbf{\Phi} = \{\phi_1(O_i)...\phi_m(O_m)\}$ be a vector of real-valued feature functions $\phi~:~O\mapsto \mathbb{R}$
-that compute rank indicating how ontologies should be ordered in the search result. The one with the highest rank is the top-hit for a specific search. Let $\mathbf{W} =\{w_1...w_m\}$
-be a vector of real-valued weights associated with each feature.
-A score is computed for each ontology $O_i$ by
-taking the dot product of the features and weights:
-$$\tau(O_i,\mathbf{W})=\mathbf{\Phi} \cdot \mathbf{W} \; .$$
-We can leverage a variety of ranking methods proposed in the literature as the feature functions $\mathbf{\Phi}$. For example,
-Alan et al.~\cite{AlaniEtal05} proposed four types of measurements to evaluate the ranks for ontologies given a list of search terms: The Class Match Measure (CMM) measures the coverage of an ontology of the given search terms; The Centrality Measure (CEM) is aimed to asses how representative a class is of an ontology according to the assumption that the more central a class is in the hierarchy, the more likely it is well analyzed and represented; Density Measure (DEM) examines how well a concept is represented by taking into consideration its neighboring concepts; And Semantic Similarity Measure (SSM) calculates the distance between classes  in an ontology that match the search terms.
-The Swoogle search engine~\cite{Ding05searchon}\cite{Ding05findingand} weighs different types of links between Semantic Web data and rank them using link-based algorithms to evaluate the importance of Semantic Web objects at three levels of granularity: documents terms and RDF graphs.
-Maedche et al.~\cite{Maedche03Onto} described a two level similarity measure. The first level is the so called lexical comparison level, where a lexical similarity measure, called string matching (SM), is proposed based on Levenshtein's edit distance to compare two lexical entries $L_i$ and $L_j$:
-$SM(L_i,L_j)=max\left( 0, \frac{min\left(|L_i|,|L_j| \right)-ed\left(L_i,L_j\right)}{min\left(|L_i|,|L_j|\right)} \right)$
-$\in \left[0,1\right]$. The second level is the conceptual comparison level where two taxonomies are compared by examining the semantic cotopies of the sets of concepts from the two ontologies.
-
-\subsubsection{Training Set.}
-Our algorithm to determine the vector of weights $\mathbf{W}$ requires a \emph{training set} of known
-top hit in the search result (chosen by human):
-$$\mathcal{T}=\{<\mathbf{O}^1,l_1>...<\mathbf{O}^n,l_n>\} \; ,$$
-where each set of ontology namespaces $\mathbf{O}^i=\{O_1...O_k\}$ is associated with label $l_i \in \{1...k\}$,
-indicating which of the ontologies should be selected for annotating the specific term $t_i$ (i.e.,
-$O_{l_i} \in O$ is the true ontology selected by human as the best choice for annotating the term).
-There are several ways to estimate $\mathbf{W}$ from the training set $\mathcal{T}$ as described below.
-
-
-\subsubsection{Subgradient Descent.}
-We can view the weight learning as maximum margin structured learning problem. Given a training set and loss function,
-the learned $\mathbf{W}$ should score each known top-hit result $O_{l_i}$ higher than all other $O$ by at least
-$\mathcal{L}(O_{l_i}, O)$, where $\mathcal{L}$ is the loss function. Mathematically, this constraint is
-$$\forall i, O \in \{\mathbf{O}^i\backslash O_{l_i}\}, \mathbf{W}\cdot \mathbf{\Phi}(O_{l_i}) \geq \mathbf{W}\cdot \mathbf{\Phi}(O)+\mathcal{L}(O_{l_i}, O) \; ,$$
-where $\{\mathbf{O}^i\backslash O_{l_i}\}$ is the set of possible ontologies returned by a specific search query excluding the gold standard ontology $O_{l_i}$ chosen by human. We can express this constraint as the following convex program:
-$$\min_{\mathbf{W},\zeta^i}\frac{\lambda}{2}\|\mathbf{W}\|^2+\frac{1}{d}\sum^d_{i=1}\zeta^i$$\\
-$$s.t. \forall i, O \in \mathbf{O}, \mathbf{W} \cdot \mathbf{\Phi}(O_{l_i})+\zeta_i \geq \mathbf{W} \cdot \mathbf{\Phi}(O) + \mathcal{L}(O_{l_i},O) \; ,$$
-where $\lambda$ is a regularization term that prevents overfitting. We can rearrange the convex program to show that the optimal $\mathbf{W}$ minimizes
-\begin{equation}
-c(\mathbf{W})=\frac{1}{d}\sum^d_{i=1}r^i(\mathbf{W})+\frac{\lambda}{2}\|\mathbf{W}\|^2 \; ,
-\label{convex}
-\end{equation}
-where $r_i(\mathbf{w})=\max_{O\in \{O_{l_i}\}}(\mathbf{W} \cdot \mathbf{\Phi}(O) + \mathcal{L}(O_{l_i},O)) - \mathbf{W} \cdot \mathbf{\Phi}(O_{l_i})\; .$
-This objective function is convex but nondifferentiable. We can therefore minimize it with subgradient descent, an extension of gradient descent to nondifferentiable objective functions. The subgradient of Equation~\ref{convex} is
-$$\lambda \mathbf{W} + \frac{1}{d}\sum^d_{i=1}(\mathbf{\Phi}(O^\ast_{l_i})-\mathbf{\Phi}(O_{l_i})) \; ,$$
-where $O^\ast_{l_i}=argmax_{O \in \{ O_{l_i} \} } \mathbf{W} \cdot \mathbf{\Phi}(O) + \mathcal{L}(O_{l_i}, O)$ is the predicted top hit ontology.
-%, determined by the loss function $\mathcal{L}(O_{l_i}, O)$ and current $\mathbf{W}$.
-Based on these ideas, we can iteratively compute the subgradient of equation~\ref{convex}~\cite{Ratliff07subgradient} and converge at the optimal weights.
-
-
-\subsubsection{Logistic Regression.}
-The second method is based on logistic regression (sometimes
-called maximum entropy classification). We
-modify the traditional logistic regression loss function to
-rank, rather than classify, instances.
-Let the binary random variable $C_i$ be 1 if and only if
-ontology $O_i$ is the gold standard chosen by human.
-Given $\mathbf{W}$ and $\mathbf{\Phi}$, we can compute the
-probability of $C_i$ as follows:
-
-$$p\left(C_i=1|\mathbf{O, W}\right)=\frac{e^{\tau(O_i, \mathbf{W})}}{\sum_{O_j \in \mathbf{O}} e^{\tau(O_j, \mathbf{W})}} \; ,$$
-where the score for ontology $O_i$ is normalized by the scores for
-every other ontologies.
-We can estimate $\mathbf{W}$ from the training set $\mathcal{T}$
-by minimizing the negative log-likelihood of the data given $\mathbf{W}$:
-\begin{equation}
-\mathcal{L}\left(\mathbf{W}, \mathcal{T}\right) = - \sum_{O^i \in \mathcal{T}} \log p \left(C_{l_i}|\mathbf{O,W} \right) \; .
-\label{logisticregression}
-\end{equation}
-Note that this is the sum of probabilities for each of the gold standard ontology
- for the current setting of $\mathbf{W}$. We can also
-add a Gaussian prior over $\mathbf{W}$ with fixed mean and variance
-to mitigate over-fitting. We can find the setting of $\mathbf{W}$ that minimizes
-Equation~\ref{logisticregression} using limited-memory BFGS, a gradient
-ascent method with a second-order approximation~\cite{Liu89onthe}.
 
 \section{Annotation by Multiple Ontologies}
 %%general review of the field of ontology matching
@@ -278,6 +190,7 @@ Given $x_a^{(n)}$, derive $x_c^{(n)}$:
 To calculate $\pi$ that satisfies equations~\ref{eq:gen_xa} and \ref{eq:gen_xc}, rather than iterating through all possible permutations, we can consider the equation as a minimum-cost assignment problem. Table~\ref{tbl:sim_mat}(A), for example, illustrates a distance table between two attribute sets $A$ and $A'$. Matching of the two sets can be considered as an assignment problem where the goal is to find an assignment of elements in $\{A_i\}$ to those in $\{A_i'\}$ that yields the minimum total distance without assigning each $A_i$ more than once. This problem can be efficiently solved by the Hungarian Method in polynomial time of $O(K_{min}^3)$~\cite{Kuhn1955}. It is worth noting that by formulating the problem as the assignment problem, we assume the matching between two sets to be a one-to-one function.
 
 \section{Case Studies}
+\section{Experiment}
 \label{sec:experiment}
 Because we are interested in understanding the property of the Pareto front obtained by our method, we conducted a series of experiments to highlight tradeoffs of the objectives functions. First, to illustrate the proposed method is indeed capable of determining matchings between numeric-typed attributes and clusters, we synthesized a dataset simulating some extreme conditions under which previous methods are ineffective. Also, from the results obtained on the synthetic dataset, we empirically study tradeoffs between the two objective functions. Then, to evaluate the scalability of the method, we carry out a series of tests on a set of data with varied sizes. Finally, encouraged by these results, we applied our methods to actual neuroscience ERP (event-related potentials) data to highlight the applicability of our method to the neuroscience domain.
 
@@ -302,7 +215,7 @@ $a_1'$ --- range: [-5.72, 5.72] & $a_3'$ --- range: [-5.24, 5.24] & $a_2'$ --- r
 $\mu$: 0, $\sigma$:2.20 & $\mu$: 0, $\sigma$:2.35 & $\mu$: 0, $\sigma$:2.15 \\
 \end{tabular}
 \end{center}
-\caption[Synthetic data generation.]{\label{fig:syndata} Scatter plots of data instances from three sample attributes in one synthetic dataset (upper frame) and those of their corresponding attributes from another (lower frame) are illustrated to show their respective value distributions.}
+\caption{\label{fig:syndata} Scatter plots of data instances from three sample attributes in one synthetic dataset (upper frame) and those of their corresponding attributes from another (lower frame) are illustrated to show their respective value distributions.}
 \end{figure*}
 
 \subsubsection{Results:}
@@ -311,7 +224,7 @@ Figure~\ref{fig:syn_pareto} illustrates the Pareto front obtained from matching 
 \begin{center}
 \includegraphics[width=0.4\textwidth]{fig/syn_pareto.eps}
 \end{center}
-\caption[An example Pareto front.]{\label{fig:syn_pareto} An example Pareto front obtained from matching two synthetic datasets with 20 attributes and 5 clusters.}
+\caption{\label{fig:syn_pareto} An example Pareto front obtained from matching two synthetic datasets with 20 attributes and 5 clusters.}
 \end{figure}
 
 \subsubsection{Running Time:}
@@ -336,7 +249,7 @@ We systematically altered the number of attributes and clusters present in the d
 \hline
 \end{tabular}
 \end{center}
-\caption[Running time.]{\label{tbl:scale} Running time of the annealing process on synthetic datasets with varied configurations of attribute and cluster sizes. The time is obtained by averaging over results of 5 runs of each test.}
+\caption{\label{tbl:scale} Running time of the annealing process on synthetic datasets with varied configurations of attribute and cluster sizes. The time is obtained by averaging over results of 5 runs of each test.}
 \end{table}
 
 \subsection{Neuroscience Dataset}
@@ -368,7 +281,7 @@ It is worth noting that our method greatly outperforms a baseline method called 
 \begin{center}
 \includegraphics[width=1.\textwidth]{fig/perf_comp.eps}
 \end{center}
-\caption[Performance of MOSA on the neuroscience dataset.]{\label{fig:perf_comp} A comparison of the attribute matching accuracy of three methods on the 16 test cases of the neuroscience dataset. The three methods being compared are matching based on whole-attribute statistics (WS), segmented attribute statistics without knowing a priori cluster matching (SS-u), and segmented attribute statistics with expert-aligned clusterings (SS).}
+\caption{\label{fig:perf_comp} A comparison of the attribute matching accuracy of three methods on the 16 test cases of the neuroscience dataset. The three methods being compared are matching based on whole-attribute statistics (WS), segmented attribute statistics without knowing a priori cluster matching (SS-u), and segmented attribute statistics with expert-aligned clusterings (SS).}
 \end{figure*}
 
 
@@ -397,7 +310,7 @@ Test case & Source params & Target params & $~~~P_a~~~$ & $~~~P_c~~~$ & $|\Sigma
 \hline
 \end{tabular}
 \end{center}
-\caption[A comparison between MOSA and MOGA performances.]{\label{tbl:nemo_perf} Matching performance of the proposed method with MOSA on the 16 test cases from the neuroscience dataset. The source and target parameter configuration of the data acquisition process of each test case are shown. $P_a$ and $P_c$ denote the accuracy of attribute matching and cluster matching respectively. $\Sigma$ is the number of points in the obtained Pareto-front. The quantities listed in the table are obtained by averaging over 5 runs of each test.}
+\caption{\label{tbl:nemo_perf} Matching performance of the proposed method with MOSA on the 16 test cases from the neuroscience dataset. The source and target parameter configuration of the data acquisition process of each test case are shown. $P_a$ and $P_c$ denote the accuracy of attribute matching and cluster matching respectively. $\Sigma$ is the number of points in the obtained Pareto-front. The quantities listed in the table are obtained by averaging over 5 runs of each test.}
 \end{table*}
 
 \subsection{Comparison with Multi-Objective Genetic Algorithm}
@@ -432,7 +345,7 @@ Test Case	&	$P_a$ (\%)	&	$P_c$ (\%) &   $\Sigma$    \\
 \hline
 \end{tabular}
 \end{center}
-\caption[The performance of MOGA on the neuroscience dataset.]{\label{tbl:moga_neuro} Matching performance of the proposed method with MOGA on the 16 test cases from the neuroscience dataset. The source and target parameter configuration of each test case is the same as in Table~\ref{tbl:nemo_perf}.}
+\caption{\label{tbl:moga_neuro} Matching performance of the proposed method with MOGA on the 16 test cases from the neuroscience dataset. The source and target parameter configuration of each test case is the same as in Table~\ref{tbl:nemo_perf}.}
 \end{table*}
 
 The number of population kept in each generation is an important parameter regarding the complexity and performance in MOGA. Intuitively, the more instances we keep, the broader the search space we can explore in each generation. Table~\ref{tbl:moga_neuro} shows the result with the number of population set to 4. We have also tested other settings and found out that the accuracy in most cases increase with the number of population but in rare cases the performance deteriorates. The overall performance of MOGA is comparable to that of MOSA but appears to be less robust. It is worth noting that the metaheuristics (MOSA and MOGA) we employed in the experiments are simple algorithms. More modern and sophisticated methods that explore various fitness assignment procedure, elitism, or diversification approaches will be very likely to improve the performance.
@@ -442,7 +355,7 @@ The number of population kept in each generation is an important parameter regar
 \begin{center}
 \begin{tabular}{l|l|l|l|l|l|l|l}
 \hline
-\multicolumn{2}{c|}{}		&	fixed acidity	&	volatile acidity	&	citric acid	&	residual sugar	&	chlorides	&	 free sulfur dioxide	\\
+\multicolumn{2}{c|}{}		&	fixed acidity	&	volatile acidity	&	citric acid	&	residual sugar	&	chlorides	&	free sulfur dioxide	\\
 \hline
 \multirow{2}{*}{mean}	&	data1	&	6.86	&	0.28	&	0.34	&	6.35	&	0.05	&	35.58	\\
 	&	data2	&	6.85	&	0.28	&	0.33	&	6.43	&	0.05	&	35.02	\\
@@ -465,7 +378,7 @@ The number of population kept in each generation is an important parameter regar
 \hline
 \end{tabular}
 \end{center}
-\caption[Statistics of the Wine Quality dataset.]{\label{tbl:wine_stat} Summary of the statistical characteristics of attributes in the Wine Quality dataset.}
+\caption{\label{tbl:wine_stat} Summary of the statistical characteristics of attributes in the Wine Quality dataset.}
 \end{table*}
 
 \subsubsection{Wine Quality Dataset}
@@ -483,6 +396,93 @@ MOSA accuracy (\%)	&	MOSA running time (ms)	&	MOGA accuracy (\%)	&	MOGA running 
 \hline
 \end{tabular}
 \end{center}
-\caption[The performances of MOSA and MOGA on the Wine Quality dataset.]{\label{tbl:wine_res} Performance of the proposed method with MOSA and MOGA as metaheuristics respectively on the Wine Quality dataset.}
+\caption{\label{tbl:wine_res} Performance of the proposed method with MOSA and MOGA as metaheuristics respectively on the Wine Quality dataset.}
 \end{table*}
 
+
+\section{Discussion}
+\label{sec:discussion}
+\textbf{Single Objective vs. Multi-objective Approaches:}
+In our previous work~\cite{LiuEtal10,LiuEtalNEUCOM12} we assume the cluster matching is known prior to attribute matching. Then the attribute matching alone is simply a single objective problem. However, as we pointed out in the Introduction section, this is a gross simplification because attribute matching and cluster matching are intertwined and usually none can be known without the knowledge of the other. Therefore in this work, we focus on tackling this deadlock.
+
+We argue that single objective approach is not applicable given the way we represent attributes and clusters. Specifically, we represent an attribute as an ordered tuple, $<v_1, v_2, \ldots, v_3>$, where $v_i$ is some statistics of the attribute in a cluster $c_i$ of one dataset. Two attributes from different datasets can be compared only when we are able to arrange the tuples so that matching positions correspond to the same cluster. This assumes a certain kind of cluster matching. The vice versa is true for cluster matching in that we need some input on attribute matching. Essentially the problem at hand is to search in two permutation spaces, one for each matching problem, which naturally leads to our multi-objective approach. If one was to adopt a single objective approach, the two spaces would have to be concatenated and variables aggregated by some functions (e.g., weighted sum).  We argue it might be flawed because there is no way to justify the ad hoc choice of such functions. On the contrary, the multi-objective approach based on Pareto optimality circumvents the choice of aggregation, but focuses on obtaining a non-dominating set of solutions (the Pareto set). We demonstrate in our case studies one simple way to utilize the Pareto set by combining both objectives based on weights that are determined through pilot experiments. Note that applying weights before and after the optimization is fundamentally different. The former carries more systematic risk of missing true optimum due to the arbitrary choice of weights, while the latter is just one way to post-process the Pareto set that is very likely to contain the optimum. In practice, the Pareto set itself can be well treated as the final product of the matching analysis. Note that we show the sizes of Pareto sets in Table~\ref{tbl:nemo_perf} for the neuroscience test case, which are all reasonably small for examination to hand-pick best solutions.
+
+
+\textbf{Scalability Issues:}
+The main computationally expensive part of the annealing process is the generation of new candidate solution phase (function $G$) in which an assignment problem is solved using the Hungarian method. The complexity of the Hungarian method is cubic and is already the most efficient algorithm for solving the assignment problem (e.g., a brute force algorithm has a factorial complexity). Although in our real-world case studies data are of relatively small dimensionality, we observe that there exist massive datasets that could render our method computationally impractical. For example, the ARCENE dataset~\cite{ARCENE} from the UCI machine learning repository contains mass-spectrometric output with 10,000 continuous input variables. ARCENE's task is to distinguish cancer versus normal patterns and the dataset is typically used as a benchmark for classification and feature selection algorithms. To match sets of attributes at this scale will definitely require more advanced adaptation of our metaheuristics search algorithm, such as approximation or partitioning of the search space to enable parallelism. On the other hand, we have shown in our case studies that our method boasts significant accuracy and the unique ability to distinguish attributes with similar statistics.  For the ARCENE dataset, we create an artificial matching problem by first randomly select a subset of data with 150 attributes as the source, and then make a target dataset by injecting a small amount of noise to the source. We then run the simulated annealing algorithm to find both attribute and cluster matchings and achieved 132/150 accuracy for attribute matching and 4/5 accuracy for cluster matching. A baseline method that simply utilizes one single statistics for each attribute scores 95/150 accuracy. This shows that, without employing parallelism, our method provides for trade-off between accuracy and scalability.
+
+\begin{comment}
+
+\subsubsection{Feature-based Semantic Search Model.}
+\label{FeatureModel}
+Consider a set of ontologies $\mathbf{O}=\{O_1...O_m\}$ returned as the search result for a specific search term. Let
+$\mathbf{\Phi} = \{\phi_1(O_i)...\phi_m(O_m)\}$ be a vector of real-valued feature functions $\phi~:~O\mapsto \mathbb{R}$
+that compute rank indicating how ontologies should be ordered in the search result. The one with the highest rank is the top-hit for a specific search. Let $\mathbf{W} =\{w_1...w_m\}$
+be a vector of real-valued weights associated with each feature.
+A score is computed for each ontology $O_i$ by
+taking the dot product of the features and weights:
+$$\tau(O_i,\mathbf{W})=\mathbf{\Phi} \cdot \mathbf{W} \; .$$
+We can leverage a variety of ranking methods proposed in the literature as the feature functions $\mathbf{\Phi}$. For example,
+Alan et al.~\cite{AlaniEtal05} proposed four types of measurements to evaluate the ranks for ontologies given a list of search terms: The Class Match Measure (CMM) measures the coverage of an ontology of the given search terms; The Centrality Measure (CEM) is aimed to asses how representative a class is of an ontology according to the assumption that the more central a class is in the hierarchy, the more likely it is well analyzed and represented; Density Measure (DEM) examines how well a concept is represented by taking into consideration its neighboring concepts; And Semantic Similarity Measure (SSM) calculates the distance between classes  in an ontology that match the search terms.
+The Swoogle search engine~\cite{Ding05searchon}\cite{Ding05findingand} weighs different types of links between Semantic Web data and rank them using link-based algorithms to evaluate the importance of Semantic Web objects at three levels of granularity: documents terms and RDF graphs.
+Maedche et al.~\cite{Maedche03Onto} described a two level similarity measure. The first level is the so called lexical comparison level, where a lexical similarity measure, called string matching (SM), is proposed based on Levenshtein's edit distance to compare two lexical entries $L_i$ and $L_j$:
+$SM(L_i,L_j)=max\left( 0, \frac{min\left(|L_i|,|L_j| \right)-ed\left(L_i,L_j\right)}{min\left(|L_i|,|L_j|\right)} \right)$
+$\in \left[0,1\right]$. The second level is the conceptual comparison level where two taxonomies are compared by examining the semantic cotopies of the sets of concepts from the two ontologies.
+
+\subsubsection{Training Set.}
+Our algorithm to determine the vector of weights $\mathbf{W}$ requires a \emph{training set} of known
+top hit in the search result (chosen by human):
+$$\mathcal{T}=\{<\mathbf{O}^1,l_1>...<\mathbf{O}^n,l_n>\} \; ,$$
+where each set of ontology namespaces $\mathbf{O}^i=\{O_1...O_k\}$ is associated with label $l_i \in \{1...k\}$,
+indicating which of the ontologies should be selected for annotating the specific term $t_i$ (i.e.,
+$O_{l_i} \in O$ is the true ontology selected by human as the best choice for annotating the term).
+There are several ways to estimate $\mathbf{W}$ from the training set $\mathcal{T}$ as described below.
+
+
+\subsubsection{Subgradient Descent.}
+We can view the weight learning as maximum margin structured learning problem. Given a training set and loss function,
+the learned $\mathbf{W}$ should score each known top-hit result $O_{l_i}$ higher than all other $O$ by at least
+$\mathcal{L}(O_{l_i}, O)$, where $\mathcal{L}$ is the loss function. Mathematically, this constraint is
+$$\forall i, O \in \{\mathbf{O}^i\backslash O_{l_i}\}, \mathbf{W}\cdot \mathbf{\Phi}(O_{l_i}) \geq \mathbf{W}\cdot \mathbf{\Phi}(O)+\mathcal{L}(O_{l_i}, O) \; ,$$
+where $\{\mathbf{O}^i\backslash O_{l_i}\}$ is the set of possible ontologies returned by a specific search query excluding the gold standard ontology $O_{l_i}$ chosen by human. We can express this constraint as the following convex program:
+$$\min_{\mathbf{W},\zeta^i}\frac{\lambda}{2}\|\mathbf{W}\|^2+\frac{1}{d}\sum^d_{i=1}\zeta^i$$\\
+$$s.t. \forall i, O \in \mathbf{O}, \mathbf{W} \cdot \mathbf{\Phi}(O_{l_i})+\zeta_i \geq \mathbf{W} \cdot \mathbf{\Phi}(O) + \mathcal{L}(O_{l_i},O) \; ,$$
+where $\lambda$ is a regularization term that prevents overfitting. We can rearrange the convex program to show that the optimal $\mathbf{W}$ minimizes
+\begin{equation}
+c(\mathbf{W})=\frac{1}{d}\sum^d_{i=1}r^i(\mathbf{W})+\frac{\lambda}{2}\|\mathbf{W}\|^2 \; ,
+\label{convex}
+\end{equation}
+where $r_i(\mathbf{w})=\max_{O\in \{O_{l_i}\}}(\mathbf{W} \cdot \mathbf{\Phi}(O) + \mathcal{L}(O_{l_i},O)) - \mathbf{W} \cdot \mathbf{\Phi}(O_{l_i})\; .$
+This objective function is convex but nondifferentiable. We can therefore minimize it with subgradient descent, an extension of gradient descent to nondifferentiable objective functions. The subgradient of Equation~\ref{convex} is
+$$\lambda \mathbf{W} + \frac{1}{d}\sum^d_{i=1}(\mathbf{\Phi}(O^\ast_{l_i})-\mathbf{\Phi}(O_{l_i})) \; ,$$
+where $O^\ast_{l_i}=argmax_{O \in \{ O_{l_i} \} } \mathbf{W} \cdot \mathbf{\Phi}(O) + \mathcal{L}(O_{l_i}, O)$ is the predicted top hit ontology.
+%, determined by the loss function $\mathcal{L}(O_{l_i}, O)$ and current $\mathbf{W}$.
+Based on these ideas, we can iteratively compute the subgradient of equation~\ref{convex}~\cite{Ratliff07subgradient} and converge at the optimal weights.
+
+
+\subsubsection{Logistic Regression.}
+The second method is based on logistic regression (sometimes
+called maximum entropy classification). We
+modify the traditional logistic regression loss function to
+rank, rather than classify, instances.
+Let the binary random variable $C_i$ be 1 if and only if
+ontology $O_i$ is the gold standard chosen by human.
+Given $\mathbf{W}$ and $\mathbf{\Phi}$, we can compute the
+probability of $C_i$ as follows:
+
+$$p\left(C_i=1|\mathbf{O, W}\right)=\frac{e^{\tau(O_i, \mathbf{W})}}{\sum_{O_j \in \mathbf{O}} e^{\tau(O_j, \mathbf{W})}} \; ,$$
+where the score for ontology $O_i$ is normalized by the scores for
+every other ontologies.
+We can estimate $\mathbf{W}$ from the training set $\mathcal{T}$
+by minimizing the negative log-likelihood of the data given $\mathbf{W}$:
+\begin{equation}
+\mathcal{L}\left(\mathbf{W}, \mathcal{T}\right) = - \sum_{O^i \in \mathcal{T}} \log p \left(C_{l_i}|\mathbf{O,W} \right) \; .
+\label{logisticregression}
+\end{equation}
+Note that this is the sum of probabilities for each of the gold standard ontology
+ for the current setting of $\mathbf{W}$. We can also
+add a Gaussian prior over $\mathbf{W}$ with fixed mean and variance
+to mitigate over-fitting. We can find the setting of $\mathbf{W}$ that minimizes
+Equation~\ref{logisticregression} using limited-memory BFGS, a gradient
+ascent method with a second-order approximation~\cite{Liu89onthe}.
+\end{comment} 
