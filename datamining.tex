@@ -1,7 +1,7 @@
-\section{Method}
+\section{Overview}
 By developing the unified representation for both data and domain knowledge, and utilizing ontological annotations, we can produce one RDF hypergraph, which serves as the basis for semantic data mining. Given this, the main research challenge is how to utilize the data and ontology together for semantic data mining. In this dissertation, we focus on one important data mining tasks, the {\em frequent pattern mining}, to showcase the utility of RDF hypergraphs.
 
-\subsection{Frequent Pattern Mining}
+\subsection{Semantically Associated Itemsets}
 \label{sec:association}
 Frequent itemsets play an essential role in many data mining tasks that try to discover interesting relations between features in large databases. In the traditional sense, an itemset is called frequent if its support (number of times the itemset occur in the dataset) is no less than a given threshold. The original motivation for searching association rules came from the need to analyze supermarket customer behavior in terms of products that are often purchased together. However, it is evident that the measure of support essentially restrains pattern discovery to account for only directly associated items (\eg, products purchased together) while ignoring possible indirect associations. A prominent example of such indirect association was given by Swanson's land mark paper published in 1987~\cite{swanson87} that described the relationship between fish oil and Raynauld's syndrom through their mutual connections with certain changes in blood.
 
@@ -9,9 +9,9 @@ Such indirect associations can be best captured by graphs. In general, an object
 
 The term \emph{semantic association} conforms with the definition proposed by Sheth et al.~\cite{ShethEtal05JDBM} for semantic association between entities in an RDF graph. Specifically, they define the semantic association based on if there exists a sequence of interconnected links between two given entities. In our study of semantically associated itemsets in transaction data, the link between entities can be as simple as the `co-occurrence' relationship if more complicated relationships in ontologies are not concerned. Under Sheth et al's definition, the semantic association between transaction items $i_0$ and $i_n$ can be established by identifying a link of the form $i_0, P_c, i_1, P_c, \ldots , i_{n-1}, P_c, i_n$, in which $P_c$ denotes the property that connects two items (\eg, co-occurrence). Given this, the problem of finding meaningful semantic association becomes how to define a proper graph representation and effective analysis methods that can be carried out to evaluate the strength of semantic associations.
 
-We first rule out simple graphs as the candidate model for discovering semantic associations due to the ambiguity and information loss. For illustrating this point of view, let us consider a relational table depicted in Figure~\ref{fig:hg_and_rg}(a). One can construct a simple undirected graph where the set of vertices is the set of relational attributes (column items) and an edge joins two vertices if the they co-occur in a tuple (as illustrated in Figure~\ref{fig:hg_and_rg}(b)). This graph is called \emph{Gaifman graph}~\cite{Hodkinson02finiteconformal} of a relational structure. The undirected graph can be further enriched by assigning to each edge a weight equal to the support of the 2-itemset consisting of vertices incident to the edge. Cliques (complete subgraphs) in the Gaifman graph, or \emph{Gaifman cliques} for short, are of particular interest because every tuple (ground atom) in data corresponds to a Gaifman clique. However, ambiguity arises as not all Gaifman cliques have matching tuple in the data. There exists cases where cliques are incidental in the sense that several relational ground atoms play together to induce a clique configuration in the Gaifman graph, but no ground atom covers the entire clique (e.g., the clique of $\{A,B,C,D\}$ in Figure~\ref{fig:hg_and_rg}(b) does not correspond to any tuple in the relational table). Further more, given the Gaifman graph we lose the information of how nodes are related. For example, if $A, B$ and $C$ are products purchased by a particular customer as indicated by a record in the transactional table, this information is no longer available in the graph
+We first rule out simple graphs as the candidate model for discovering semantic associations due to the ambiguity and information loss. For illustrating this point of view, let us consider a relational table depicted in Figure~\ref{fig:hg_and_rg}(a). One can construct a simple undirected graph where the set of vertices is the set of relational attributes (column items) and an edge joins two vertices if the they co-occur in a tuple (as illustrated in Figure~\ref{fig:hg_and_rg}(b)). This graph is called \emph{Gaifman graph}~\cite{Hodkinson02finiteconformal} of a relational structure. The undirected graph can be further enriched by assigning to each edge a weight equal to the support of the 2-itemset consisting of vertices incident to the edge. Cliques (complete subgraphs) in the Gaifman graph, or \emph{Gaifman cliques} for short, are of particular interest because every tuple (ground atom) in data corresponds to a Gaifman clique. However, ambiguity arises as not all Gaifman cliques have matching tuple in the data. There exists cases where cliques are incidental in the sense that several relational ground atoms play together to induce a clique configuration in the Gaifman graph, but no ground atom covers the entire clique (e.g., the clique of $\{A,B,C,D\}$ in Figure~\ref{fig:hg_and_rg}(b) does not correspond to any tuple in the relational table). Further more, given the Gaifman graph we lose the information of how nodes are related. For example, if $A, B$ and $C$ are products purchased by a particular customer as indicated by a record in the transactional table, this information is no longer available in the graph.
 
-The RDF bipartite graph introduced in~\ref{sec:graph-rep-for-rdb} comes to remedy as it maximally preserves the semantics in the original table and contains no ambiguity. Plus it is able to represent ontologies in the same way so that analysis approaches on the RDF bipartite graph can systematically utilize information from both data and domain knowledge. Moreover, if a mining task does not involve the use of domain knowledge from ontologies, the RDF bipartite graph can be transformed to a more compact form that achieves better scalability. In the rest of this chapter, we describe in detail the methods for discovering semantically associated itemsets with and without the incorporation of ontologies respectively.
+The RDF bipartite graph introduced in~\ref{sec:graph-rep-for-rdb} comes to remedy as it maximally preserves the semantics in the original table and contains no ambiguity. Plus it is able to represent ontologies in the same way so that analysis approaches on the RDF bipartite graph can systematically utilize information from both data and domain knowledge. Moreover, if a mining task does not involve the use of domain knowledge from ontologies, the RDF bipartite graph can be transformed to a more compact form that achieves better scalability. In the rest of this chapter, we describe in detail the methods for discovering semantically associated itemsets without the incorporation of ontologies. We cover the usage of the RDF bipartite graph to incorporate ontologies in the mining process in the next chapter.
 
 \subsection{Graph-based similarity}
 Data mining algorithms rely on the notion of similarity between data points to make meaningful inferences. When data is in $\mathbb{R}^d$, the standard similarity measure is the Euclidean distance. When data has an explicit link structure, shortest path distance is commonly used. However, neither of these measures incorporates the intuition that two data points are similar to each other if they are connected by a high density region. This latter concept of similarity measure has been shown in experiments to lead to significant improvement in a number of learning tasks, see, for example, (Blum \& Chawla, 2001; Corduneanu \& Jaakkola, 2003; Bous-quet et al., 2004)~\cite{}.
@@ -77,7 +77,7 @@ Zhou et al.~\cite{Zhou06learningwith} define the following normalized hypergraph
 \mathcal{L}=\mathbf{I}-\mathbf{\Theta},   ~\mathrm{where}~ \mathbf{\Theta}=\mathbf{D}_v^{-\frac12}\mathbf{HWD}_e^{-1}\mathbf{H}^T\mathbf{D}_v^{-\frac12} \label{eq:normalizedHyperL}.
 \end{align}
 
-\section{Mining Semantically Associated Itemsets without Ontologies}
+\section{Method}
 In this section, we present our study for discovering semantically associated itemsets based on hypergraph without incorporating domain knowledge in ontologies. The goal of this study is to show that, using graph based formalism, we can obtain interesting patterns that are unable to be captured by traditional methods.
 
 If a mining task does not involve the usage of ontologies and focuses only on data in tables, we can use an alternative hypergraph representation that is more compact than the RDF bipartite graph to model the data. The process to generate such hypergraph is called \emph{RDF hypergraph coarsening} as described in Definition~\ref{def:hg-coarsen}.
@@ -113,7 +113,7 @@ In the following we describe two similarity measures that define the strength of
 
 \textbf{Average Commute Time Similarity $s_{CT}$}\\
 To compute commute-time distance between vertices in a hypergraph, we need to first define the combinatory hypergraph Laplacian $\mathbf{L}$.
-It follows from Zhou et al's formalism of normalized hypergraph Laplacian in Equation~\ref{eq:normalizedHyperL} that:
+It follows from Zhou et al's formalism of normalized hypergraph Laplacian in~\ref{eq:normalizedHyperL} that:
 \begin{equation}
 \mathbf{L}=\mathbf{D}^{1/2}\mathcal{L}\mathbf{D}^{-1/2}=\mathbf{D}_v-\mathbf{HWD}_e^{-1}\mathbf{H}^T \label{eq:combinatoryHyperL}
 \end{equation}
@@ -131,14 +131,14 @@ $
 \mathbf{e}_i=[\stackbin[1]{}{0}, \ldots, \stackbin[i-1]{}{0}, \stackbin[i]{}{1},$
 $ \stackbin[i+1]{}{0}, \ldots, \stackbin[n]{}{0}]^T
 $),
-Equation~\ref{eq:CT} can be transformed to:
+~\ref{eq:CT} can be transformed to:
 \begin{align}
 n(i,j)=V_G(\mathbf{e}_i-\mathbf{e}_j)^T\mathbf{L}^+(\mathbf{e}_i-\mathbf{e}_j), \label{eq:CT2}
 \end{align}
 Since $n(i,j)$ is a distance, it is straightforward to convert it to a similarity measure $s_{CT}(i,j)$ by normalize it to unit range and subtract from 1.
 
 \textbf{Pseudoinverse-based Inner-Product Similarity $s_{L+}$}\\
-Equation \ref{eq:CT2} can be mapped into a new Euclidean space that preserves the commute time distance:
+\ref{eq:CT2} can be mapped into a new Euclidean space that preserves the commute time distance:
 \begin{align}
 \notag n(i,j)&=V_G(\mathbf{e}_i-\mathbf{e}_j)^T\mathbf{L}^+(\mathbf{e}_i-\mathbf{e}_j)\\
 \notag &=V_G(\mathbf{x}_i'-\mathbf{x}_j')^T(\mathbf{x}_i'-\mathbf{x}_j')\\
@@ -199,7 +199,7 @@ Because we are interested in understanding the differences between the $s_{CT}$ 
 
 \subsection{Fish Oil}
 \subsubsection{Dataset}
-As mentioned in Section~\ref{sec:introduction}, \emph{fish oil} and \emph{Raynaud's syndrome} have been shown by Swanson~\cite{swanson87} to be linked together indirectly via various \emph{blood changes}.  He found these associations from examining biomedical texts.  As a proof of concept, we replicated this situation by synthesizing a table of 50 rows, which is about the same scale as in Swanson's experiment.  Each row represents a set of terms generated to represent biomedical text.   Each set of terms was specifically generated so that \emph{fish oil} and \emph{Raynaud's syndrome} never appear together. The column headers include \emph{fish oil, blood changes}, \emph{Raynaud's syndrome}.  Six other random variables acted as noise.  We then applied the $s_{CT}$, $s_{L+}$ to the dataset. Specifically, we set a threshold for first generating top-15 2-itemsets using either similarity measure. Based on the generated 2-itemsets we used clique search to generate $(k>2)$-itemsets.
+As mentioned in Section~\ref{sec:association}, \emph{fish oil} and \emph{Raynaud's syndrome} have been shown by Swanson~\cite{swanson87} to be linked together indirectly via various \emph{blood changes}.  He found these associations from examining biomedical texts.  As a proof of concept, we replicated this situation by synthesizing a table of 50 rows, which is about the same scale as in Swanson's experiment.  Each row represents a set of terms generated to represent biomedical text.   Each set of terms was specifically generated so that \emph{fish oil} and \emph{Raynaud's syndrome} never appear together. The column headers include \emph{fish oil, blood changes}, \emph{Raynaud's syndrome}.  Six other random variables acted as noise.  We then applied the $s_{CT}$, $s_{L+}$ to the dataset. Specifically, we set a threshold for first generating top-15 2-itemsets using either similarity measure. Based on the generated 2-itemsets we used clique search to generate $(k>2)$-itemsets.
 
 %The goal of the synthetic data experiment is to show proof-of-concept of proposed method for discovering semantically associated itemsets by emulating the setting in Swanson's landmark paper [] published in 1987, in which he hypothesized that dietary fish oil could probably be used to treat Raynaud's syndrome by identifying, in some literature, associations between fish oil and blood change and, in some other literature, Raynaud's syndrome and blood change. The synthetic dataset is a relational table of 50 rows, just about the same scale as Swanson's experiment. Each row represents key terms (indicated by column headers) extracted from some imaginary biomedical publication (essentially a boolean bag-of-word representation in information extraction). The column headers include \texttt{fish\_oil, blood\_change}, \texttt{Raynaud\_syndrome} and six other random variables acted as noise. It is specifically made so that \texttt{fish\_oil} and \texttt{Raynaud\_syndrom} never occur together in the same row, corresponding to the setting of Swanson's experiment where no literature covers the association between those two.
 
@@ -434,23 +434,116 @@ $\mathbf{s_{L+}}$      &   \textbf{Itemset}\\
 \end{table}
 
 
-\subsection{Discussion}
-We have shown in Equation~\ref{eq:ECTD} that the random walk commute time distance can be calculated using the following formula.
+\section{Discussion}
+We have observed in the experiments that with the increase of the data size, the commute time based similarity $s_{CT}$ converges to support, while the inner product similarity $s_{L+}$ remains distinct. In this section, we study the cause of this phenomenon.
+
+The core attribute that affects the behavior of $s_{CT}$ and $s_{L+}$ is the node degree distribution of the graph. For graphs that are relatively uniform (the out degree distribution of the graph does not follow a skewed distribution), the $s_{CT}$ and $s_{L+}$ appear equally useful. However, for realistic data where the degree distribution follows a Zipf or power-law relationship, then commute time distance displays a bias toward high degree nodes. It is well known that real-world large graphs follow a power law, hence the degradation of $s_{CT}$ in such cases. %This is due to the fact that high degree nodes will have a much higher stationary probability (probability that a random walk will be at the high degree node at any given time) and consequently all the distances are skewed toward the largest nodes.
+
+Figure~\ref{fig:distro} demonstrates the degree distributions of the three experiments datasets which gradually evolve into a power-law distribution. The electronic health dataset even exhibits a Zipf-like distribution as illustrated by the near linear pattern on the log-log plot.
+
+
+\begin{figure}[tbh]
+\centering
+\begin{minipage}[c]{0.49\textwidth}\centering
+\includegraphics[width=\textwidth]{fig/distro-toy.eps}
+\caption*{(a) Fish oil}
+\end{minipage}
+\hfill
+\begin{minipage}[c]{0.49\textwidth}\centering
+\includegraphics[width=\textwidth]{fig/distro-foodmart.eps}
+\caption*{(b) Shopping cart}
+\end{minipage}
+\centering
+\begin{minipage}[c]{0.49\textwidth}\centering
+\includegraphics[width=\textwidth]{fig/distro-stride.eps}
+\caption*{(c) Electronic health}
+\end{minipage}
+\hfill
+\begin{minipage}[c]{0.49\textwidth}\centering
+\includegraphics[width=\textwidth]{fig/distro-stride-log.eps}
+\caption*{(d) Electronic health (log-log scale)}
+\end{minipage}
+\caption{\label{fig:distro}The degree distributions of experiment datasets.}
+\end{figure}
+
+Below we further explore mathematically the reason why $s_{CT}$ and $s_{L+}$ behave in the respective ways. We have shown in ~\ref{eq:ECTD} that the random walk commute time distance (which is inversely proportional to $s_{CT}$) can be calculated using the following formula:
 \begin{align}
-n(i,j)&=V_G(l^+_{ii}+l^+_{jj}-2l^+_{ii})\notag\\
-&=V_G(\mathbf{e}_i-\mathbf{e}_j)^T\mathbf{L}^+(\mathbf{e}_i-\mathbf{e}_j)\notag\\
-&=V_G||\mathbf{x}_i'-\mathbf{x}_j'||^2\notag
+n(i,j)=V_G||\mathbf{x}_i'-\mathbf{x}_j'||^2\notag
 \end{align}
 
-The last equality is derived by making the following transformation to the unit node vector:
-$\mathbf{x}_i=\mathbf{U}^T\mathbf{e}_i~(\mathbf{e}_i=\mathbf{Ux}_i)$ ,and $\mathbf{x}_i'=\mathbf{\Lambda}^{1/2}\mathbf{x}_i$, where $\mathbf{U}$ is an orthonormal matrix made of the eigenvectors of $\mathbf{L}^+$ ordered in decreasing order of corresponding eigenvalue $\lambda_k$, and $\mathbf{\Lambda}=diag(\lambda_k)$. On the other hand, quite remarkably, as is shown in~\ref{eq:sim_L+}, elements of the pseudoinverse of the Laplacian matrix are the inner products of the transformed node vectors:
+The transformed node vector $x_i'$ is derived by first projecting the unit node vector to the new space spanned by the eigenvectors of $\mathbf{L}$:
+$\mathbf{x}_i=\mathbf{U}^T\mathbf{e}_i$, which is then further scaled to $\mathbf{x}_i'=\mathbf{\Lambda}^{1/2}\mathbf{x}_i$, where $\mathbf{U}$ is an orthonormal matrix made of the eigenvectors of $\mathbf{L}^+$ ordered in decreasing order of corresponding eigenvalue $\lambda_k$, and $\mathbf{\Lambda}=diag(\lambda_k)$. On the other hand, quite remarkably, as is shown in~\ref{eq:sim_L+}, elements of the pseudoinverse of the Laplacian matrix are the inner products of the transformed node vectors (which are defined as $s_{L+}$):
 \begin{equation}
 l_{ij}^{+}=\mathbf{x}_i'^T\mathbf{x}_j'.\notag
 \label{eq:innerprod}
 \end{equation}
 This means that we can construct an embedding which maps the vertices $v_i$ of the graph on points $x_i' \in \mathcal{R}^n$ such that the commute distances on the graph coincide with the Euclidean distances between the points $x_i'$, and the inner-product similarities between the points of $x_i'$ correspond to elements of the pseudoinverse of the graph Laplacian.
 
-We have observed in experiments that raw commute times reflect node degree distribution, meaning that popular states will crowd near the origin regardless of dissimilarity. The inner product similarity alleviates to some extent the bias of commute time similarity towards high degree nodes. This can be attributed to the fact that inner product encodes an ``angle" between vectors:
+In large graphs following a power law distribution, there are abundant subgraphs with a star structure, where a high degree node is in the middle connecting to a large number of leaves. It is therefore particularly pertinent to study the spectral properties of star graphs for a comprehensive understanding of $s_{CT}$ and $s_{L+}$. %Lemma~\ref{lem:star} outlines three properties of the Laplacian and pseudoinverse of the Laplacian of a star graph $S_n$ of order $n$.
+\begin{mylem}
+\label{lem:star}
+For a star graph $S_n$ of order $n$, its Laplacian and pseudoinverse of the Laplacian have the following properties:
+\begin{enumerate}
+\item The eigenvalues of the Laplacian $\mathbf{L}(S_n)$ are 0, 1 (with multiplicity $n-2$), and $n$.
+\item The eigenvalues of the Laplacian $\mathbf{L}^+(S_n)$ are 0, 1 (with multiplicity $n-2$), and $1/n$.
+\item The linearly independent $n-2$ eigenvectors of the eigenvalue 1 are such that the eigencomponent corresponding to the central vertex is 0.
+\end{enumerate}
+\end{mylem}
+For the proof of this Lemma, readers are referred to~\cite{Das2005Star} for details.
+
+
+\begin{figure}[tbh]
+\centering
+\begin{minipage}[c]{0.35\textwidth}\centering
+\includegraphics[width=.6\textwidth]{fig/star4.eps}
+\end{minipage}
+\hfill
+\begin{minipage}[c]{0.64\textwidth}\centering\footnotesize{
+\begin{equation}\notag
+\mathbf{U}=
+    \begin{blockarray}{cccccc}
+            ~       &   \mathbf{v}_1  &   \mathbf{v}_2  &   \mathbf{v}_3& \mathbf{v}_4& \mathbf{v}_5  \\
+        \begin{block}{r[rrccc]}
+            x_1   &   -0.89	&	0.45	&	0.00	&	0.00            &	0.00 \\
+            x_2   &   0.22	&	0.45	&	0.60	&	0.71	        &	0.71	\\
+            x_3   &   0.22	&	0.45	&	-0.72	&	-0.28 - 0.24i	&	-0.28 + 0.24i	\\
+            x_4   &   0.22	&	0.45	&	0.29	&	-0.22 - 0.22i	&	-0.22 + 0.22i	\\
+            x_5   &   0.22	&	0.45	&	-0.17	&	-0.21 + 0.46i	&	-0.21 - 0.46i	\\
+        \end{block}
+    \end{blockarray}
+\end{equation}}
+$\mathbf{\Lambda}=diag\left(~[~~0.2~~0~~1~~1~~1~~]~\right)$\\
+\end{minipage}
+\caption*{}
+\begin{equation}\notag\footnotesize{
+\mathbf{X}'=\mathbf{\Lambda}^{1/2}\mathbf{U}^T=
+    \begin{blockarray}{ccccc}
+     \mathbf{x}_1'  &   \mathbf{x}_2'  &   \mathbf{x}_3'& \mathbf{x}_4'& \mathbf{x}_5' \\
+        \begin{block}{[rrccc]}
+           -0.40	&	0.10    &	0.10	        &	0.10	        &	0.10	\\
+           0.00	    &	0.00	&	0.00	        &	0.00	        &	0.00	\\
+           0.00 	&	0.60	&	-0.72	        &	0.29	        &	-0.17	\\
+           0.00	    &	0.71	&	-0.28 + 0.25i	&	-0.22 + 0.22i	&	-0.21 - 0.46i	\\
+           0.00 	&	0.71	&	-0.28 - 0.25i	&	-0.22 - 0.22i	&	-0.21 + 0.46i	\\
+        \end{block}
+    \end{blockarray}}
+\end{equation}
+\caption[An example star graph.]{\label{star5} An example star graph and its eigenvalues/eigenvectors of the $\mathbf{L}+$, together with node vectors in the transformed space.}
+\end{figure}
+
+
+Figure~\ref{star5} shows an example of a simple star graph with five nodes. The eigenvectors $\mathbf{U}$ ($=[\mathbf{v}_1,\ldots,\mathbf{v}_5]$) and eigenvalues $\mathbf{\Lambda}$ of $\mathbf{L}^+$ are shown in the upper half of the graph. The values of $\mathbf{\Lambda}$ agrees with Lemma~\ref{lem:star}(2), and the eigencomponents of the three eigenvectors ($\mathbf{v}_3,\mathbf{v}_4,\mathbf{v}_5$) of the eigenvalue 1 in the node vector $\mathbf{x}_1$ corresponding to the central vertex are all zeros, satisfying Lemma~\ref{lem:star}(3).
+
+The lower half of Figure~\ref{star5} shows the node vectors ($\mathbf{x}_1,\ldots,\mathbf{x}_5$) in the transformed space. As mentioned above, the commute time distance between nodes in the original graph becomes the Euclidean distance between nodes in the transformed space, and the elements of $\mathbf{L}^+$ is the inner product of the corresponding nodes in the transformed space.
+
+It is obvious that for a large graph with many local star structures, the commute time distance between any two center nodes is small since there are many zeros as the eigencomponents in their corresponding transformed node vectors (such as $\mathbf{x}_1'$ in the example). Together with the fact that the transformed node vectors $\mathbf{x}_i'$ are centered\footnotemark[1] ($\sum^n_{i=1}\mathbf{x}_i'=\mathbf{0}$), we can also conclude that for any leaf node connecting directly to two center nodes, the commute time distance is smaller between the leaf and the one with a larger degree.
+
+
+\footnotetext[1]{This can be shown from $\sum^n_{i=1}\mathbf{x}_i'=\mathbf{\Lambda}^{1/2}\sum^n_{i=1}\mathbf{x}_i=\mathbf{\Lambda}^{1/2}\mathbf{U}^T\sum^n_{i=1}\mathbf{e}_i=\mathbf{\Lambda}^{1/2}\mathbf{U}^T\mathbf{e}$.
+And from $\mathbf{\Lambda}=\mathbf{U}^T\mathbf{L}^+\mathbf{U}$, we have $\mathbf{\Lambda}^{1/2}\mathbf{U}^T=\mathbf{\Lambda}^{-1/2}\mathbf{U}^T\mathbf{L}^+$. Therefore $\sum^n_{i=1}\mathbf{x}_i'=(\mathbf{\Lambda}^{1/2}\mathbf{U}^T)\mathbf{e}=(\mathbf{\Lambda}^{-1/2}\mathbf{U}^T\mathbf{L}^+)\mathbf{e}=\mathbf{0}$ since $\mathbf{L}^+\mathbf{e}=\mathbf{0}$.}
+
+\begin{comment}
+Now we have explained mathematically why the commute time reflects node degree distribution, meaning that popular states will crowd near the origin regardless of dissimilarity. The inner product similarity alleviates to some extent the bias of commute time similarity towards high degree nodes. This can be attributed to the fact that inner product encodes an ``angle" between vectors:
 
 \begin{align}
 l_{ij}^{+}&=\mathbf{x}_i'^T\mathbf{x}_j'\notag\\
@@ -459,8 +552,9 @@ l_{ij}^{+}&=\mathbf{x}_i'^T\mathbf{x}_j'\notag\\
 \end{align}
 
 As a crude example, if two words occur frequently in a text corpus, the expected time for a random walker to hit either from any other word will be low, thus they will have a small mutual commute time. But if they are usually mentioned together with different words, the angle between them may be large, implying decorrelation or anticorrelation.
+\end{comment}
 
-A more detailed example is shown in Figure~\ref{fig:example_ct_vs_lp}. A connection graph between people and movies is used to encode the information of movie viewerships where movies are illustrated as big solid circles and people as small circles. An arc is drawn between a movie and a person if the movie is watched by the person. From the graph, we observe that three out of ten people watch both movie A and C. On the other hand, seven people who watch movie A watch movie B as well.
+A more detailed example is shown in Figure~\ref{fig:example_ct_vs_lp}. A connection graph between people and movies is used to encode the information of movie viewerships where movies are illustrated as big solid circles and people as small circles. An arc is drawn between a movie and a person if the movie is watched by the person. From the graph, we observe that there exists three star substructures with A, B and C being center vertexes respectively.
 
 \begin{figure}[tbh]
 \centering
@@ -470,58 +564,44 @@ A more detailed example is shown in Figure~\ref{fig:example_ct_vs_lp}. A connect
 
 Given such a graph, finding similar movies can be naturally solved by a graph-based similarity (such as $s_{CT}$ or $s_{L+}$). At the first glance, since movie A and B have more common viewers than A and C, we should conclude that A and B are more similar to each other than A and B. However, it is soon evident that the group of people who watch C also exclusively watch A. And while movie A and B are commonly viewed by more, it is simply because B is popular and in fact many more people who watch B neither watch A and C. While it might be very legitimate for a system to rank B higher than C in the recommendation to a person who has viewed A, the viewership distribution in this scenario suggests a closer bond between A and C in terms of relevance (imagine A and B are movies from completely different genres and C being a director's cut version of A).
 
-To capture such relevance, $s_{L+}$ would perform better than $s_{CT}$, as we have pointed out and show-cased in the experiments that commute time distance is biased towards high-degree nodes. This is especially pronounced in graphs with skewed degree distribution. The connection graph in this example is a bit skewed in that movie B has much more viewers than A and C. Indeed, the calculation below again proves this point.
+To capture such relevance, $s_{L+}$ would perform better than $s_{CT}$, as we have pointed out and show-cased in the experiments that commute time distance is biased towards high-degree nodes. This is especially pronounced in graphs with skewed degree distribution. The connection graph in this example is a bit skewed in that movie B has much more viewers than A and C. Indeed, the calculation below illustrates this point.
 
-$n(A,B)=0.535$, $n(A,C)=0.817$, $l^+(A,B)=-0.031$, $l^+(A,C)=0.098$.
-$S_{CT}(A,B)>S_{CT}(A,C)$, while $S_{L+}(A,B)<S_{L+}(A,C)$.
+$n(A,B)=0.535$, $n(A,C)=0.817$, $l^+(A,B)=-0.031$, $l^+(A,C)=0.098$. Therefore, $S_{CT}(A,B)>S_{CT}(A,C)$, while $S_{L+}(A,B)<S_{L+}(A,C)$.
 
+To give an intuition of the calculation of $s_{CT}$ and $s_{L+}$ in this example, Figure~\ref{fig:embededNodeVectors} shows a 3-D plot of the transformed node vectors, where $x_1'$ corresponds to node B in Figure~\ref{fig:example_ct_vs_lp}, $x_5'$ to A, $x_{13}'$ to C, and they are color-coded differently. Additionally, people who watch both A and C (blue nodes in the original graph) correspond to the transformed node vectors $x_2'-x_4'$; people who watch both A and B (red nodes in the original graph) correspond to $x_6'-x_{12}'$; and people who watch B only correspond to $x_{14}'-x_{26}'$.
+
+It is obvious that $x_1'$, $x_5'$ and $x_{13}'$ appear much flatter than others because they are center nodes in their respective stars. Moreover, notice that last eigencomponents from all node vectors form an eigenvector $\mathbf{v}_{26}'$ corresponding to the largest eigenvalue of $\mathbf{L}^+$, which is the second eigenvalue of $\mathbf{L}$, therefore $\mathbf{v}_{26}'$ is the \emph{Fiedler vector} and can be used to partition the graph. The most straightforward way is to use the sign of the eigencomponents to partition the graph into two clusters: $\{x_1'-x_{12}'\}$ and $\{x_{13}'-x_{26}'\}$. The inner product similarity $s_{L+}$ accounts for this partition and is mainly decided by the product at these eigencomponents.
 
 %This point can be illustrated by comparing the component $||\mathbf{x}_i'-\mathbf{x}_j'||^2$ in $s_{CT}$ and $\mathbf{x}_i'^T\mathbf{x}_j'$ in $s_{L+}$. Skewed graph with nodes having very large degrees yields skewed values in certain dimensions of $x_i'$ or $x_j'$, making $||\mathbf{x}_i'-\mathbf{x}_j'||^2$ inevitable large, but this is not necessarily the case for $\mathbf{x}_i'^T\mathbf{x}_j'$. For example, if two words are mentioned a lot in a text corpus, the expected time for a random walker to hit either from any word will be low, thus they will have a small mutual commute time. But if they are usually mentioned together with different words, the angle between them may be large, implying decorrelation or anticorrelation. To completely factor out artifacts of skewed distribution or biased sampling, the cosine correlations may be used.
 
 %However, the angle between the embedding vectors factors out the centrality of popular states. More importantly, its cosine measures the correlation between these two states's travel times to the rest of the graph--how similar their roles are in a random walk. E.g., if two states are perfectly correlated, then jumping instantaneously from one to the other would not change the statistics of the random walk over the remaining states.
 
-$\mathbf{U}$ is widely used in spectral clustering to approximate the best normalized cut, where vertices in graphs are mapped on rows in $\mathbf{U}$. Note that following from equation~\ref{eq:ectd_embed}, the calculation of commute time distance can be viewed as an embedding of the graph where vertices are mapped on the matrix $(\mathbf{\Lambda})^{1/2}\mathbf{U}$. That is, compared to the entries of yi, the entries of zi are additionally scaled by the inverse eigenvalues of L.
+%$\mathbf{U}$ is widely used in spectral clustering to approximate the best normalized cut, where vertices in graphs are mapped on rows in $\mathbf{U}$. Note that following from equation~\ref{eq:ectd_embed}, the calculation of commute time distance can be viewed as an embedding of the graph where vertices are mapped on the matrix $(\mathbf{\Lambda})^{1/2}\mathbf{U}$. That is, compared to the entries of $y_i$, the entries of $z_i$ are additionally scaled by the inverse eigenvalues of $\mathbf{L}$.
+
+
+
+\begin{comment}
+\begin{proof}
+Let $n$ be an eigenvalue of multiplicity $k (\geq 1)$ of $\mathbf{L}(S_n)$. Then we can easily construct $k-1$ linearly independent eigenvectors of the eigenvalue $n$ such that the eigencomponent corresponding to the central vertex is zero.
+
+Let $v_1$ be the central vertex of the graph $S_n$ and $v^c_1$ be the corresponding vertex of the complement graph $S^c_n$. Therefore vertex $v^c_1$ is the isolated vertex in the complement graph $S^c_n$.
+
+Let $x^c_1$ be the eigencomponent of an eigenvector of $\lambda (\neq 0)$ of $\mathbf{L}(S^c_n)$ corresponding to the vertex $v^c_1$. In $L(S^c_n)$, the eigencomponent of an eigenvector of non-zero eigenvalue $\lambda$ corresponding to $v^c_1$ is zero, as $\lambda x^c_1 = 0$. Now, the number of non-zero eigenvalues of $\mathbf{L}(S^c_n)$ are $n - k - 1$. Using Lemma 2.3 we conclude that the eigencomponent corresponding to the central vertex of $n - k - 1$ eigenvalues (these eigenvalues are strictly less than $n$) of $\mathbf{L}(S_n)$ are zero.
+Hence the Lemma.
+\end{proof}
+\end{comment}
 
 \begin{figure}[tbh]
 \centering
 \includegraphics[width=.7\textwidth]{fig/embededNodeVectors.eps }
-\caption[]{\label{fig:embededNodeVectors}.}
+\caption[The 3-D plot of node vectors in the transformed space.]{\label{fig:embededNodeVectors} The 3-D plot of node vectors in the transformed space for the graph depicted in Figure~\ref{fig:example_ct_vs_lp}.}
 \end{figure}
 
-\begin{figure}[tbh]
-\centering
-\includegraphics[width=.7\textwidth]{fig/eigens.eps }
-\caption[]{\label{fig:eigens}.}
-\end{figure}
+%\begin{figure}[tbh]
+%\centering
+%\includegraphics[width=.7\textwidth]{fig/eigens.eps }
+%\caption[]{\label{fig:eigens}.}
+%\end{figure}
 
 
 %Similarly, with a movie database described below we find that the horror thriller Silence of the Lambs” to the children's film Free Willy have a smaller than average mutual commute time because both were box-office successes, yet the angle between them is larger than average because there was little overlap in their audiences.
-
-
-For data that is relatively uniform (the out degree distribution of the graph does not follow a skewed distribution), the commute distance actually appears useful. However, for realistic data where the degree distribution follows a Zipf or power-law relationship, the commute distance displays a bias toward high degree nodes. This is due to the fact that high degree nodes will have a much higher stationary probability (probability that a random walk will be at the high degree node at any given time) and consequently all the distances are skewed toward the largest nodes.
-
-
-
-\begin{figure}[tbh]
-\centering
-\begin{minipage}[c]{0.49\textwidth}\centering
-\includegraphics[width=\textwidth]{fig/distro-toy.eps}
-\end{minipage}
-\hfill
-\begin{minipage}[c]{0.49\textwidth}\centering
-\includegraphics[width=\textwidth]{fig/distro-foodmart.eps}
-\end{minipage}
-\caption[]{\label{fig:distro}.}
-\end{figure}
-
-\begin{figure}[tbh]
-\centering
-\begin{minipage}[c]{0.49\textwidth}\centering
-\includegraphics[width=\textwidth]{fig/distro-stride.eps}
-\end{minipage}
-\hfill
-\begin{minipage}[c]{0.49\textwidth}\centering
-\includegraphics[width=\textwidth]{fig/distro-stride-log.eps}
-\end{minipage}
-\caption[]{\label{fig:distro2}.}
-\end{figure}

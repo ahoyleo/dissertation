@@ -1,3 +1,4 @@
+The RDF bipartite graph introduced in~\ref{sec:graph-rep-for-rdb} can maximally preserve the semantics in the data tables and contains no ambiguity. It is also able to represent ontologies in the same way so that analysis approaches on the RDF bipartite graph can systematically utilize information from both data and domain knowledge. If a mining task does not involve the use of domain knowledge from ontologies, the RDF bipartite graph can be transformed to a more compact form that achieves better scalability. In the last chapter, we describe in detail the mining method without the incorporation of ontologies based on the coarsened RDF hypergraph. In this chapter, we cover the usage of the RDF bipartite graph to incorporate ontologies to mine semantically associated itemsets.
 
 \section{Method}
 %Mining Semantically Associated Itemsets with the Incorporation of Ontologies
@@ -6,9 +7,9 @@ To enable the incorporation of ontologies in mining semantically associated item
 
 The RDF bipartite graph as a combined representation for both data and ontology is defined as $G=\langle V_v \cup V_s, E \rangle$, where $V_v$ denotes value nodes corresponding to RDF components (subject, predicate, or object), and $V_s$ denotes statement nodes corresponding to RDF statements. More specifically, statement nodes can be further divided according to whether they are from data or ontology, i.e., $V_s=V_d \cup V_o$; the value nodes can be divided according to whether they represent rows or attributes in the data, i.e. $V_d=V_r \cup V_a$. The graph $G$ can be represented in a biadjacency matrix $\mathbf{M}$, where $\mathbf{M}(i,j)$ is non-zero if there is an edge between $\langle V_{v_i}, V_{s_j} \rangle$. For an unweighted graph, the value can be 0/1, while for a weighted graph, any non-negative value.
 
-The biadjacency matrix $\mathbf{M}$ can be split into vertical stripes by statement nodes $V_s$. For example, according to Figure~\ref{fig:hypergraph-combined}(B), the bipartite graph corresponding to lower 8 RDF statements representing the underlying transaction table can be modeled as the matrix $\mathbf{M}_d$ in Equation~\ref{eq:Md} (RDF statement nodes are labeled $s_1\dots s_8$ respectively); and the bipartite graph corresponding to upper 4 statements (labeled $s_9\dots s_{12}$) representing the subsumption hierarchy in the ontology can be modeled as the matrix $\mathbf{M}_o$ in Equation~\ref{eq:Mo}.
+The biadjacency matrix $\mathbf{M}$ can be split into vertical stripes by statement nodes $V_s$. For example, according to Figure~\ref{fig:hypergraph-combined}(B), the bipartite graph corresponding to lower 8 RDF statements representing the underlying transaction table can be modeled as the matrix $\mathbf{M}_d$ in~\ref{eq:Md} (RDF statement nodes are labeled $s_1\dots s_8$ respectively); and the bipartite graph corresponding to upper 4 statements (labeled $s_9\dots s_{12}$) representing the subsumption hierarchy in the ontology can be modeled as the matrix $\mathbf{M}_o$ in~\ref{eq:Mo}.
 
-To obtain the biadjacency matrix $\mathbf{M}$ of the combined RDF bipartite graph in Figure~\ref{fig:hypergraph-combined}, we can simply concatenate $\mathbf{M}_d$ and $\mathbf{M}_o$ horizontally: $\mathbf{M}=\left[\mathbf{M}_d~\mathbf{M}_o\right]$. In general, If there are $k$ different semantic relationships in the ontology, $\mathbf{M}_o$ can be further divided into more vertical stripes $\mathbf{M}_{o_i}, i=1\dots k$, where $\mathbf{M}_{o_i}$ may represent, for example, the ``part\_of" lattice. Each $\mathbf{M}_{o_i}$ is  distinguished from another by the respective weight. In this case, $\mathbf{M}$ is the horizontal concatenation of all the weighted vertical stripes as shown in Equation~\ref{eq:horzcat}. After the concatenation, $\mathbf{M}$ can be represented as the form shown in Equation~\ref{striped_M}.
+To obtain the biadjacency matrix $\mathbf{M}$ of the combined RDF bipartite graph in Figure~\ref{fig:hypergraph-combined}, we can simply concatenate $\mathbf{M}_d$ and $\mathbf{M}_o$ horizontally: $\mathbf{M}=\left[\mathbf{M}_d~\mathbf{M}_o\right]$. In general, If there are $k$ different semantic relationships in the ontology, $\mathbf{M}_o$ can be further divided into more vertical stripes $\mathbf{M}_{o_i}, i=1\dots k$, where $\mathbf{M}_{o_i}$ may represent, for example, the ``part\_of" lattice. Each $\mathbf{M}_{o_i}$ is  distinguished from another by the respective weight. In this case, $\mathbf{M}$ is the horizontal concatenation of all the weighted vertical stripes as shown in~\ref{eq:horzcat}. After the concatenation, $\mathbf{M}$ can be represented as the form shown in~\ref{striped_M}.
 
 %horizontal concatenation
 \begin{equation}\label{eq:horzcat}
@@ -66,7 +67,7 @@ To obtain the biadjacency matrix $\mathbf{M}$ of the combined RDF bipartite grap
         \end{blockarray}
 \end{equation}
 
-By developing the unified representation for both data and domain knowledge, and utilizing ontology annotations, such as our results~\cite{LePendu2010}, we can produce one RDF hypergraph, which serves as the basis for perform semantic data mining in a systematic way. Given this, the main research challenge is how to utilize the data and ontology together for semantic data mining. In this paper, we focus on one fundamental data mining tasks, namely, the {\em association mining}. With additional information from ontology (domain knowledge), the unified RDF hypergraphs will enable us to discover hidden association between entities, between entities and ontological concepts, and between ontological concepts. Intuitively, these associations are defined in terms of the paths linking the nodes and the node labels should be taken into consideration as they represent different semantics.
+By developing the unified representation for both data and domain knowledge, and utilizing ontology annotations, such as our results~\cite{LePendu2010}, we can produce one RDF hypergraph, which serves as the basis for perform semantic data mining in a systematic way. Given this, the main research challenge is how to utilize the data and ontology together for semantic data mining. We focus on one fundamental data mining tasks, namely, the {\em association mining}. With additional information from ontology (domain knowledge), the unified RDF hypergraphs will enable us to discover hidden association between entities, between entities and ontological concepts, and between ontological concepts. Intuitively, these associations are defined in terms of the paths linking the nodes and the node labels should be taken into consideration as they represent different semantics.
 
 
 
@@ -78,7 +79,7 @@ Given an attribute node $a$ in the unified graph $G = G_d \cup G_o$ and $a \in G
 
 In the following, we first propose an algorithm for random walk-based similarity ranking on a unified RDF bipartite graph. The algorithm can be used in such situations as, for example, if users are interested in products that are usually bought together in the same transactions by different customers, or common side effects of the same drugs prescribed to different patients, etc.
 
-Given the biadjacency matrix $\mathbf{M}$ in Equation~\ref{eq:horzcat} for the combined RDF bipartite graph $G$, we can construct the adjacency matrix $\mathbf{A}$ of $G$ as following:
+Given the biadjacency matrix $\mathbf{M}$ in~\ref{eq:horzcat} for the combined RDF bipartite graph $G$, we can construct the adjacency matrix $\mathbf{A}$ of $G$ as following:
 \[
 \mathbf{A}=\left[
                \begin{array}{cc}
@@ -123,7 +124,7 @@ Let $c$ be the probability of restarting random-walk from the node $a$. Then the
 The iterative update of $\mathbf{u}_a$ in the algorithm (inside the while loop) is modified from Lemma~\ref{lem:pi} while avoiding materializing $\mathbf{A}$ and $\mathbf{P}$ for scalability.
 
 
-\section{Mining Semantic Association with Ontologies}
+\section{Case Studies}
 In this section, we evaluate the combined RDF bipartite graph for discovering semantic associations. We conducted a series of experiments to highlight the effect of the incorporation of ontologies in the mining framework, and to explore the impact of different ratios of weights assigned to various kinds of relationships in the graphs. First, to illustrate the power of combined RDF bipartite graph in finding semantic associations while taking into account seamlessly the ontological information, we evaluated our methods against a commonly used \emph{shopping cart} dataset together with a manually created ontology describing the subsumption hierarchy for grocery items.  Then, encouraged by the result, we applied our method to actual \emph{electronic health records} to highlight its scalability and applicability to the medical domain. The sizes of the datasets are specified in Table~\ref{tbl:exp_overview}.
 
 \begin{table}[tbh]\scriptsize
@@ -212,7 +213,7 @@ Note that without filtering the ranked semantic associations on the combined gra
 \hline
 \multicolumn{6}{c||}{w/ data only}  &   \multicolumn{6}{c}{w/ onto only}\\
 \hline
-item	&	p(\%)	&	freq	&	item	&	p(\%)	&	freq	&	item	&	p(\%)	&	freq	&	item	&	freq	&	p(\%)	\\
+item	&	p(\%)	&	freq	&	item	&	p(\%)	&	freq	&	item	&	p(\%)	&	freq	&	item	&	freq	&	p(\%)	 \\
 \hline																							
 Cheese	&	0.38	&	98	&	Preserves	&	0.19	&	65	&	TVDinner	&	0.46	&	40	&	Sponges	&	21	&	0.06	\\
 Cookies	&	0.32	&	96	&	Juice	&	0.17	&	47	&	Pizza	&	0.46	&	46	&	Soap	&	0	&	0.06	\\
@@ -257,7 +258,7 @@ p(\%)	&	item	&	p(\%)	&	item	&	p(\%)	&	item	\\
 \hline
 1.11	&	pseudoisocytidine				&	1.46	&	oral form rofecoxib				&	1.35	&	oral form rofecoxib	\\
 1.11	&	dimetpramid						&	1.16	&	rofecoxib 50 mg oral tablet		&	1.07	&	rofecoxib 50 mg oral tablet	\\
-1.11	&	quinalphos						&	1.16	&	rofecoxib 12.5 mg oral tablet	&	1.07	&	rofecoxib 12.5 mg oral tablet	\\
+1.11	&	quinalphos						&	1.16	&	rofecoxib 12.5 mg oral tablet	&	1.07	&	rofecoxib 12.5 mg oral tablet	 \\
 1.11	&	retinol o-fatty-acyltransferase	&	1.16	&	rofecoxib 25 mg oral tablet		&	1.07	&	rofecoxib 25 mg oral tablet	 \\
 1.11	&	trimethylaminobutyrate			&	1.07	&	cyclooxygenase 2 inhibitors		&	0.85	&	cyclooxygenase 2 inhibitors	\\
 1.11	&	fungiqual						&	0.78	&	duplicate concept				&	0.79	&	social control policies	 \\

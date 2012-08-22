@@ -23,41 +23,47 @@ We argue that mapping RDB or spreadsheet to linked data (e.g., RDF) without refe
 In order to suggest suitable Semantic Web terms and ontologies for users to annotate their data, we propose a learning-based semantic search algorithm. We first submit a list of terms appeared in the schema of (semi-)structured data to our semantic search algorithm and then use the returned results for annotation. In a fully automatic setting, the search algorithm is configured to return the top-1 hit; while in an interactive setting, the search algorithm returns ordered top-k search results for users to decide. Previous semantic search algorithms leverage a variety of measures, including lexical and structural similarities (see details below) to rank Semantic Web documents according to how likely they can be semantically matched to the search terms. However, using any single measure alone may not be sufficient to achieve the optimal result. We propose to combine various measures to a weighted feature-based search model, where the weights are learned from training data. We believe the incorporation of learning techniques will improve the semantic search result. We have built a prototypical system for gathering training data for two algorithms: logistic regression and subgradient descent. The evaluation of such method is a matter of ongoing research.
 
 
-\section{Annotation by Multiple Ontologies}
+\section{Matching Ontologies}
 %%general review of the field of ontology matching
-The presence of heterogeneity among schemas supporting vast amount of information demands advanced solution for semantic integration of disparate data sources to facilitate interoperability and reuse of the information. The challenge is especially pronounced in many scientific domains where a massive amount of data are produced independently and thus each having their own data vocabulary. While manual integration is time-consuming and requires expensive specialized human capital, the development of automatic approaches becomes imminent to aid inter-institute collaborations. One purpose of the present paper is to suggest a method for solving a specific kind of ontology matching problem under some severe constraints that can cause traditional methods to be ineffective. The constraints that we deal with are, namely, 1) little-to-no string-based or linguistic similarity between terminologies, and 2) all numeric typed data instances. This phenomenon is commonly seen in integrating scientific datasets which involves discovery of correspondences among distinct numeric-typed summary features (``attributes") that are used to characterize datasets that have been collected and analyzed in different research labs. We call this the \emph{attribute matching} problem.
+The presence of heterogeneity among schemas supporting vast amount of information demands advanced solution for semantic integration of disparate data sources to facilitate interoperability and reuse of the information. The challenge is especially pronounced in many scientific domains where a massive amount of data are produced independently and thus each having their own data vocabulary. While manual integration is time-consuming and requires expensive specialized human capital, the development of automatic approaches becomes imminent to aid inter-institute collaborations. One purpose is to suggest a method for solving a specific kind of ontology matching problem under some severe constraints that can cause traditional methods to be ineffective. The constraints that we deal with are, namely, 1) little-to-no string-based or linguistic similarity between terminologies, and 2) all numeric typed data instances. This phenomenon is commonly seen in integrating scientific datasets which involves discovery of correspondences among distinct numeric-typed summary features (``attributes") that are used to characterize datasets that have been collected and analyzed in different research labs. We call this the \emph{attribute matching} problem.
 
-Our study of matching alternative attribute sets is closely related to the schema matching problem. According to the type of instance value, various instance-based approaches have been developed in previous research. For example, for textual attributes, a linguistic characterization based on information retrieval techniques can be applied~\cite{Rahm01asurvey}; for nominal attributes, evaluation of the degree of overlap of instance values is a preferred approach. Larson et al.~\cite{Larson1989} and Sheth et al.~\cite{Sheth1988} discussed how relationships and entity sets could be integrated primarily based on their domain relationships. Similarity of partially overlapped instance set can be also calculated based on measures such as Hamming distance and Jaccard coefficient; for numeric attributes, most methods use aggregated statistics to characterize the attributes, e.g., `SSN' and `PhonNo' can be distinguished based on their respective patterns~\cite{Rahm01asurvey}. Hybrid systems that combine several approaches to determine matching often achieve better performance. For example, SemInt~\cite{Li00semint:a} is a comprehensive matching prototype exploiting up to 15 constraint-based and 5 content-based matching criteria. The LSD (Learning Source Descriptions)~\cite{Doan2000} system uses several instance-level matchers (learners) that are trained during a preprocessing step. The iMAP~\cite{Dhamankar04imap} system uses multiple basic matchers, called searches, e.g., text, numeric, category, unit conversion, each of which addresses a particular subset of the match space.
+Another challenging task given multiple data sources is to carry out meaningful meta-analysis that combines results of several studies on different datasets to address a set of related research hypotheses. Finding correspondences among distinct patterns that are observed in different scientific datasets is an example of meta-analysis. Supposing the patterns are derived by clustering analysis, this problem can be addressed by the application of cluster comparison (or cluster matching) techniques. Clustering is an unsupervised data mining task widely used to discover patterns and relationships in a variety of fields. The clustering result provides a pattern characterization from a data-driven perspective. If similar results are obtained across multiple datasets, this leads in turn to a revision and refinement of existing domain knowledge, which is a central goal of meta-analysis. However, there are noticeably few cluster comparison methods that are able to compare two clusterings derived from different datasets. The difficulty for the comparison is further exacerbated by the fact that the datasets may be described by attributes from heterogeneous schemas or ontologies. Even those methods that are able to measure clustering similarity across different datasets (e.g., the ADCO~\cite{Bae2010} method) have to assume the homogeneous meta-data (e.g., the same schemas).
 
-Due to the nature of many scientific datasets, we face several unique challenges. First, the data under study are semi-structured, thus invalidating those matching methods that presume a complete, known-in-advance schematic structure. In addition, totally different labels (usually acronyms or pseudowords) are widely adopted for the same or similar metrics, rendering lexical similarity-based methods unsuitable. Moreover, an important limitation of previous instance-based matching methods is their inability to handle numerical instances appropriately in certain domain applications. They use statistical characterization extracted from the numerical instances, such as range, mean and standard deviation, to determine match. However such information is too rough to capture patterns in data that are crucial in determining the correspondence.
+Given this situation, in order to carry out cluster comparison for meta-analysis, researchers often need to perform ontology or schema matching first in order to mitigate the gap for meta-data. In previous work~\cite{LiuEtal10}, we examine a practical attribute matching problem on neuroscience data where schema elements from one dataset share no lexical similarity with those from the other. Moreover, structural similarity is also limited. One can only resort to instance-based (extensional) methods. However, since all attributes are numerical, information clues available to an instance-level matcher is very restricted. Traditional instance-based matchers typically make use of constraint-based characterization, such as numerical value ranges and averages to determine correspondences. However, this is often too rough in the case of all-numerical dataset. Two attributes may have similar ranges and averages but totally different internal value distributions (an example is shown in Section~\ref{sec:syn_exp}). Given this, we propose to represent the attribute value distribution at a finer granularity by partitioning the values into groups. To do this, clustering is performed, and resulting clusters are then aligned across two datasets (assuming that the same pattern exists in both datasets). In this way, each attribute can be characterized by, instead of a single value, a vector of per-cluster statistical quantities (i.e., the \emph{segmented statistical characterization}). A distance function can then be applied based on this representation. Table~\ref{tbl:sim_mat}(A) shows an example distance table on the cross join of two sets of attributes. To discover attribute matching from this table can be reduced to solving a minimum assignment problem (assuming matching is bijective), which is a classical combinatory optimization problem that has a polynomial solution using the Hungarian Method~\cite{Kuhn1955}.
 
-To solve this difficulty, in the present paper, viewing the two matching problems as combinatorial optimization problems with distinct yet interrelated objective functions, we propose a novel approach using a multi-objective heuristics to discover attribute matching and cluster matching simultaneously. The objectives in the optimization are to minimize distances of attribute matching and cluster matching respectively. We explore the widely used simulated annealing algorithm as the metaheuristics algorithm and briefly compare its performance with the evolutionary multi-objective algorithm in experiments.
+Unfortunately, however, the above solution requires us to be able to align clusters across datasets, which is a difficult problem in its own right. If fully automated, as mentioned above, methods such as ADCO adopt a so called \emph{density profile}~\cite{Bae2010} representation of clusters that requires homogeneous meta-data or a priori knowledge about the attribute matching in heterogeneous scenarios. Then the cluster matching can be carried out in a similar manner to the attribute matching by casting to the assignment problem (see Table~\ref{tbl:sim_mat}(B), for example). This leads to a circular causality, or a deadlock, between the attribute matching (under the segmented statistical characterization) and cluster matching (under the density profile representation) problems---none of them can be solved automatically without the other one being solved first.
 
-\emph{Density Profile}: To represent clusters using density profiles, the attribute's range in each cluster is first discretized into a number of bins, and the similarity between two clusters corresponds to the number of points of each cluster falling within these bins. The formal definition for this number of points is the \textit{density} of an attribute-bin region for cluster $c_k$ in clustering $C$, denoted as $dens_C(k, i, j)$. It refers to the number of points in the region $(i, j)$---the $j$-th bin of the $i$-th attribute---that belongs to the cluster $c_k$ of clustering $C$. For example, for clustering $C$ in Fig.~\ref{fig:density_profile}, $dens_C(1, 1, 1) = 8$, because there are 8 data points in region $(1, 1)$---the first bin of the first attribute $x$---that belongs to the first cluster $c_1$.
 
-%The values of $dens_C(k, i, j)$ for all possible $k$, $i$, $j$ are then listed in a certain ordering to form a clustering's \emph{density profile vector} (defined below). This ordering is imposed on all attribute-bin regions and must be applied to the two datasets in which the clusterings were generated. It is necessary, then, that both datasets must have the same attribute set. If this requirement does not stand, the matching between the sets must be specified in advance. Therefore, in order to apply the density profile method in the ERP pattern matching problem, we must first carry out measure matching. We further discuss the interdependence between pattern matching and metric matching in Section~\ref{sec:discuss}.
-
-The density profile vector $V_C$ for a clustering $C$ is formally defined as an ordered tuple:
-\begin{align}
-\notag V_C = \bigg[ & dens_C(1, 1, 1), ~\ldots, ~dens_C (1, 1, Q),\\
-\notag & dens_C (1, 2, 1), ~\ldots, ~dens_C (1, M, Q),\\
-& dens_C (2, 1, 1), ~\ldots, ~dens_C (N, M, Q) \bigg]\, ,\label{eq:densp}
-\end{align}
-where $Q$ is the number of bins in each of the $M$ attributes, and $N$ is the number of clusters in $C$.
-
-\emph{The ADCO measure}: After the density profile vectors of two clusterings $C$ and $C'$ are obtained, the degree of similarity between  $C$ and $C'$ can be determined by calculating the dot product of the density profile vectors:
-$sim(C, C') = V_C  \cdot V_{C'} \, .$
-
-The $ADCO(C,C')$ measure is defined as $sim(C,C')$ normalized by the maximum achievable similarity when using either of the two clusterings:
-\[ADCO(C, C') = \frac{sim(C, C')}{NF(C, C')} \, , \]
-where $NF(C, C') = max \big[sim(C, C), \,sim(C', C')\big]$.
-
-\begin{figure}[tb]
+\begin{table}
 \begin{center}
-\includegraphics[width=0.4\textwidth]{fig/density_profile.eps}
+\begin{minipage}{0.45\linewidth}\centering
+\begin{tabular}{c | c c c}
+	& \textbf{$a'_1$}		& $\cdots$ & \textbf{$a'_m$}\\
+\hline
+\textbf{$a_1$}	& $d_{11'}$ & $\cdots$  & $d_{1m'}$\\
+%\textbf{$a_2$}	& $d_{21'}$	&           & $d_{2m'}$\\
+$\vdots$        &           & $\ddots$  &\\
+\textbf{$a_m$}	& $d_{m1'}$	&           & $d_{mm'}$\\
+\multicolumn{4}{c}{(A)}\\
+\end{tabular}
+\end{minipage}
+\hspace{.5cm}
+\begin{minipage}{0.45\linewidth}\centering
+\begin{tabular}{c | c c c c}
+	& \textbf{$c'_1$}	& $\cdots$ & \textbf{$c'_n$}\\
+\hline
+\textbf{$c_1$}	& $d_{11'}$ & $\cdots$  & $d_{1n'}$\\
+%\textbf{$c_2$}	& $d_{21'}$	&           & $d_{2n'}$\\
+$\vdots$        &           & $\ddots$  &\\
+\textbf{$c_n$}	& $d_{n1'}$	&           & $d_{nn'}$\\
+\multicolumn{4}{c}{(B)}\\
+\end{tabular}
+\end{minipage}
 \end{center}
-\caption[An example of cluster density profiles]{\label{fig:density_profile} Two clusterings $C=\{c_1, c_2\}$ and $C'=\{c_1', c_2'\}$. Two attributes $X$ (attribute 1) and $Y$ (attribute 2) are discretized into 2 bins each. See~\cite{Bae2010} for details.}
-\end{figure}
+\caption[Example distance matrices]{\label{tbl:sim_mat} Example distance matrices between (A) two sets of attributes and (B) two sets of clusters, respectively.}
+\end{table}
+
+To solve this difficulty, viewing the two matching problems as combinatorial optimization problems with distinct yet interrelated objective functions, we propose a novel approach using a multi-objective heuristics to discover attribute matching and cluster matching simultaneously. The objectives in the optimization are to minimize distances of attribute matching and cluster matching respectively. We explore the widely used simulated annealing algorithm as the metaheuristics algorithm and briefly compare its performance with the evolutionary multi-objective algorithm in experiments.
 
 \subsection{The Multi-Objective Simulated Annealing Framework}
 \textbf{Problem Definition:} We tackle two integration tasks in this work, namely, the attribute matching and cluster matching problems. We cast the dual matching problems to a multi-objective optimization problem so that the matchings can be solved simultaneously. The two objective functions to be optimized are defined as the total distance of matched elements in attribute and cluster matching respectively. To this end, we explore methods to represent attributes and clusters so that distance measure can be reasonably defined. We assume that the optimal matching lies at the Pareto front in this multi-objective problem.
@@ -129,7 +135,7 @@ V_A=\bigg[\mu_1, \mu_2, \ldots, \mu_n\bigg],
 where we choose the mean value $\mu_i$ for cluster $i$ as the statistical indicator in our implementation.
 
 \subsubsection{Representation of Clusters:}
-Clusters can be represented by density profiles~\cite{Bae2010} as described in Section~\ref{sec:related}. The attribute's range in each cluster is discretized into a number of bins, and the similarity between two clusters corresponds to the number of points of each cluster falling within these bins. Given this, density profile vector $V_C$ for a clustering $C$ is formally defined as an ordered tuple by Equation~\ref{eq:densp}
+Clusters can be represented by density profiles~\cite{Bae2010} as described in Section~\ref{sec:annotAndMatching}. The attribute's range in each cluster is discretized into a number of bins, and the similarity between two clusters corresponds to the number of points of each cluster falling within these bins. Given this, density profile vector $V_C$ for a clustering $C$ is formally defined as an ordered tuple by~\ref{eq:densp}
 %and is repeated here:
 %\begin{align}
 %\notag V_C = \bigg[ & dens_C(1, 1, 1), ~\ldots, ~dens_C (1, 1, Q),\\
@@ -141,8 +147,10 @@ where $dens_C(k, i, j)$ refers to the number of points in the region $(i, j)$---
 %The values of $dens_C(k, i, j)$ for all possible $k$, $i$, $j$ are then listed in a certain ordering to form a clustering's \emph{density profile vector} (defined below). This ordering is imposed on all attribute-bin regions and must be applied to the two datasets in which the clusterings were generated. It is necessary, then, that both datasets must have the same attribute set. If this requirement does not stand, the matching between the sets must be specified in advance. Therefore, in order to apply the density profile method in the ERP pattern matching problem, we must first carry out measure matching. We further discuss the interdependence between pattern matching and metric matching in Section~\ref{sec:discuss}.
 
 \subsection{Objective Functions}
-The objective functions in the attribute matching and cluster matching problems are criteria to evaluate the ``goodness" of matchings. We use the sum of pair-wise distances between matched elements (see Figure~\ref{tbl:sim_mat} for example) as the objective function. Given this, to determine the form of objective functions amounts to defining proper pair-wise distance measures for the attribute and cluster matching problems respectively, as detailed in the following.
 \label{sec:obj_funcs}
+The objective functions in the attribute matching and cluster matching problems are criteria to evaluate the ``goodness" of matchings. We use the sum of pair-wise distances between matched elements (see Table~\ref{tbl:sim_mat} for example) as the objective function. Given this, to determine the form of objective functions amounts to defining proper pair-wise distance measures for the attribute and cluster matching problems respectively, as detailed in the following.
+
+
 \subsubsection{Distance function between two attributes}
 The pairwise distance between two attributes are defined as the Euclidean distance between their segmented statistical characterization vectors, and $f_a$ calculates the sum of pair-wise distances under the attribute matching specified by $x_a$:
 \begin{align}
@@ -154,11 +162,11 @@ where $x_a \in P_M$.
 
 \subsubsection{Distance function between two clusters}
 
-The ADCO similarity described in Section~\ref{sec:cc} can be transformed to a distance defined as follows~\cite{Bae2010}:
+The ADCO similarity described in~\ref{eq:adco} of Section~\ref{sec:clusterMatching}, Chapter~\ref{chap:background}, can be transformed to a distance defined as follows~\cite{Bae2010}:
 \begin{align}
 D_{ADCO}(C,C')=\left\{\begin{array}{ll}
-	   {\scriptstyle 2-ADCO(C,C')} &, {\scriptstyle ~if~ C \neq C'}\\
-	   {\scriptstyle 0} &, ~{\scriptstyle otherwise}
+	   { 2-ADCO(C,C')} &, { ~if~ C \neq C'}\\
+	   { 0} &, ~{ otherwise}
 	   \end{array}\right.
 \end{align}
 We use $D_{ADCO}$ as the pair-wise distance between two clusters under the density profile representation, and $f_c$ calculates the sum of pair-wise distances under the cluster matching specified by $x_c$
@@ -187,9 +195,8 @@ Given $x_a^{(n)}$, derive $x_c^{(n)}$:
 &\max{\bigg[\sum_{i=1}^M\sum_{j=1}^Q {\scriptstyle dens(k,i,j)^2},\sum_{i=1}^M\sum_{j=1}^Q {\scriptstyle dens(\pi(k),x_a^{(n)}(i),j)^2}\bigg]}\Bigg) \label{eq:gen_xc}
 \end{align}
 
-To calculate $\pi$ that satisfies equations~\ref{eq:gen_xa} and \ref{eq:gen_xc}, rather than iterating through all possible permutations, we can consider the equation as a minimum-cost assignment problem. Table~\ref{tbl:sim_mat}(A), for example, illustrates a distance table between two attribute sets $A$ and $A'$. Matching of the two sets can be considered as an assignment problem where the goal is to find an assignment of elements in $\{A_i\}$ to those in $\{A_i'\}$ that yields the minimum total distance without assigning each $A_i$ more than once. This problem can be efficiently solved by the Hungarian Method in polynomial time of $O(K_{min}^3)$~\cite{Kuhn1955}. It is worth noting that by formulating the problem as the assignment problem, we assume the matching between two sets to be a one-to-one function.
+To calculate $\pi$ that satisfies~\ref{eq:gen_xa} and~\ref{eq:gen_xc}, rather than iterating through all possible permutations, we can consider the equation as a minimum-cost assignment problem. Table~\ref{tbl:sim_mat}(A), for example, illustrates a distance table between two attribute sets $A$ and $A'$. Matching of the two sets can be considered as an assignment problem where the goal is to find an assignment of elements in $\{A_i\}$ to those in $\{A_i'\}$ that yields the minimum total distance without assigning each $A_i$ more than once. This problem can be efficiently solved by the Hungarian Method in polynomial time of $O(K_{min}^3)$~\cite{Kuhn1955}. It is worth noting that by formulating the problem as the assignment problem, we assume the matching between two sets to be a one-to-one function.
 
-\section{Case Studies}
 \section{Experiment}
 \label{sec:experiment}
 Because we are interested in understanding the property of the Pareto front obtained by our method, we conducted a series of experiments to highlight tradeoffs of the objectives functions. First, to illustrate the proposed method is indeed capable of determining matchings between numeric-typed attributes and clusters, we synthesized a dataset simulating some extreme conditions under which previous methods are ineffective. Also, from the results obtained on the synthetic dataset, we empirically study tradeoffs between the two objective functions. Then, to evaluate the scalability of the method, we carry out a series of tests on a set of data with varied sizes. Finally, encouraged by these results, we applied our methods to actual neuroscience ERP (event-related potentials) data to highlight the applicability of our method to the neuroscience domain.
@@ -215,7 +222,7 @@ $a_1'$ --- range: [-5.72, 5.72] & $a_3'$ --- range: [-5.24, 5.24] & $a_2'$ --- r
 $\mu$: 0, $\sigma$:2.20 & $\mu$: 0, $\sigma$:2.35 & $\mu$: 0, $\sigma$:2.15 \\
 \end{tabular}
 \end{center}
-\caption{\label{fig:syndata} Scatter plots of data instances from three sample attributes in one synthetic dataset (upper frame) and those of their corresponding attributes from another (lower frame) are illustrated to show their respective value distributions.}
+\caption[Distribution of the synthetic dataset.]{\label{fig:syndata} Scatter plots of data instances from three sample attributes in one synthetic dataset (upper frame) and those of their corresponding attributes from another (lower frame) are illustrated to show their respective value distributions.}
 \end{figure*}
 
 \subsubsection{Results:}
@@ -224,7 +231,7 @@ Figure~\ref{fig:syn_pareto} illustrates the Pareto front obtained from matching 
 \begin{center}
 \includegraphics[width=0.4\textwidth]{fig/syn_pareto.eps}
 \end{center}
-\caption{\label{fig:syn_pareto} An example Pareto front obtained from matching two synthetic datasets with 20 attributes and 5 clusters.}
+\caption[An example Pareto front result from the synthetic dataset]{\label{fig:syn_pareto} An example Pareto front obtained from matching two synthetic datasets with 20 attributes and 5 clusters.}
 \end{figure}
 
 \subsubsection{Running Time:}
@@ -249,7 +256,7 @@ We systematically altered the number of attributes and clusters present in the d
 \hline
 \end{tabular}
 \end{center}
-\caption{\label{tbl:scale} Running time of the annealing process on synthetic datasets with varied configurations of attribute and cluster sizes. The time is obtained by averaging over results of 5 runs of each test.}
+\caption[Running time on the synthetic dataset]{\label{tbl:scale} Running time of the annealing process on synthetic datasets with varied configurations of attribute and cluster sizes. The time is obtained by averaging over results of 5 runs of each test.}
 \end{table}
 
 \subsection{Neuroscience Dataset}
@@ -260,11 +267,11 @@ To address the problems of attribute and cluster matching in a real-world neuros
 
 The raw data for this study consist of 80 simulated event-related potentials (ERPs), in which each ERP comprises simulated measurement data for a particular subject ($n$ = 40). The 40 simulated subjects are randomly divided into two 20-subject groups, SG1 and SG2, each containing 40 ERPs (20 subjects in 2 experimental conditions). Each ERP consists of a superposition of 5 latent varying spatiotemporal patterns. These patterns were extracted from the two datasets, SG1 and SG2, using two techniques: temporal Principal Components Analysis (tPCA) and spatial Independent Components Analysis (sICA), two data decomposition techniques widely used in ERP research~\cite{Dien2010}. To quantify the spatiotemporal characteristics of the extracted patterns, two alternative metric sets, m1 and m2, were applied to the two tPCA and the two sICA derived datasets. For a complete explanation of these alternative metrics, please see Appendix in~\cite{FrishkoffEtal07}.
 
-In summary, the simulated ERP data generation process yielded eight test datasets in total, reflecting a 2 (attribute sets) $\times$ 2 (subject groups) $\times$ 2 (decomposition methods) factorial design. Therefore, for each attribute sets there are 4 datasets generated from different combinations of subject groups and decomposition methods, resulting $4 \times 4 = 16$ cases for the studies of attribute matching and cluster matching. The reason to include such variabilities was to test the robustness of our matching method to different sources of heterogeneities across the different datasets. Within all test datasets, 5 major ERP spatiotemporal patterns are present. They are P100, N100, N3, MFN, and P300. These patterns can be identified in the datasets by clustering analysis. Pretending that the latent patterns underlying discovered clusters are unknown, we hope to match clusters across datasets to recover the fact that the same patterns are present in all datasets.
+In summary, the simulated ERP data generation process yielded eight test datasets in total, reflecting a 2 (attribute sets) $\times$ 2 (subject groups) $\times$ 2 (decomposition methods) factorial design. Therefore, for each attribute set there are 4 datasets generated from different combinations of subject groups and decomposition methods, resulting $4 \times 4 = 16$ cases for the studies of attribute matching and cluster matching. The reason to include such variabilities was to test the robustness of our matching method to different sources of heterogeneities across the different datasets. Within all test datasets, 5 major ERP spatiotemporal patterns are present. They are P100, N100, N3, MFN, and P300. These patterns can be identified in the datasets by clustering analysis. Pretending that the latent patterns underlying discovered clusters are unknown, we hope to match clusters across datasets to recover the fact that the same patterns are present in all datasets.
 
 \subsubsection{Results:}
 %Figure~\ref{fig:nemo_exp} illustrates the Pareto fronts derived by the proposed method on each of the 16 test cases.
-We applied the weighted sum method as the post-process step after obtaining the Pareto-optimal solutions to determine the most favored choice using the parameters ($\alpha$ and $\beta$) discovered in the preliminary experiments on synthetic datasets (cf. Section~\ref{sec:syn_exp}). The accuracy of attribute matching and cluster matching along with the number of points in the Pareto front are listed in Table~\ref{tbl:nemo_perf} (all these results are obtained by taking average from 5 runs for each test case).
+We applied the weighted sum method as the post-processing step after obtaining the Pareto-optimal solutions to determine the most favored choice using the parameters ($\alpha$ and $\beta$) discovered in the preliminary experiments on synthetic datasets (cf. Section~\ref{sec:syn_exp}). The accuracy of attribute matching and cluster matching along with the number of points in the Pareto front are listed in Table~\ref{tbl:nemo_perf} (all these results are obtained by taking average from 5 runs for each test case).
 
 %\begin{figure*}[tb]
 %\begin{center}
@@ -275,13 +282,13 @@ We applied the weighted sum method as the post-process step after obtaining the 
 
 It can be observed from the results in Table~\ref{tbl:nemo_perf} that more different factors involved in the acquisition of the two datasets for matching can negatively affect the matching performance. For example, in test case 1, the two datasets are drawn from the same subject group (SG1) and preprocessed using the same decomposition method (sICA); whereas in test case 4, the subject groups and decomposition methods are all different, resulting in greater variability and hence the performance is less satisfactory.
 
-It is worth noting that our method greatly outperforms a baseline method called WS (see Figure~\ref{fig:perf_comp}) that determines attribute matching based on data distribution at the whole attribute level, which is typical in previous systems such as SemInt~\cite{Li00semint:a}. In this figure we also demonstrate the accuracy of the segmented statistics characterization with expert-labeled patterns, meaning that the data is partitioned and aligned in the most accurate way, which marks the best achievable attribute matching performance. But it is not feasible because, as mentioned in~Section~\ref{sec:intro}, manually recognizing patterns (partitioning data) and aligning them across datasets requires a priori knowledge of attributes in the datasets which is exactly what the problem of attribute matching tries to discover (the circular causality problem). On the other hand, our method does not require human involvement (except the specification of the number of clusters (patterns) present in the data in order to run the clustering analysis) in determining both the attribute matching and cluster matching and is able to achieve close-to-optimal results.
+It is worth noting that our method greatly outperforms a baseline method called WS (see Figure~\ref{fig:perf_comp}) that determines attribute matching based on data distribution at the whole attribute level, which is typical in previous systems such as SemInt~\cite{Li00semint:a}. In this figure we also demonstrate the accuracy of the segmented statistics characterization with expert-labeled patterns, meaning that the data is partitioned and aligned in the most accurate way, which marks the best achievable attribute matching performance. But it is not feasible because manually recognizing patterns (partitioning data) and aligning them across datasets requires a priori knowledge of attributes in the datasets which is exactly what the problem of attribute matching tries to discover (the circular causality problem). On the other hand, our method does not require human involvement (except the specification of the number of clusters (patterns) present in the data in order to run the clustering analysis) in determining both the attribute matching and cluster matching and is able to achieve close-to-optimal results.
 
 \begin{figure*}[tb]
 \begin{center}
 \includegraphics[width=1.\textwidth]{fig/perf_comp.eps}
 \end{center}
-\caption{\label{fig:perf_comp} A comparison of the attribute matching accuracy of three methods on the 16 test cases of the neuroscience dataset. The three methods being compared are matching based on whole-attribute statistics (WS), segmented attribute statistics without knowing a priori cluster matching (SS-u), and segmented attribute statistics with expert-aligned clusterings (SS).}
+\caption[A comparison between methods on the neuroscience dataset]{\label{fig:perf_comp} A comparison of the attribute matching accuracy of three methods on the 16 test cases of the neuroscience dataset. The three methods being compared are matching based on whole-attribute statistics (WS), segmented attribute statistics without knowing a priori cluster matching (SS-u), and segmented attribute statistics with expert-aligned clusterings (SS).}
 \end{figure*}
 
 
@@ -310,11 +317,11 @@ Test case & Source params & Target params & $~~~P_a~~~$ & $~~~P_c~~~$ & $|\Sigma
 \hline
 \end{tabular}
 \end{center}
-\caption{\label{tbl:nemo_perf} Matching performance of the proposed method with MOSA on the 16 test cases from the neuroscience dataset. The source and target parameter configuration of the data acquisition process of each test case are shown. $P_a$ and $P_c$ denote the accuracy of attribute matching and cluster matching respectively. $\Sigma$ is the number of points in the obtained Pareto-front. The quantities listed in the table are obtained by averaging over 5 runs of each test.}
+\caption[The performance of MOSA on the neuroscience dataset]{\label{tbl:nemo_perf} Matching performance of the proposed method with MOSA on the 16 test cases from the neuroscience dataset. The source and target parameter configuration of the data acquisition process of each test case are shown. $P_a$ and $P_c$ denote the accuracy of attribute matching and cluster matching respectively. $\Sigma$ is the number of points in the obtained Pareto-front. The quantities listed in the table are obtained by averaging over 5 runs of each test.}
 \end{table*}
 
 \subsection{Comparison with Multi-Objective Genetic Algorithm}
-The concept of Genetic Algorithm (GA) was developed by Holland and his colleagues~\cite{Holland1992}. GA is first inspired by the evolutionary process in which weak and unfit species within their environment are faced with extinction and stronger ones have greater opportunities to pass their genes to next generation. Comparing to Simulated Annealing, Genetic Algorithm often offers a different perspective in the field of numerical optimization. Starts from a number of random generated population, cross over and evolve; GA has the ability to search in parallel around different and often fully scattered instances in the solution space, in contrast to the ``single thread" search in Simulated Annealing. In this paper, we also implemented the Multi-Objective Genetic Algorithm (MOGA) as the metaheuristics to solve the dual matching problem.
+The concept of Genetic Algorithm (GA) was developed by Holland and his colleagues~\cite{Holland1992}. GA is first inspired by the evolutionary process in which weak and unfit species within their environment are faced with extinction and stronger ones have greater opportunities to pass their genes to next generation. Comparing to Simulated Annealing, Genetic Algorithm often offers a different perspective in the field of numerical optimization. Starts from a number of random generated population, cross over and evolve; GA has the ability to search in parallel around different and often fully scattered instances in the solution space, in contrast to the ``single thread" search in Simulated Annealing. We also implemented the Multi-Objective Genetic Algorithm (MOGA) as the metaheuristics to solve the dual matching problem.
 
 %For the crossover operation in our MOGA implementation, we go through all the attributes (clusters) in a random sequence, if the matching of one attribute in both parents is not used, we keep the matching from either one of its parents with 50\% probability; if the matching of one of the two parent is used, we keep the matching from another parent; or if the matching of both parents are used already, we random choose one matching from the rest used matching attribute.
 
@@ -345,40 +352,41 @@ Test Case	&	$P_a$ (\%)	&	$P_c$ (\%) &   $\Sigma$    \\
 \hline
 \end{tabular}
 \end{center}
-\caption{\label{tbl:moga_neuro} Matching performance of the proposed method with MOGA on the 16 test cases from the neuroscience dataset. The source and target parameter configuration of each test case is the same as in Table~\ref{tbl:nemo_perf}.}
+\caption[The performance of MOGA on the neuroscience dataset]{\label{tbl:moga_neuro} Matching performance of the proposed method with MOGA on the 16 test cases from the neuroscience dataset. The source and target parameter configuration of each test case is the same as in Table~\ref{tbl:nemo_perf}.}
 \end{table*}
 
 The number of population kept in each generation is an important parameter regarding the complexity and performance in MOGA. Intuitively, the more instances we keep, the broader the search space we can explore in each generation. Table~\ref{tbl:moga_neuro} shows the result with the number of population set to 4. We have also tested other settings and found out that the accuracy in most cases increase with the number of population but in rare cases the performance deteriorates. The overall performance of MOGA is comparable to that of MOSA but appears to be less robust. It is worth noting that the metaheuristics (MOSA and MOGA) we employed in the experiments are simple algorithms. More modern and sophisticated methods that explore various fitness assignment procedure, elitism, or diversification approaches will be very likely to improve the performance.
 
 
-\begin{table*}[tbh]
+\begin{table*}[tbh]\footnotesize{
 \begin{center}
-\begin{tabular}{l|l|l|l|l|l|l|l}
+\begin{tabular}{l|l|l|l|l|l|l}
 \hline
-\multicolumn{2}{c|}{}		&	fixed acidity	&	volatile acidity	&	citric acid	&	residual sugar	&	chlorides	&	free sulfur dioxide	\\
+\multicolumn{2}{c|}{}		&	fixed acidity	&	volatile acidity	&	citric acid	&	residual sugar	&	chlorides	\\
 \hline
-\multirow{2}{*}{mean}	&	data1	&	6.86	&	0.28	&	0.34	&	6.35	&	0.05	&	35.58	\\
-	&	data2	&	6.85	&	0.28	&	0.33	&	6.43	&	0.05	&	35.02	\\
+\multirow{2}{*}{mean}	&	data1	&	6.86	&	0.28	&	0.34	&	6.35	&	0.05	\\
+	&	data2	&	6.85	&	0.28	&	0.33	&	6.43	&	0.05	\\
 \hline
-\multirow{2}{*}{stdev}	&	data1	&	0.84	&	0.1	&	0.12	&	4.98	&	0.02	&	16.4	\\
-	&	data2	&	0.86	&	0.1	&	0.12	&	5.16	&	0.02	&	17.61	\\
-
-\hline
-\end{tabular}
-\begin{tabular}{l|l|l|l|l|l|l|l}
-\hline
-\multicolumn{2}{c|}{}		&	total sulfur dioxide	&	density	&	pH	&	sulphates	&	alcohol	&	quality	\\
-\hline
-\multirow{2}{*}{mean}	&	data1	&	138.98	&	0.99	&	3.19	&	0.49	&	10.53	&	5.88	\\
-	&	data2	&	137.68	&	0.99	&	3.19	&	0.49	&	10.49	&	5.88	\\
-\hline
-\multirow{2}{*}{stdev}	&	data1	&	41.86	&	0.02	&	0.16	&	0.11	&	1.25	&	0.89	\\
-	&	data2	&	43.18	&	0	&	0.15	&	0.12	&	1.22	&	0.89	\\
-
+\multirow{2}{*}{stdev}	&	data1	&	0.84	&	0.1	&	0.12	&	4.98	&	0.02	\\
+	&	data2	&	0.86	&	0.1	&	0.12	&	5.16	&	0.02	\\
 \hline
 \end{tabular}
-\end{center}
-\caption{\label{tbl:wine_stat} Summary of the statistical characteristics of attributes in the Wine Quality dataset.}
+\newline
+\vspace*{.5cm}
+
+\begin{tabular}{l|l|l|l|l|l|l|l|l}
+\hline
+\multicolumn{2}{c|}{}		&	total sulfur dioxide	&	density	&	pH	&	sulphates	&	alcohol	&	quality	&	free sulfur dioxide	 \\
+\hline
+\multirow{2}{*}{mean}	&	data1	&	138.98	&	0.99	&	3.19	&	0.49	&	10.53	&	5.88	&	35.58	\\
+	&	data2	&	137.68	&	0.99	&	3.19	&	0.49	&	10.49	&	5.88	&	35.02	\\
+\hline
+\multirow{2}{*}{stdev}	&	data1	&	41.86	&	0.02	&	0.16	&	0.11	&	1.25	&	0.89	&	16.4	\\
+	&	data2	&	43.18	&	0	&	0.15	&	0.12	&	1.22	&	0.89	&	17.61	\\
+\hline
+\end{tabular}
+\end{center}}
+\caption[Distribution of the Wine Quality dataset]{\label{tbl:wine_stat} Summary of the statistical characteristics of attributes in the Wine Quality dataset.}
 \end{table*}
 
 \subsubsection{Wine Quality Dataset}
@@ -388,15 +396,16 @@ We then apply the proposed method with MOSA and MOGA as metaheuristics respectiv
 
 \begin{table*}[tbh]
 \begin{center}
-\begin{tabular}{l|l|l|l}
+\begin{tabular}{l|l|l}
 \hline
-MOSA accuracy (\%)	&	MOSA running time (ms)	&	MOGA accuracy (\%)	&	MOGA running time (ms)	\\
+                &   MOSA    &   MOGA    \\
 \hline
-95.5	&	517	&	92.3	&	3356	\\
+accuracy (\%)   &    95.5   &   92.3    \\
+running time    &    517    &   3356    \\
 \hline
 \end{tabular}
 \end{center}
-\caption{\label{tbl:wine_res} Performance of the proposed method with MOSA and MOGA as metaheuristics respectively on the Wine Quality dataset.}
+\caption[The performance of MOSA and MOGA on the Wine Quality dataset]{\label{tbl:wine_res} Performance of the proposed method with MOSA and MOGA as metaheuristics respectively on the Wine Quality dataset.}
 \end{table*}
 
 
