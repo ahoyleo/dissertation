@@ -1,5 +1,6 @@
-The RDF bipartite graph introduced in~\ref{sec:graph-rep-for-rdb} can maximally preserve the semantics in the data tables and contains no ambiguity. It is also able to represent ontologies in the same way so that analysis approaches on the RDF bipartite graph can systematically utilize information from both data and domain knowledge. If a mining task does not involve the use of domain knowledge from ontologies, the RDF bipartite graph can be transformed to a more compact form that achieves better scalability. In the last chapter, we describe in detail the mining method without the incorporation of ontologies based on the coarsened RDF hypergraph. In this chapter, we cover the usage of the RDF bipartite graph to incorporate ontologies to mine semantically associated itemsets.
+The RDF bipartite graph introduced in~\ref{sec:graph-rep-for-rdb} can maximally preserve the semantics in the data tables and contains no ambiguity. It is also able to represent ontologies in the same way so that analysis approaches on the RDF bipartite graph can systematically utilize information from both data and domain knowledge. If a mining task does not involve the use of domain knowledge from ontologies, the RDF bipartite graph can be transformed to a more compact form that achieves better scalability. In the last chapter, we describe in detail the mining method without the incorporation of ontologies based on the coarsened RDF bipartite graph. In this chapter, we cover the usage of the RDF bipartite graph to incorporate ontologies to mine semantically associated itemsets.
 
+This chapter makes the following main contributions:  First, we employ a RDF bipartite representation to capture both ontologies and data. We can weight each hyperedge so that certain links (such as \emph{is\_a} or \emph{may\_treat} relationships) can carry appropriate strength.  Then, we implement highly efficient and scalable random walks with restart over the bipartite graph to generate frequent itemsets, including associations that may not necessarily be co-frequent. Finally, we evaluate the correctness of the results on well-known shopping cart benchmark datasets, and the scalability of the method on our large electronic healthcare dataset.
 \section{Method}
 %Mining Semantically Associated Itemsets with the Incorporation of Ontologies
 
@@ -131,14 +132,14 @@ In this section, we evaluate the combined RDF bipartite graph for discovering se
 \begin{center}
 \begin{tabular}{c|c|c|c}
 \hline
-    & \# data stmts & \# isa stmts & \# other stmts* \\
+    & \# data stmts & \# isa stmts & \# other stmts$^\dag$ \\
     \hline
   Shopping cart     &  8,481       & 127       &    0\\
-  Electronic health &  10,000,257  & 1,048,604 &    43780\\
+  Electronic health &  148,690,056  & 1,048,604 &    43780\\
   \hline
 \end{tabular}
 \end{center}
-\caption[Overview of the test cases.]{\label{tbl:exp_overview} Dataset overview (``stmts" stands for RDF statements). *In the electronic healths test, we explore the ``may\_treat" relationship between drugs and diseases defined in the National Drug File.}
+\caption[Overview of the test cases.]{\label{tbl:exp_overview} Dataset overview (``stmts" stands for RDF statements). $^\dag$ In the electronic healths test, we explore the ``may\_treat" relationship between drugs and diseases defined in the National Drug File.}
 \end{table}
 
 
@@ -195,7 +196,7 @@ Mouthwash	&	0.23	&	Milk	&	0.21	&	Soap	&	0.25	\\
 \multicolumn{2}{c}{(D)}  &  \multicolumn{2}{c}{(E)}  \\
 \end{tabular}
 \end{center}
-\caption[Top results on the Foodmart dataset.]{\label{tbl:foodmart_comp} Foodmart items ranked by the strength of semantic association (i.e., $p(\%)$, the steady-state probability).}
+\caption[Top results on the Foodmart dataset.]{\label{tbl:foodmart_comp} Foodmart items ranked by the strength of semantic association  (i.e., $p(\%)$, the steady-state probability), given the query term ``Tooth Brush".}
 \end{table*}
 
 Note that without filtering the ranked semantic associations on the combined graph, the list will include items that never appear in the transactional data. It is because typically the semantic annotation process links table attributes to their most specific matching concept in the ontology which are close to the leaf level. The incorporation of ontology is to aid the mining process, therefore including in the result those internal items (e.g., ``PersonalHygiene") that never appear in the data is counterintuitive. To overcome this, we can simply filter out those items exclusive to the ontology. Table~\ref{tbl:foodmart_comp2} shows an example where the query term is ``soup" and both test settings yield rankings taking value on the same set of items.
@@ -240,7 +241,7 @@ We obtained the set of drugs and diseases for each patient's clinical note by us
 %In addition to having obvious data-mining applications, the workflow has been used by biomedical researchers to build semantic-search applications, such as the NCBO Resource Index~\cite{jonquet11}, which won the Semantic Web Challenge\footnote{\url{http://challenge.semanticweb.org/}} in 2010. The annotation process utilizes the vast NCBO BioPortal ontology library~\cite{bioportal} to extract information by using a lexicon of over one million terms generated from the relevant ontologies, such as SNOMED-CT, RxNORM, and MedDRA. Furthermore, it also incorporates negation detection --- the ability to discern whether a term is negated with the context of the narrative (e.g., lack of valvular dysfunction). Finally, it uses mappings between terms across ontologies~\cite{ghazvinian09}, which forms a rich knowledge graph %(Figure~\ref{fig:collapse})
 %or mega-thesaurus, to normalize the lexicon by reducing the feature set from over one million to merely 11,107 unique drugs and 3,594 unique diseases.
 
-From this set of 1.6 million patients, we extracted a subset whose clinical notes mention the terms of interest (including both drugs and diseases, such as vioxx and myocardial infraction).  Out of those annotated records, we vectorize texts and turned them into a huge bag-of-word representation, from which a RDF bipartite graph is constructed (including 10 million RDF statements, see Table~\ref{tbl:exp_overview}). we applied our algorithms to all previous records in the patient's timeline, looking at just the set of drugs and their semantically related diseases.  Therefore, at a very simplistic level, the experiment result shows that strong semantically associated items in this context could possibly represent sets of drugs that could lead toward certain diseases.
+From this set of 1.6 million patients with annotated records, we vectorize texts and turned them into a huge bag-of-word representation, from which a RDF bipartite graph is constructed (including 148 million RDF statements, see Table~\ref{tbl:exp_overview}). we applied our algorithms to all previous records in the patient's timeline, looking at just the set of drugs and their semantically related diseases.  Therefore, at a very simplistic level, the experiment result shows that strong semantically associated items in this context could possibly represent sets of drugs that could lead toward certain diseases.
 
 One strength of the Annotator is the highly comprehensive and interlinked lexicon that it uses. It can incorporate the entire NCBO BioPortal ontology library of over 250 ontologies to identify biomedical concepts from text using a dictionary of terms generated from those ontologies. Terms from these ontologies are linked together via mappings. For this study, we specifically configured the workflow to use a subset of those ontologies that are most relevant to clinical domains, including Unified Medical Language System (UMLS) terminologies such as SNOMED-CT, the National Drug File (NDFRT) and RxNORM, as well as ontologies like the Human Disease Ontology. The resulting set of ontologies contains 1 million subsumption statements.
 To highlight the capability of our method for incorporating multiple types of relationships, we also explore the ``may\_treat" relationship between drugs and diseases defined in NDFRT, for example, Thiabendazole may\_treat Larva Migrans. Since we are interested in learning the interaction between drugs and diseases, may\_treat is naturally a better indicator relationship to include while mining semantic associations than the subsumption relationship. Our results below prove this point.
@@ -250,26 +251,24 @@ To highlight the capability of our method for incorporating multiple types of re
 Before studying the drug-disease association, we carried out a similar test to that on the shopping cart dataset, in which we focus on studying the drug-drug and disease-disease association. To this purpose, we combine the subsumption hierarchy in the ontology graph with the data graph. Table~\ref{tbl:health_comp} shows the ranked semantic association for the query term ``ROFECOXIB" (an active ingredient of some anti-inflammatory drugs) given different configuration of graphs. Without any preprocessing and prior knowledge about how the clinical notes are prescribed, the incorporation of subsumption relationship can be seen as a mean for denoising and enhancement of the data. Given the ratio of the size of the ontology to the size of data, the ontology in this test is more dominant in determining the ranking than in the shopping cart experiment. One can gradually change the ratio of $w_o$ to $w_d$ to strike a balance and achieve the optimal result.
 \begin{table*}[tbh]\scriptsize
 \begin{center}
-\begin{tabular}{ c  c || c  c || c  c  }
+\begin{tabular}{ c | c | c | c  }
 \hline
-\multicolumn{2}{c||}{w/ data only}			&	\multicolumn{2}{c||}{$w_o=1, w_d=1$}			&	\multicolumn{2}{c}{$w_o=1, w_d=2$}		 \\
+rank    &   w/ data only	&	w/ onto only		&$w_o=10000, w_d=1$	 \\
 \hline
-p(\%)	&	item	&	p(\%)	&	item	&	p(\%)	&	item	\\
-\hline
-1.11	&	pseudoisocytidine				&	1.46	&	oral form rofecoxib				&	1.35	&	oral form rofecoxib	\\
-1.11	&	dimetpramid						&	1.16	&	rofecoxib 50 mg oral tablet		&	1.07	&	rofecoxib 50 mg oral tablet	\\
-1.11	&	quinalphos						&	1.16	&	rofecoxib 12.5 mg oral tablet	&	1.07	&	rofecoxib 12.5 mg oral tablet	 \\
-1.11	&	retinol o-fatty-acyltransferase	&	1.16	&	rofecoxib 25 mg oral tablet		&	1.07	&	rofecoxib 25 mg oral tablet	 \\
-1.11	&	trimethylaminobutyrate			&	1.07	&	cyclooxygenase 2 inhibitors		&	0.85	&	cyclooxygenase 2 inhibitors	\\
-1.11	&	fungiqual						&	0.78	&	duplicate concept				&	0.79	&	social control policies	 \\
-1.10	&	chemoembolization, therapeutic	&	0.63	&	rofecoxib 2.5 oral suspension	&	0.79	&	dimetpramid	\\
-1.10	&	social control policies			&	0.63	&	rofecoxib 5 oral suspension		&	0.79	&	quinalphos	\\
-1.10	&	insulin							&	0.56	&	cyclooxygenase inhibitors		&	0.79	&	trimethylaminobutyrate	 \\
-1.10	&	2-...hexanoic acid				&	0.54	&	r [preparations]				&	0.79	&	pseudoisocytidine	\\
+1	&		reflux	&	valdecoxib	&		reflux	\\
+2	&		medical history	&	meloxicam	&		obstruction	\\
+3	&		history of previous events	&	celecoxib	&		injury	\\
+4	&		diagnosis	&	parecoxib	&		valdecoxib	\\
+5	&		pharmaceutical preparations	&	etoricoxib	&		medical history	\\
+6	&		blood and lymphatic system disorders	&	deracoxib	&		foreign body sensation	\\
+7	&		disease	&	lumiracoxib	&		history of previous events	\\
+8	&		infantile neuroaxonal dystrophy	&	firocoxib	&		adverse effects	\\
+9	&		today	&	nabumetone	&		celecoxib	\\
+10	&		hypersensitivity	&	macrolides	&		actual hypothermia	\\
 \hline
 \end{tabular}
 \end{center}
-\caption[Top results on the electronic health dataset.]{\label{tbl:health_comp}Results of Health items ranked by the strength of semantic association.}
+\caption[Top results on the electronic health dataset.]{\label{tbl:health_comp}Results of Health items ranked by the strength of semantic association, given the query term ``rofecoxib".}
 \end{table*}
 
 Table~\ref{tbl:health_exp} illustrates the rankings of three associations (one per row) under different settings. The first element in the pair is the query item, which are all active ingredients of some prescription drugs, and the ranking shown in the table is for the second item, which are diseases. For example, arthritis is ranked as the 527th semantically associated item to ROFECOXIB according to similarity ranking based only on data graph. All these item pairs are actually backed by known relationships, i.e., as a golden standard, we know the semantic associations between them should be strong.
@@ -294,4 +293,18 @@ $\langle troglitazone, diabetes\rangle$  &   0.006   &   478     &   0.005    & 
 
 We first observe that the ranking based on data graph alone is fairly high already, consider there are approximately 1 million distinct terms in the ontology. However, the results based on the combination of data and subsumption (``isa") graph are worse. It is because the subsumption hierarchy for drugs and diseases are largely separate structures. While on the one hand, the incorporation of subsumption relationship boosts the association within closely related drugs and diseases, it on the other hand in fact obfuscate the association between drugs and diseases across their respective subsumption hierarchies. On the other hand, the association between these pairs can be exactly captured by the NDFRT ``may\_treat" relationship (e.g., NDFRT explicitly defines that ROFECOXIB may\_treat arthritis). Therefore, when the ``may\_treat" graph is incorporated into the mining process, the ranking for the association is greatly boosted.
 
-We believe this result demonstrates the power of domain knowledge in data mining. Using the proposed combined RDF bipartite graph for both data and ontology, the incorporation of domain knowledge can be achieved by simply encoding it in the ontology and choose appropriately relevant part of the ontology that best suits the mining task. 
+We believe this result demonstrates the power of domain knowledge in data mining. Using the proposed combined RDF bipartite graph for both data and ontology, the incorporation of domain knowledge can be achieved by simply encoding it in the ontology and choose appropriately relevant part of the ontology that best suits the mining task.
+
+\section{Discussion}
+\label{sec:discussion}
+We have demonstrated that using the proposed combined RDF bipartite graph incorporates both ontologies and data based on the user's desired weights for each component for finding semantically associated itemsets.
+
+Developing scalable algorithms for semantic data mining is critically important. In our work, the healthcare dataset has grown beyond 100 billion triples and the size of the ontologies used are also large (SNOMED-CT has nearly 400,000 classes). The RWR method we describe works well for query-based node similarity, but it will not scale to generate full pair-wise node similarities at this tremendous scale.% because a calculation of eigenvectors of the Laplacian is required to derive the similarity measures, which is very expensive on large graphs.
+
+While non-trivial practical problems associated with very large graphs cannot be completely avoided, our work makes it possible to leverage decades of work on graph-based methods in this effort to mine semantically associated data. The general strategy going forward is to employ approximation and develop parallelizable algorithms. Lin and Cohen~\cite{LinEtal2010ICML} proposed an approximation to a eigenvalue-weighted linear combination of all the eigenvectors, which can be achieved by performing a small number of matrix-vector multiplications.  The procedure results in a more scalable method called \emph{power iteration clustering} that finds a very low-dimensional data embedding using truncated power iteration on a normalized pair-wise similarity matrix of the data points. Zhao et al.~\cite{ZhaoEtal2011Eff} described the idea of \emph{graph coordinate systems}, which provides a fast embedding of large graphs into a hyperbolic space. The method parallelizes easily and efficiently locate shortest paths between node pairs, which relates well to the notion of commute time distance, which our RWR method seeks to elicit. Savas and Dhillon~\cite{SavasEtal2011Clu} introduced a novel framework called \emph{clustered low rank matrix approximation for massive graphs}. After a few intermediate steps, they are able to finally project an optimal, low rank approximation of the entire graph, thus including connections or edges between vertices from different clusters. We intend to extend these ideas to ontology-annotated hypergraphs.
+
+The weighted hyperedges provide a great deal of flexibility to users who may prefer domain knowledge over data (or vice versa) and opens up new research questions on how to optimally learn the weights. In reality, the appropriate ratio for the edge weights is not only dependent on the size of graphs but also the graph configuration (depth, average degree, etc). Moreover, allowing users to specify the ratio of prior knowledge in ontologies versus inductive evidence from data enables us to discover empirically optimal configurations. We have performed exhaustive feature selection on classification algorithms for our healthcare dataset in the past, and we would also explore a few permutations on these hyperedge weights going forward. We can draw upon other works, such as, Tian et al.~\cite{Tian09}, who proposed an semi-supervised approach for classifying nodes in a graph based on a relatively small labeled set.
+
+The RDF bipartite graph representation has limited expressivity compared to OWL itself. For example, domain, range and cardinality constraints are not straightforward to model.  One possible approach is to model domain constraints by explicitly describing the desired or acceptable walk (traversal sequence) in the RDF hypergraph. In this case, the recently proposed \emph{regular traversal expression} ~\cite{Marko10} technique may apply. However, their fast power-iteration approach for computing the stationary probability may not be applicable any more due to the label sequence constraint, but the Monte-Carlo simulation of the random walk may help to approximate the similarity measure.
+
+We have showcased the utility of the RDF bipartite graph in mining \emph{semantically associated itemsets} and will explore other data mining tasks as well. For example, the classification task can be formulated as discovering the correct labels for unlabeled vertices in the weighted bipartite graph. Conceptually, the pair of nodes being ``close to'' one another shall share the same labels, which are consistent to one basic principle of semi-supervised learning, so the challenge is to define the closeness between two nodes. The clustering task can be viewed as a neighborhood formation for vertices on the data partition. Basically, for any closely related nodes, we group them together. Again, with an explicit similarity measure, possibly even the classical k-means in this case, could be directly applied to cluster the vertices. 

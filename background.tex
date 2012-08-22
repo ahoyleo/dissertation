@@ -239,6 +239,7 @@ Many of the graph algorithms are sensitive to the application scenario in which 
 \end{comment}
 
 \section{Semantic Annotation and Matching}
+This section describes various background areas related to the contributions of the matching work in Chapter~\ref{chap:annotation}.
 \label{sec:annotAndMatching}
 \subsection{The Multiobjective Optimization Problem and Pareto-Optimality}
 Multi-objective optimization problem (also called multi-criteria, multi-performance or vector optimization) can be defined mathematically as to find the vector $X=[x_1, x_2, \ldots, x_k]^T$ which satisfies the following $m$ inequality constraints and $l$ equality constraints:
@@ -262,7 +263,7 @@ Real-life problems require simultaneous optimization of several incommensurable 
 When the objectives associated with any pair of non-dominated solutions are compared, it is found that each solution is superior with respect to at least one objective. The set of non-dominated solutions to a multi-objective optimization problem is known as the Pareto-optimal set (Pareto front)~\cite{Zitzler98multiobjectiveoptimization}.
 
 \subsubsection{Metaheuristics on Solving Multi-Objective Optimization Problems}
-Metaheuristics are used for combinatorial optimization in which an optimal solution is sought over a large, discrete search-space. Popular metaheuristics for combinatorial problems include simulated annealing by Kirkpatrick et al.~\cite{Kirkpatrick1987}, genetic algorithms by Holland et al.\cite{Holland1992}. Extensive previous research has been devoted to extend these methods to multi-objective optimization problems as discussed in the following, which yield sets of mutually non-dominating solutions that are an approximation to the true Pareto front. In Section~\ref{sec:method} we explore in detail the multi-objective simulated annealing algorithm applied to the dual matching problem. We compare the performance with the multi-object genetic algorithm in Section~\ref{sec:experiment}.
+Metaheuristics are used for combinatorial optimization in which an optimal solution is sought over a large, discrete search-space. Popular metaheuristics for combinatorial problems include simulated annealing by Kirkpatrick et al.~\cite{Kirkpatrick1987}, genetic algorithms by Holland et al.\cite{Holland1992}. Extensive previous research has been devoted to extend these methods to multi-objective optimization problems as discussed in the following, which yield sets of mutually non-dominating solutions that are an approximation to the true Pareto front. 
 
 \textbf{Simulated Annealing in Multi-Objective Optimization:} Simulated annealing (SA) is based on an analogy of thermodynamics with the way metals cool and anneal. It has been proved to be a compact and robust technique. Simulated Annealing was started as a method or tool for solving single objective combinatorial problems, these days it has been applied to solve single as well as multiple objective optimization problems in various fields. A comprehensive survey can be found in~\cite{SumanSurvey}.
 
