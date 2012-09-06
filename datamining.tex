@@ -1,119 +1,65 @@
-\section{Overview}
-By developing the unified representation for both data and domain knowledge, and utilizing ontological annotations, we can produce one RDF hypergraph, which serves as the basis for semantic data mining. Given this, the main research challenge is how to utilize the data and ontology together for semantic data mining. In this dissertation, we focus on one important data mining tasks, the {\em frequent pattern mining}, to showcase the utility of RDF hypergraphs.
+We have described the unified representation for both data and ontologies based on RDF hypergraphs or bipartite graphs in Chapter~\ref{chap:representation}, as well as methods to resolve heterogeneities from disparate sources in Chapter~\ref{chap:annotation}. The main research challenge remaining is to develop appropriate analysis methods based on the unified graph representation to solve data mining problems. In this and the next chapters, several such methods are described and their capabilities, limitations and possible directions for improvements are studied.
 
+We focus our efforts on a particular mining task that aims at finding semantically associated itemsets to showcase the utility of the methods. More specifically, if a mining task does not require the use of domain knowledge from ontologies, the RDF hypergraph can be coarsened to a compact form for better scalability. The emphasis of this chapter is to present details of the coarsened RDF hypergraph and similarity measures designed based on it to discover semantically associated itemsets without the incorporation of ontologies. We cover the usage of the RDF bipartite graph in cases where ontologies are needed in the next chapter.
+
+\section{Overview}
 \subsection{Semantically Associated Itemsets}
 \label{sec:association}
-Frequent itemsets play an essential role in many data mining tasks that try to discover interesting relations between features in large databases. In the traditional sense, an itemset is called frequent if its support (number of times the itemset occur in the dataset) is no less than a given threshold. The original motivation for searching association rules came from the need to analyze supermarket customer behavior in terms of products that are often purchased together. However, it is evident that the measure of support essentially restrains pattern discovery to account for only directly associated items (\eg, products purchased together) while ignoring possible indirect associations. A prominent example of such indirect association was given by Swanson's land mark paper published in 1987~\cite{swanson87} that described the relationship between fish oil and Raynauld's syndrom through their mutual connections with certain changes in blood.
+The problem we aim to solve is to find semantically associated itemsets, a particular kind of frequent itemset mining task. In the traditional sense, an itemset is called frequent if its support (number of times the itemset occur in the dataset) is no less than a given threshold. The original goal for finding associations came from the need to analyze supermarket customer behavior in terms of products that are often purchased together. However, we notice that the measure of support essentially restrains pattern discovery to account for only directly associated items (\eg, products purchased together in one transaction) while ignoring possible indirect ones. A prominent example of meaningful indirect associations was given by Swanson's landmark paper published in 1987~\cite{swanson87} that described the relationship between fish oil and Raynauld's syndrome through their mutual connections with some certain changes in blood.
 
-Such indirect associations can be best captured by graphs. In general, an object set endowed with pairwise relationships can be conceptually viewed as a graph in which vertices represent objects, and any two vertices that have some kind of relationship are joined together by an edge. In this sense the traditional measure of support evaluates the significance of a itemset by the number of direct edges (1-hop path) between item nodes. Extending this notion to allow paths with arbitrary lengths to be taken into account, we are able to evaluate the significance of an itemset in terms of the indirect connections among its nodes. From here on, we call the itemset associated by the indirect connection via multi-hop paths the \emph{semantically associated itemset}, or simply the \emph{semantic association}. In this chapter, We focus on describing graph-based algorithms to find semantically associated itemsets.
+Such indirect associations can be best captured by graphs. In general, an object set endowed with pairwise relationships can be conceptually viewed as a graph in which vertices represent objects, and any two vertices that have some kind of relationship are joined together by an edge. In this sense the traditional measure of support evaluates the significance of an itemset by the number of direct edges (of one-hop length) between item nodes. Extending this notion to allow paths with arbitrary lengths to be taken into account, we are able to evaluate the significance of an itemset in terms of the indirect connections among its nodes. From here on, we call the itemset associated by the indirect connection via multi-hop paths the \emph{semantically associated itemset}, or simply the \emph{semantic association}. In this chapter, we focus on describing graph-based algorithms to find semantically associated itemsets.
 
-The term \emph{semantic association} conforms with the definition proposed by Sheth et al.~\cite{ShethEtal05JDBM} for semantic association between entities in an RDF graph. Specifically, they define the semantic association based on if there exists a sequence of interconnected links between two given entities. In our study of semantically associated itemsets in transaction data, the link between entities can be as simple as the `co-occurrence' relationship if more complicated relationships in ontologies are not concerned. Under Sheth et al's definition, the semantic association between transaction items $i_0$ and $i_n$ can be established by identifying a link of the form $i_0, P_c, i_1, P_c, \ldots , i_{n-1}, P_c, i_n$, in which $P_c$ denotes the property that connects two items (\eg, co-occurrence). Given this, the problem of finding meaningful semantic association becomes how to define a proper graph representation and effective analysis methods that can be carried out to evaluate the strength of semantic associations.
+The usage of the term semantic association conforms with the definition proposed by Sheth \etal~\cite{ShethEtal05JDBM} for connections between entities in an RDF graph. Specifically, they defined the semantic association based on if there exists a sequence of interconnected links between two given entities. In our study of semantically associated itemsets in transaction data, the link between entities can be as simple as the ``co-occurrence" relationship if more complicated relationships in ontologies are not concerned. Under Sheth \etal's definition, the semantic association between transaction items $i_0$ and $i_n$ can be established by identifying a link of the form $i_0, P_c, i_1, P_c, \ldots , i_{n-1}, P_c, i_n$, in which $P_c$ denotes the property, or relationship, that connects two items (\eg, co-occurrence). Given this, the problem of finding meaningful semantic association becomes how to define a proper graph representation and effective analysis methods that can be carried out to evaluate the strength of semantic associations.
 
-We first rule out simple graphs as the candidate model for discovering semantic associations due to the ambiguity and information loss. For illustrating this point of view, let us consider a relational table depicted in Figure~\ref{fig:hg_and_rg}(a). One can construct a simple undirected graph where the set of vertices is the set of relational attributes (column items) and an edge joins two vertices if the they co-occur in a tuple (as illustrated in Figure~\ref{fig:hg_and_rg}(b)). This graph is called \emph{Gaifman graph}~\cite{Hodkinson02finiteconformal} of a relational structure. The undirected graph can be further enriched by assigning to each edge a weight equal to the support of the 2-itemset consisting of vertices incident to the edge. Cliques (complete subgraphs) in the Gaifman graph, or \emph{Gaifman cliques} for short, are of particular interest because every tuple (ground atom) in data corresponds to a Gaifman clique. However, ambiguity arises as not all Gaifman cliques have matching tuple in the data. There exists cases where cliques are incidental in the sense that several relational ground atoms play together to induce a clique configuration in the Gaifman graph, but no ground atom covers the entire clique (e.g., the clique of $\{A,B,C,D\}$ in Figure~\ref{fig:hg_and_rg}(b) does not correspond to any tuple in the relational table). Further more, given the Gaifman graph we lose the information of how nodes are related. For example, if $A, B$ and $C$ are products purchased by a particular customer as indicated by a record in the transactional table, this information is no longer available in the graph.
+To develop solutions for semantically associated itemsets, we first rule out simple graphs as the candidate representation of data due to the ambiguity and information loss, as is illustrated in Section~\ref{sec:graphForRelationalStructure}, Chapter~\ref{chap:background}. The RDF hypergraph or bipartite graph comes to remedy as it preserves the semantics in the original table and contains no ambiguity. It is also able to represent ontologies in the same way so that analysis approaches on the RDF hypergraph can utilize information from both data and domain knowledge. However, if a mining task does not require the use of domain knowledge from ontologies, the RDF hypergraph can be coarsened to a more compact form to achieve better scalability. In the rest of this chapter, we describe in detail the methods for discovering semantically associated itemsets on the coarsened RDF hypergraph without the incorporation of ontologies. %We cover the usage of the RDF bipartite graph to incorporate ontologies in the mining process in the next chapter.
 
-The RDF bipartite graph introduced in~\ref{sec:graph-rep-for-rdb} comes to remedy as it maximally preserves the semantics in the original table and contains no ambiguity. Plus it is able to represent ontologies in the same way so that analysis approaches on the RDF bipartite graph can systematically utilize information from both data and domain knowledge. Moreover, if a mining task does not involve the use of domain knowledge from ontologies, the RDF bipartite graph can be transformed to a more compact form that achieves better scalability. In the rest of this chapter, we describe in detail the methods for discovering semantically associated itemsets without the incorporation of ontologies. We cover the usage of the RDF bipartite graph to incorporate ontologies in the mining process in the next chapter.
-
-\subsection{Graph-based similarity}
-Data mining algorithms rely on the notion of similarity between data points to make meaningful inferences. When data is in $\mathbb{R}^d$, the standard similarity measure is the Euclidean distance. When data has an explicit link structure, shortest path distance is commonly used. However, neither of these measures incorporates the intuition that two data points are similar to each other if they are connected by a high density region. This latter concept of similarity measure has been shown in experiments to lead to significant improvement in a number of learning tasks, see, for example, (Blum \& Chawla, 2001; Corduneanu \& Jaakkola, 2003; Bous-quet et al., 2004)~\cite{}.
-
-Take the simple graph in Fig.~\ref{fig:graphcomp}(B) for example, suppose given a task of friend recommendation based on the information in this graph, the interesting question is whether $c$ or $e$ is a better choice of recommendation to $a$. To answer this question, it is natural to compare the similarity measures $s(a, c)$ and $s(a, e)$. In a rough sense, on can identify in the hypergraph representation that there are two paths between $a$ and $c$ (the formal definition for paths in hypergraphs will be given in Section~\ref{sec:rw_hyper}), while only one between $a$ and $e$. It's intuitive to conclude that $a$ and $c$ are more similar, or closer, than $a$ and $e$. This gives us a hint that meaningful similarity measures on the graph should satisfy the following intuitions:
-\begin{enumerate}
-\item The more paths connecting two nodes, the closer they are.
-\item The shorter the paths, the closer they are.
-\end{enumerate}
-In other words, the more ``short" connections between two given nodes, the more similar those nodes are.
-To this end, we propose to employ the following quantities as the candidate similarity measure since both of them have the desired property. They are, namely, the \emph{commute time distance} based similarity measure from the random walk model on hypergraph, and the inner product similarity based on the \emph{pseudoinverse of the hypergraph Laplacian}.
-Several measures derived from random walk on graphs have been shown to possess such desired property. In the following example, we quantitatively show the property of commute time distance, which characterizes the expected number of steps to take a round trip between a starting node and a target node.
-
-\begin{figure}[tbh]
-\centering
-\begin{minipage}[c]{\textwidth}\centering
-\includegraphics[width=.4\textwidth]{fig/comm-dist-demo.eps}
-\end{minipage}
-\hfill
-\begin{minipage}[c]{\textwidth}\centering
-\begin{tabular}{r|r|r|r|r|r || r|r|r|r|r}
-\hline\hline
-\multicolumn{6}{c||}{Euclidian Distance}	&	\multicolumn{5}{c}{Commute Distance}		\\
-\hline\hline							
-Index	&	1	&	2	&	3	&	4	&	5	&	1	&	2	&	3	&	4	&	5	\\
-\hline
-1	&	0	&	1	&	1.85	&	1.85	&	2.41	&	0	&	12.83	&	19.79	&	19.79	&	20.34	\\
-\hline
-2	&	1	&	0	&	1	&	1	&	1.41	&	12.83	&	0	&	6.96	&	6.96	&	7.51	\\
-\hline
-3	&	1.85	&	1	&	0	&	1.41	&	1	&	19.79	&	6.96	&	0	&	7.51	&	6.96	\\
-\hline
-4	&	1.85	&	1	&	1.41	&	0	&	1	&	19.79	&	6.96	&	7.51	&	0	&	6.96	\\
-\hline
-5	&	2.41	&	1.41	&	1	&	1	&	0	&	20.34	&	7.51	&	6.96	&	6.96	&	0	\\
-\hline\hline
-\end{tabular}
-\end{minipage}
-\caption{\label{fig:cd-demo} A Comparison between the Euclidean distance and the commute time distance.}
-\end{figure}
-
-Figure~\ref{fig:cd-demo} shows a graph of five nodes with a specific edge configuration (the so called ``lollipop graph''). The Euclidean distance between each pair of nodes are shown in the left-hand side of the corresponding table above and the respective commute time distance are shown on the righ-hand side. It can be seen that node 1 and node 3 are equally close to node 2 in terms of their Euclidean distances. However, node 2 and 3 are considered much closer under commute time distance because they are within a much more densely connected subgraph. This shows that, unlike Euclidean distance and shortest path distance, commute distance between two nodes captures both the length of paths between them and their local neighborhood densities. We believe such property makes the commute time distance a suitable measure for graph-based data mining algorithms. We also explore other random walk-based measures including the pseudoinverse of the Laplacian matrix and the stationary probability that are closely related to commute time distance. In the following, we first describe random walk on simple graph and then introduce the extension to hypergraph. The details of hypergraph-based similarity measures are described in the subsequent sections.
-%These methods are described in detail in the following sections and trade-offs between them are studied.
-
-\subsubsection{Random Walk}
-\textbf{Random Walk on Simple Graph}
-Given a graph and a starting point we select a neighbor of it at random and move to this neighbor then we select a neighbor of this point at random and move to it etc. The random sequence of points selected this way is a random walk on the graph. In other words, a random walker can jump from vertex to vertex and each vertex therefore represents a state of the Markov chain. The average first-passage time $m(k|i)$~\cite{randomwalks} is the average number of steps needed by a random walker for reaching state $k$ for the first time, when starting from state $i$. The symmetrized quantity $n(i,j)=m(j|i)+m(i|j)$ called the average commute time~\cite{randomwalks}, provides a distance measure between any pair of states. The fact that this quantity is indeed a distance on a graph was proved independently by Klein and Randic~\cite{Klein} and Gobel and Jagers~\cite{Gobel}.
-
-The Laplacian matrix $\mathbf{L}$ of a graph is widely used for finding many properties of the graphs in spectral graph theory. Given node degree matrix $\mathbf{D}$ and graph adjacency matrix $\mathbf{A}$, the Laplacian matrix of the graph is defined as $\mathbf{L}=\mathbf{D}-\mathbf{A}$. The normalized Laplacian is given by $\mathbf{L}_N=\mathbf{I}-\mathbf{D}^{-1/2}\mathbf{A}\mathbf{D}^{-1/2}$, where $\mathbf{I}$ is the identity matrix. The average commute time $n(i,j)$ can be computed in closed form from the Moore-Penrose pseudoinverse of $\mathbf{L}$~\cite{pseudo}, denoted by $\mathbf{L}^+$.
-
-Various quantities derived from random walk on graph has been used in a number of applications. Fouss et al.~\cite{Fouss06random-walkcomputation} compared twelve scoring algorithms based on graph representation of the database to perform collaborative movie recommendation. Pan et al.~\cite{Pan} developed a similarity measure based on random walk steady state probability to discover correlation between multimedia objects containing data of various modalities. Yen et al.~\cite{Yen05clusteringusing} introduced a new k-means clustering algorithm utilizing the random walk average commute time distance. Zhou et al.~\cite{Zhou:2009:GCB:1687627.1687709} presented a unified framework based on neighborhood random walk to integrate structural and attribute similarities for graph clustering.
-
-\textbf{Random Walk on Hypergraph}
-\label{sec:rw_hyper}
-We can associate each hypergraph with a natural random walk which has the transition rule as described in~\cite{Zhou06learningwith}. Given the current position $u \in V$; first choose a hyperedge $e$ over all hyperedges incident with $u$ with the probability proportional to $w(e)$; and then choose a vertex $v \in e$ uniformly at random. Obviously, it generalizes the natural random walk defined on simple graphs. Let $\mathbf{P}$ denote the transition probability matrix of this hypergraph random walk.
-Then each entry of $\mathbf{P}$ is
-\[
-p(u,v) = \sum_{e\in E}{w(e)\frac{h(u,e)}{d(u)}\frac{h(v,e)}{\delta(e)}}\, .
-\]
-In matrix notation, $\mathbf{P}=\mathbf{D}_v^{-1}\mathbf{HWD}_e^{-1}\mathbf{H}^T$.
-Zhou et al.~\cite{Zhou06learningwith} define the following normalized hypergraph Laplacian $\mathcal{L}$ based on the random walk model:
-\begin{align}
-\mathcal{L}=\mathbf{I}-\mathbf{\Theta},   ~\mathrm{where}~ \mathbf{\Theta}=\mathbf{D}_v^{-\frac12}\mathbf{HWD}_e^{-1}\mathbf{H}^T\mathbf{D}_v^{-\frac12} \label{eq:normalizedHyperL}.
-\end{align}
 
 \section{Method}
-In this section, we present our study for discovering semantically associated itemsets based on hypergraph without incorporating domain knowledge in ontologies. The goal of this study is to show that, using graph based formalism, we can obtain interesting patterns that are unable to be captured by traditional methods.
-
-If a mining task does not involve the usage of ontologies and focuses only on data in tables, we can use an alternative hypergraph representation that is more compact than the RDF bipartite graph to model the data. The process to generate such hypergraph is called \emph{RDF hypergraph coarsening} as described in Definition~\ref{def:hg-coarsen}.
+In this section, we present our method for discovering semantically associated itemsets based on hypergraphs when ontologies are not present in the mining task. We first introduce an alternative hypergraph representation that is more compact to model the data. The process to generate such hypergraph is called \emph{RDF hypergraph coarsening} as described in Definition~\ref{def:hg-coarsen}. Then, two similarity measures based on the coarsened hypergraphs are described to discover semantically associated 2-itemsets. Finally, methods to generate $k$-itemsets are presented.
 
 \subsection{RDF Hypergraph Coarsening}
 
 \begin{figure}[tbh]
 \centering
 \includegraphics[width=\textwidth]{fig/hypergraph-coarsening.eps}
-\caption{\label{fig:hypergraph-coarsening} An example hypergraph coarsening process.}
+\caption{\label{fig:hypergraph-coarsening} An example of the hypergraph coarsening process.}
 \end{figure}
 
 \begin{mydef}[\textbf{RDF hypergraph coarsening}]
 \label{def:hg-coarsen}
-RDF hypergraph coarsening is the process of computing a compact form given an input RDF hypergraph for a relational table by merging vertices into larger groups and removing less significant vertices. The choice of vertices is pertinent to the specific mining tasks. Note that RDF hypergraph is 3-uniform and in the case of RDF hypergraph for relation tables, each hyperedge has three nodes corresponding to the RDF statement of the form \texttt{<row>, <p>, <column>}. The \texttt{<p>} node is the auxiliary predicate denoting the context-dependent semantic relationship between the row and column nodes (\eg, such as that can be as general as \texttt{<mentions>}), and since it is incident to all RDF hyperedges it is first removed in the coarsening process as it bears the least amount of information. Next, if the mining task focuses on discovering patterns among column nodes (\eg, frequent pattern mining), we can merge column nodes that coincide with the same row nodes into a new hyperedge and subsequently remove the row node, and vice versa for mining tasks focusing on row nodes.
+RDF hypergraph coarsening is the process of generating a compact form given an input RDF hypergraph for a relational table by merging vertices into larger groups and removing less significant vertices. The choice of vertices is pertinent to specific mining tasks. Notice that RDF hypergraph is 3-uniform and in the case of RDF hypergraph for relation tables, each hyperedge has three nodes corresponding to the RDF statement of the form \texttt{<row>, <p>, <column>}. The \texttt{<p>} node is an auxiliary predicate denoting the context-independent semantic relationship between the row and column nodes (such as the general \texttt{<mentions>} relationship), and since it is incident to all RDF hyperedges it is first removed in the coarsening process as it bears the least amount of information. Next, if the mining task focuses on discovering patterns among column nodes (such as in frequent pattern mining), we can place column nodes that coincide with the same row nodes into a new hyperedge and subsequently remove the row node. The result is a column-oriented coarsened RDF hypergraph. The vice versa can be carried out for mining tasks that focus on row nodes (such as clustering).
 \end{mydef}
 
-\begin{myexp}[\textbf{Generation of a column-wise hypergraph for a relational table}]
+\begin{myexp}[\textbf{Generation of a column-oriented coarsened hypergraph for a relational table}]
 \label{column-wise-hg}
-Figure~\ref{fig:hypergraph-coarsening} (A) shows a sample relational table. Using the method described in Example~\ref{exp:repBinRDB} we can represent this binary-valued table to an RDF hypergraph as is shown in Figure~\ref{fig:hypergraph-coarsening} (B), which demonstrates three hyperedges corresponding to the first row in the table created by transforming the row into three RDF statements, i.e., \texttt{<$e_1$, p, A>, <$e_1$, p, B>}, and \texttt{<$e_1$, p, C>}. Figure~\ref{fig:hypergraph-coarsening} (C) illustrates the coarsened hypergraph according to Definition~\ref{def:hg-coarsen}. Supposing we are interested in discovering relationship between column nodes \texttt{A, B} and \texttt{C} in a frequent pattern mining task, we can remove the nodes \texttt{$e_1$} and \texttt{p} that are commonly incident to all the three hyperedges, and then merge nodes \texttt{A, B} and \texttt{C} to form a single hyperedge. Figure~\ref{fig:hypergraph-coarsening} (D) shows the resulting coarsened hypergraph for the relational table in Figure~\ref{fig:hypergraph-coarsening} (A).
+Figure~\ref{fig:hypergraph-coarsening} (A) shows a sample relational table. Using the method described in Example~\ref{exp:repBinRDB}, Chapter~\ref{chap:representation}, we can represent this binary-valued table to an RDF hypergraph as is shown in Figure~\ref{fig:hypergraph-coarsening} (B). We can see there are three hyperedges for the first row in the table corresponding to three RDF statements, \ie, \texttt{<$e_1$, p, A>, <$e_1$, p, B>}, and \texttt{<$e_1$, p, C>}. Figure~\ref{fig:hypergraph-coarsening} (C) illustrates the coarsened hypergraph according to Definition~\ref{def:hg-coarsen}. Supposing we are interested in discovering relationships between column nodes \texttt{A, B} and \texttt{C} in a frequent pattern mining task, we can remove the nodes \texttt{$e_1$} and \texttt{p} that are commonly incident to all the three hyperedges, and then place nodes \texttt{A, B} and \texttt{C} on a single hyperedge. Figure~\ref{fig:hypergraph-coarsening} (D) shows the coarsened hypergraph for all rows from the relational table in Figure~\ref{fig:hypergraph-coarsening} (A).
 \end{myexp}
 
-Given the method for RDF hypergraph coarsening, we propose to construct a coarsed hypergraph for the relational table in the scenario where ontologies are not included. The relational attributes constitute the universe of vertices in the hypergraph. Based on this hypergraph, our approach for mining semantically associated itemsets starts by first generating 2-itemsets. A 2-itemset $\langle i,j \rangle$ is considered semantically associated if the hypergraph-based similarity measure $s(i,j)$ exceeds some threshold. In the following, we describe two similarity measures $s_{CT}$ and $s_{L+}$ based on, respectively, the average commute time distance on hypergraph and the inner-product-based representation of the pseudoinverse of Hypergraph Laplacian. Given discovered semantically associated 2-itemsets, we propose a hypergraph expansion method along with two search strategies, namely, the clique and connected component search, in the resulting graph for finding semantically associated $k$-itemsets ($k>2$).
-\begin{figure*}[tbh]
-\begin{center}
-\includegraphics[width=.8\textwidth]{fig/hg_and_rg1.eps}
-\end{center}
-\caption[The simple graph vs. hypergraph for representing a relational table.]{\label{fig:hg_and_rg} (a) an example transaction table; (b) the Gaifman graph representation of the table; (c) The hypergraph representation of the table}
-\end{figure*}
+Given this method, we can construct a coarsened hypergraph for any relational table in mining tasks where ontologies are not required. The relational attributes constitute the universe of vertices in the hypergraph. Based on the coarsened hypergraph, our approach for mining semantically associated itemsets starts by first generating 2-itemsets as detailed below.
 
 \subsubsection{Methods for Generating 2-itemsets}
-In the following we describe two similarity measures that define the strength of bond between a pair of semantically associated items.
+A 2-itemset $\langle i,j \rangle$ is considered semantically associated if the hypergraph-based similarity measure $s(i,j)$ exceeds some threshold. In the following, we describe two similarity measures $s_{CT}$ and $s_{L+}$ based on, respectively, the average commute time distance on hypergraphs and the inner-product-based representation of the pseudoinverse of hypergraph Laplacian. Given discovered semantically associated 2-itemsets, we propose a hypergraph expansion method along with two search strategies, namely, the clique and connected component search, in the resulting graph for finding semantically associated $k$-itemsets ($k>2$).
 
-\textbf{Average Commute Time Similarity $s_{CT}$}\\
+We first introduce the concept of random walk on hypergraphs as an extension to random walk on simple graphs. Several key quantities are defined, especially the Laplacian for hypergraphs, based on which the similarity measures $s_{CT}$ and $s_{L+}$ can be calculated.
+
+\vspace{.5cm}
+\noindent\textbf{Random Walk on Hypergraphs}\\
+\label{sec:rw_hyper}
+We can associate each hypergraph with a natural random walk which has the transition rule as described in~\cite{Zhou06learningwith}. Given the current position $u \in V$; first choose a hyperedge $e$ over all hyperedges incident with $u$ with the probability proportional to $w(e)$ (the edge weight); and then choose a vertex $v \in e$ uniformly at random. Obviously, it generalizes the natural random walk defined on simple graphs. Let $\mathbf{P}$ denote the transition probability matrix of this hypergraph random walk.
+Then each entry of $\mathbf{P}$ is
+\[
+p(u,v) = \sum_{e\in E}{w(e)\frac{h(u,e)}{d(u)}\frac{h(v,e)}{\delta(e)}}\, .
+\]
+In matrix notation, $\mathbf{P}=\mathbf{D}_v^{-1}\mathbf{HWD}_e^{-1}\mathbf{H}^T$.
+Zhou et al.~\cite{Zhou06learningwith} defined the following normalized hypergraph Laplacian $\mathcal{L}$ based on the random walk model:
+\begin{align}
+\mathcal{L}=\mathbf{I}-\mathbf{\Theta},   ~\mathrm{where}~ \mathbf{\Theta}=\mathbf{D}_v^{-\frac12}\mathbf{HWD}_e^{-1}\mathbf{H}^T\mathbf{D}_v^{-\frac12} \label{eq:normalizedHyperL}.
+\end{align}
+
+\vspace{.5cm}
+\noindent\textbf{Average Commute Time Similarity $s_{CT}$}\\
 To compute commute-time distance between vertices in a hypergraph, we need to first define the combinatory hypergraph Laplacian $\mathbf{L}$.
-It follows from Zhou et al's formalism of normalized hypergraph Laplacian in~\ref{eq:normalizedHyperL} that:
+It follows from Zhou et al's definition of normalized hypergraph Laplacian in~\ref{eq:normalizedHyperL}:
 \begin{equation}
 \mathbf{L}=\mathbf{D}^{1/2}\mathcal{L}\mathbf{D}^{-1/2}=\mathbf{D}_v-\mathbf{HWD}_e^{-1}\mathbf{H}^T \label{eq:combinatoryHyperL}
 \end{equation}
@@ -135,9 +81,10 @@ $),
 \begin{align}
 n(i,j)=V_G(\mathbf{e}_i-\mathbf{e}_j)^T\mathbf{L}^+(\mathbf{e}_i-\mathbf{e}_j), \label{eq:CT2}
 \end{align}
-Since $n(i,j)$ is a distance, it is straightforward to convert it to a similarity measure $s_{CT}(i,j)$ by normalize it to unit range and subtract from 1.
+Since $n(i,j)$ can be proven to be a distance, it is straightforward to convert it to a similarity measure $s_{CT}(i,j)$ by, for example, calculating the reciprocal $1/n(i,j)$.
 
-\textbf{Pseudoinverse-based Inner-Product Similarity $s_{L+}$}\\
+\vspace{.5cm}
+\noindent\textbf{Pseudoinverse-based Inner-Product Similarity $s_{L+}$}\\
 \ref{eq:CT2} can be mapped into a new Euclidean space that preserves the commute time distance:
 \begin{align}
 \notag n(i,j)&=V_G(\mathbf{e}_i-\mathbf{e}_j)^T\mathbf{L}^+(\mathbf{e}_i-\mathbf{e}_j)\\
@@ -158,38 +105,40 @@ The inner-product-based similarity measures are well-studied for the vector-spac
 
 \subsubsection{Effective Computation}
 \label{sec:eff_comp}
-In high dimensional data sets, the computations of the Hypergraph Laplacian and the pseudoinverse becomes intractable. We discuss two approaches to mitigate this scalability problem.
+In high dimensional data sets, the computation of the hypergraph Laplacian and the pseudoinverse becomes intractable. We discuss two approaches to mitigate this scalability problem.
 
-To compute Hypergraph Laplacian $\mathbf{L}$ in Equation \ref{eq:combinatoryHyperL} requires multiplication of hypergraph incidence matrices $\mathbf{H}$ and its transpose $\mathbf{H}^T$. Since $\mathbf{H}$ grows in proportion to the size of underlying transaction data (each node corresponds to a column and each hyperedge corresponds to a row), it eventually becomes unable to fit in memory when the size exceeding a certain amount. In this case the computation can still be carried out using a block partitioned matrix product by performing operations only on the submatrices of tractable sizes. Owing to the fact that, in most cases, $|V|$ is much smaller than $|E|$, $\mathbf{H}$ can then be partitioned into $s$ vertical stripes and the square matrix $\mathbf{D}_e$ into $s$ diagonal blocks. The multiplication in Equation \ref{eq:combinatoryHyperL} can be calculated by $\mathbf{HD}_e^{-1}\mathbf{H}^T=\sum_{\gamma=1}^s{\mathbf{H}_\gamma\mathbf{D}_{e\gamma}^{-1}\mathbf{H}_\gamma^T}$. Note that $\mathbf{H}$ is sparse in many applications. This property can be exploited to gain high performance and due to its importance much effort has been devoted to the study resulting a number of libraries and routines from which we can leverage.
+To compute hypergraph Laplacian $\mathbf{L}$ in~\ref{eq:combinatoryHyperL} requires multiplication of hypergraph incidence matrices $\mathbf{H}$ and its transpose $\mathbf{H}^T$. Since $\mathbf{H}$ grows in proportion to the size of underlying transaction data (each node corresponds to a column and each hyperedge corresponds to a row), it eventually becomes unable to fit in memory when the size exceeds a certain amount. In this case the computation can still be carried out using a block partitioned matrix product by performing operations only on the submatrices of tractable sizes. Owing to the fact that, in most cases, $|V|$ is much smaller than $|E|$, $\mathbf{H}$ can then be partitioned into $s$ vertical stripes and the square matrix $\mathbf{D}_e$ into $s$ diagonal blocks. The multiplication in~\ref{eq:combinatoryHyperL} can be calculated by $\mathbf{HD}_e^{-1}\mathbf{H}^T=\sum_{\gamma=1}^s{\mathbf{H}_\gamma\mathbf{D}_{e\gamma}^{-1}\mathbf{H}_\gamma^T}$. Notice that $\mathbf{H}$ is sparse in many applications which can be exploited to gain high performance.
 
-As the number of nodes grows, to compute pseudoinverse in closed form using Equation \ref{eq:pL} also becomes intractable. A procedure based on Cholesky factorization to compute $\mathbf{L}^+$ for large sparse matrices~\cite{matrix} is proved useful. It allows to compute $\mathbf{L}^+$ in a column-by-column manner. In particular, the procedure involves the following steps for computing the $i$th column of $\mathbf{L}^+$:
+As the number of nodes grows, to compute pseudoinverse in closed form using~\ref{eq:pL} also becomes intractable. A procedure based on Cholesky factorization to compute $\mathbf{L}^+$ for large sparse matrices~\cite{matrix} allows to compute $\mathbf{L}^+$ in a column-by-column manner. In particular, the procedure involves the following steps for computing the $i$th column of $\mathbf{L}^+$:
 \begin{enumerate}
 \item Compute the projection $\mathbf{y}_i$ of base vector $\mathbf{e}_i$ on the column space of $\mathbf{L}$.
 \item Find a solution $l_i^{*+}$ of the linear system $\mathbf{Ll}=\mathbf{y}_i$.
 \item Project $l_i^{*+}$ on the row space of $\mathbf{L}$ to get $l_i^+$.
 \end{enumerate}
-Since $\mathbf{L}$ is symmetric, its row space is the same as column space. The projection in step 1 and 2 can be represented by the matrix $(\mathbf{I-ee}^T/n)$. The equation in step 2 can be solved by first solving a reduced linear system: $\mathbf{\hat{L}\hat{l}}=\mathbf{\hat{y}}_i$, where $\mathbf{\hat{L}}$, $\mathbf{\hat{l}}$, and $\mathbf{\hat{y}}$ are obtained respectively by removing the last row from $\mathbf{l}$, $\mathbf{y}$, and last row and column from $\mathbf{L}$. We observe that $\mathbf{\hat{L}}$ is full rank and positive definite and hence is able to be decomposed using the Cholesky factorization, $\mathbf{\hat{L}=RR}^T$. Since $\mathbf{R}$ is lower-triangular, one solution of $\mathbf{\hat{L}\hat{l}}=\mathbf{RR}^T\mathbf{\hat{l}}=\mathbf{\hat{y}}_i$ can be efficiently obtained by two back-substitutions. After solving the reduced linear system, the solution to the original equation in step 2 is therefore $(\mathbf{l}_i^{*+})=[\mathbf{\hat{l}}_i^{*+},0]^T$. With the help of this technique, we are able to analyze datasets of a million rows and 10 thousand columns.
+Since $\mathbf{L}$ is symmetric, its row space is the same as its column space. The projection in step 1 and 2 can be represented by the matrix $(\mathbf{I-ee}^T/n)$. The equation in step 2 can be solved by first solving a reduced linear system: $\mathbf{\hat{L}\hat{l}}=\mathbf{\hat{y}}_i$, where $\mathbf{\hat{L}}$, $\mathbf{\hat{l}}$, and $\mathbf{\hat{y}}$ are obtained respectively by removing the last row from $\mathbf{l}$, $\mathbf{y}$, and last row and column from $\mathbf{L}$. We observe that $\mathbf{\hat{L}}$ is full rank and positive definite and hence is able to be decomposed using the Cholesky factorization, $\mathbf{\hat{L}=RR}^T$. Since $\mathbf{R}$ is lower-triangular, one solution of $\mathbf{\hat{L}\hat{l}}=\mathbf{RR}^T\mathbf{\hat{l}}=\mathbf{\hat{y}}_i$ can be efficiently obtained by two back-substitutions. After solving the reduced linear system, the solution to the original equation in step 2 is therefore $(\mathbf{l}_i^{*+})=[\mathbf{\hat{l}}_i^{*+},0]^T$. With the help of this technique, we are able to analyze datasets of a million rows and 10 thousand columns.
 
 
 \subsubsection{Methods for Generating $k$-itemset ($k>2$)}
 Now, we consider finding semantically associated $k$-itemset ($k>2$) from given 2-itemsets.
-As is common in hypergraph theory, we can associate an induced graph $G(H)$ with every hypergraph $H$ by expanding every hyperedge $e$ in $H$ to a clique in $G(H)$. Edges in the induced graph $G(H)$ can be called \emph{subedges} to avoid unnecessary confusion. We can further construct a pruned graph $G'(H)$ from $G(H)$ by applying the following inclusion rule on each subedge: the similarity between the incident nodes of a subedge has to be greater than a user-specified threshold $\theta$. In formal definition, given a hypergraph $H=(V,E)$, the pruned subgraph is $G'(H)=\{V,E'\}$ where
+As is common in hypergraph theory, we can associate an induced graph $G(H)$ with every hypergraph $H$ by expanding every hyperedge $e$ in $H$ to a clique in $G(H)$. Edges in the induced graph $G(H)$ can be called \emph{subedges} to avoid unnecessary confusion. We can further construct a pruned graph $G'(H)$ from $G(H)$ by applying the following inclusion rule on each subedge: the similarity between the incident nodes of a subedge has to be greater than a user-specified threshold $\theta$. More formally, given a hypergraph $H=(V,E)$, the pruned subgraph is defined as $G'(H)=\{V,E'\}$, where
 \begin{align}
 \notag E'=\{&(u,v)\in V^2 \, : \, u \neq v \; \mathrm{and} \; \\
 \notag &u, v \in e \; \mathrm{for} \; \mathrm{some} \; e \in E \; \mathrm{and} \; \\
 \notag &s(u,v) > \theta\}.
 \end{align}
-Given $G'(H)$, finding semantically associated $k$-itemset ($k>2$) can be formulated into two ways: finding cliques or connected components in $G'(H)$.
+We only use the pruned induced graph to model the local neighborhood relationship between data points, which is essentially a \emph{similarity graph} for data points under the hypergraph similarity measures (\ie, $s_{CT}$ or $s_{L+}$). It is worth noticing that each hypergraph has a unique induced graph but the same is not true the other way around. The induced graph alone is not an ideal representation of the data (see the discussion on the ambiguity of Gaifman graphs in Section~\ref{sec:graphForRelationalStructure}, Chapter~\ref{chap:background}). Therefore we develop ways to use hypergraphs and hypergraph-based measures to characterize the similarity between data points.
+
+Given $G'(H)$, finding semantically associated $k$-itemset ($k>2$) can be solved in two ways: finding cliques or connected components in $G'(H)$.
 
 \subsubsection{Cliques of $G'(H)$}
-Finding cliques in $G'(H)$ corresponds to searching and testing in the powerset of $V$. Given the fact that every subset of a clique is also a clique, this downward-closure property can make efficient clique discovery algorithm possible in a way similar to the Apriori algorithm for finding frequent itemsets
+Finding cliques in $G'(H)$ corresponds to searching and testing in the powerset of $V$. Given the fact that every subset of a clique is also a clique, this downward-closure property can make clique discovery algorithm efficient in a way similar to the Apriori algorithm for finding frequent itemsets
 --- with a ``bottom up" manner, the candidate generation step extends valid $k-1$ length itemsets one item at a time, and groups of candidates are tested against $G'(H)$ to determine if they form cliques. The algorithm terminates when no further successful extensions are found.
 
 \subsubsection{Connected Components of $G'(H)$}
-Complete subgraph (i.e., clique) is a very strong requirement that can limit the approach to restricted cases of semantically associated itemsets. One way to relax this requirement is to find connected components of $G'(H)$, which can be viewed as a closure under semantic association. The number of connected components equals the multiplicity of 0 as an eigenvalue of the Laplacian matrix of $G'(H)$. Although the set of connected components is not downward closed, there is efficient way to find all connected components of a graph in linear time using either breadth-first search or depth-first search. In either case, a search that begins at some particular vertex will find the entire connected component containing the vertex. When the search returns, loop through other vertices and start a new search whenever the loop reaches a vertex that has not already been included in a previously found connected component.
+Complete subgraph (\ie, clique) is a very strong requirement that can limit the approach to restricted cases of semantically associated itemsets. One way to relax this requirement is to find connected components of $G'(H)$, which can be viewed as a closure under semantic association. The number of connected components equals the multiplicity of the eigenvalue 0 of the Laplacian matrix of $G'(H)$. Although the set of connected components is not downward closed, there is efficient way to find all connected components of a graph in linear time using either breadth-first search or depth-first search. In either case, a search that begins at some particular vertex will find the entire connected component containing the vertex. When the search returns, loop through other vertices and start a new search whenever the loop reaches a vertex that has not already been included in a previously found connected component.
 
 \subsubsection{Ranking of Itemsets}
-Once the semantically associated 2-itemsets and $k$-itemsets are generated, they can be ranked by a quantity indicating the strength of association among items in the set. We tentatively compute this quantity by averaging the total pairwise similarities over the number of subedges of the itemset's corresponding clique or connected component in $G'(H)$.
+Once the semantically associated 2-itemsets and $k$-itemsets are generated, they can be ranked by a quantity indicating the strength of association among items in the set. We compute this quantity by averaging the total pairwise similarities over the number of subedges of the itemset's corresponding clique or connected component in $G'(H)$.
 
 \section{Case Studies}
 \label{experiment}
@@ -206,7 +155,7 @@ As mentioned in Section~\ref{sec:association}, \emph{fish oil} and \emph{Raynaud
 \subsubsection{Results}
 The hypergraph approach finds significant links between \emph{fish oil} and \emph{Raynaud's syndrome}, as demonstrated particularly well by the $s_{CT}$ method as shown in Table~\ref{tbl:syn}. Even the triplet was discovered by the clique search technique.  Most notably, because their co-occurrence is zero, the association would never be discovered by traditional frequent itemset techniques such as the Apriori algorithm~\cite{apriori}.
 
-The $s_{L+}$ method also picks-up the association, but it was fairly weak:  the association is ranked 23rd among all 2-itemsets (column 3 in Table~\ref{tbl:syn} lists the ranking of the $s_{CT}$ results given by the $s_{L+}$).  However, as our next evaluations suggest, the $s_{L+}$ demonstrates other favorable qualities.
+The $s_{L+}$ method also picks-up the association, but it was fairly weak:  the association is ranked 23rd among all 2-itemsets (column 3 in Table~\ref{tbl:syn} lists the ranking of the $s_{CT}$ results given by the $s_{L+}$).  However, as our next evaluations suggest, $s_{L+}$ demonstrates other favorable qualities.
 \begin{table}
 \begin{center}
 \begin{tabular}{r |@{ } r |@{ } r | l }
@@ -242,21 +191,15 @@ $\mathbf{s_{CT}}$  & $\mathbf{s_{L+}}$ rank    &\textbf{Freq}&   \textbf{Itemset
 
 \subsection{Shopping Cart}
 \subsubsection{Dataset}
-To better understand how the $s_{CT}$ method compares against the $s_{L+}$ method, we tested them on a business shopping cart dataset.  This dataset contains purchase information on 100 grocery items (represented by boolean column headers) for 2,127 shopping orders (corresponding to tuples). We applied $s_{L+}$ and $s_{CT}$ and set a threshold to include top-100 2-itemsets, based on which we subsequently used clique search to generate $(k>2)$ itemsets. The top-10 2-itemset results and ($k>2$)-itemsets corresponding to maximum cliques generated by $s_{CT}$ and $s_{+}$ are reported in Table~\ref{tbl:foodmart_ct} and \ref{tbl:foodmart_pl} respectively.
+To better understand how the $s_{CT}$ method compares against the $s_{L+}$ method, we tested them on a business shopping cart dataset.  This dataset contains purchase information on 100 grocery items (represented by Boolean column headers) for 2,127 shopping orders (corresponding to tuples). We applied $s_{L+}$ and $s_{CT}$ and set a threshold to include top-100 2-itemsets, based on which we subsequently used clique search to generate $(k>2)$ itemsets. The top-10 2-itemset results and ($k>2$)-itemsets corresponding to maximum cliques generated by $s_{CT}$ and $s_{+}$ are reported in Table~\ref{tbl:foodmart_ct} and \ref{tbl:foodmart_pl} respectively.
 
 % this data set is interesting because... why? it is used by many in classrooms? it is just the right size?  it is easily understandable?  what?  give a motivation of somekind for choosing it xxx
 
 
 
 \subsubsection{Results}
-Unlike the experiment on the fish oil dataset, We do not have specific hypothesis to validate in this test. After examining the results from both measures, we can only conclude they make intuitive sense. However, we observe that the difference between the $s_{CT}$ and $s_{L+}$ becomes more significant in this experiment. The $s_{CT}$ tends to include itemsets with high support and the effect of indirect links is less pronounced. On the other hand, $s_{L+}$ promotes items with support values towards the lower end. We also observe one drawback of the $s_{CT}$ that the result is centered around items with large frequencies (i.e., many direct links to other nodes) and hence in a sense limiting the information (most itemsets are about \emph{cheese}, \emph{soup} and \emph{cookie}). By contrast, the $s_{L+}$ produces more diversified itemsets.
+Unlike the experiment on the fish oil dataset, we do not have specific hypothesis to validate in this test. After examining the results from both measures, we can only conclude they make intuitive sense. However, we observe that the difference between the $s_{CT}$ and $s_{L+}$ becomes more significant in this experiment. The $s_{CT}$ tends to include itemsets with high support and the effect of indirect links is less pronounced. On the other hand, $s_{L+}$ promotes items with support values towards the lower end. We also observe one drawback of the $s_{CT}$ that the result is centered around items with large frequencies (\ie, many direct links to other nodes) and hence in a sense limiting the information (most itemsets are about \emph{cheese}, \emph{soup} and \emph{cookies}). By contrast, $s_{L+}$ produces more diversified itemsets. This point can be further illustrated in Table~\ref{tbl:foodmart_freq} where we list the top 2-itemsets ranked by the frequency of occurrences. The list is similar to the $s_{CT}$-based result but vastly different from the $s_{L+}$-based result.
 
-Finally we tested our methods on the dataset of electronic health records of real patients. This dataset is different from the above two datasets not only in scale but also in practical importance as described in the following.
-% state in very clear sentence what the conclusion is, what is the take-home message you want them to see? xxx
-
-% why is this interesting? what should we have learned? xxx
-
-%finally, lead-in to final experiment... we finally did this last experiment because:  1) its huge, 2) its important to people to solve xxx
 
 \begin{table}
 \begin{center}
@@ -311,6 +254,32 @@ Finally we tested our methods on the dataset of electronic health records of rea
 \caption[Top $s_{L+}$ results on the shopping cart dataset.]{\label{tbl:foodmart_pl} Top semantically associated itemsets generated by $s_{L+}$ from the shopping cart dataset.}
 \end{table}
 
+Finally we tested our methods on the dataset of electronic health records of real patients. This dataset is different from the above two datasets not only in scale but also in practical importance as described in the following.
+
+
+\begin{table}
+\begin{center}
+\begin{tabular}{l|l }
+\hline
+\textbf{Itemset}   &   \textbf{Freq}   \\
+  \hline\hline
+$\langle$\emph{	Cheese	,	Soup	}$\rangle$	&	39	\\
+$\langle$\emph{	Cookies	,	Soup	}$\rangle$	&	38	\\
+$\langle$\emph{	Dried Fruit	,	Soup	}$\rangle$	&	36	\\
+$\langle$\emph{	Cheese	,	Dried Fruit	}$\rangle$	&	32	\\
+$\langle$\emph{	Cheese	,	Preserves	}$\rangle$	&	31	\\
+$\langle$\emph{	Cookies	,	Dried Fruit	}$\rangle$	&	30	\\
+$\langle$\emph{	Cereal	,	Soup	}$\rangle$	&	29	\\
+$\langle$\emph{	Cookies	,	Preserves	}$\rangle$	&	29	\\
+$\langle$\emph{	Frozen Vegetables	,	Soup	}$\rangle$	&	29	\\
+$\langle$\emph{	Nuts	,	Preserves	}$\rangle$	&	29	\\
+\hline
+\end{tabular}
+\end{center}
+\caption[Top itemsets ranked by the frequency of occurrences on the shopping cart data]{\label{tbl:foodmart_freq} Top itemsets ranked by the frequency of occurrences on the shopping cart dataset.}
+\end{table}
+
+
 \subsection{Electronic Health Records}
 \subsubsection{Dataset}
 In our final evaluation, we analyzed the electronic health records of real patients. Applying methods like the ones we have described to this kind of data is particularly relevant because of recent legislation aimed at increasing the meaningful use of electronic health records. Discovering meaningful semantically associated itemsets among the set of drugs and diseases identified in the patient's clinical note is a critical step toward identifying combinations of drug classes and co-morbidities, or risk-factors and co-morbidities that are common in patients with a certain outcome (for example, those suffering from myocardial infarction), toward building predictive risk models, as well as toward providing probable hypotheses about the possible causes of that outcome.  %The main challenge is that roughly 80\% of the clinical electronic medical data is found in free-text narrative (e.g., doctor's notes).
@@ -334,7 +303,7 @@ From this set of 1.6 million patients, we extracted a cohort of patients that su
 %As a result of applying this tool to the patient records from STRIDE, we created a bit-map of roughly 9 million rows and 15 thousand columns.  Each row represents a patient note.  Each column represents either a drug or a disease (or a class of drug or class of disease).  The bit (1 or 0) represents either the presence or absence of a non-negated mention of the drug or disease in the note.  Each note (i.e., row) is linked to a patient identifier, a relative timestamp, and the patient's age\footnote{All ages approaching 90 are appropriately masked for privacy as required by law.} at the time so that the patient's timeline-view is preserved.  Other demographic data such as ethnicity and race were not used for this study.
 
 \subsubsection{Results}
-The cohort dataset described above contains 467791 rows (corresponding to patients' clinical notes) and 10167 columns (corresponding to annotated terms appeared in the notes). With the help of the techniques described in Section~\ref{sec:eff_comp}, we are able to compute $L^+$ in a tractable amount of time (Equation~\ref{eq:combinatoryHyperL} and \ref{eq:pL} are calculated within 4 hours on a Quad-Core AMD Opteron(tm) Processor with 8 gigabyte memory), based on which we can efficiently derive the $s_{L+}$ itemsets. However, the calculation of $s_{CT}$ on this scale is intractable because an exact computation of all pair-wise $s_{CT}$ requires to fill in a $|V|\times|V|$ similarity table. In order to ameliorate the computational cost, we exploit domain knowledge to identify 582 terms of particular interest and then apply both $s_{CT}$ and $s_{L+}$ on the reduced dataset. The results are shown in Table~\ref{tbl:ncbo_ct} and \ref{tbl:ncbo_lp} respectively, where we list top-10 2-itemsets and all ($k>$2)-itemsets corresponding to the maximum clique.
+The cohort dataset described above contains 467,791 rows (corresponding to patients' clinical notes) and 10,167 columns (corresponding to annotated terms appeared in the notes). With the help of the techniques described in Section~\ref{sec:eff_comp}, we are able to compute $L^+$ in a tractable amount of time (\ref{eq:combinatoryHyperL} and \ref{eq:pL} are calculated within 4 hours on a Quad-Core AMD Opteron(tm) Processor with 8 gigabyte memory), based on which we can efficiently derive the $s_{L+}$ itemsets. However, the calculation of $s_{CT}$ on this scale is intractable because an exact computation of all pair-wise $s_{CT}$ requires filling in a $|V|\times|V|$ similarity table. In order to ameliorate the computational cost, we exploit domain knowledge to identify 582 terms of particular interest and then apply both $s_{CT}$ and $s_{L+}$ on the reduced dataset. The results are shown in Table~\ref{tbl:ncbo_ct} and \ref{tbl:ncbo_lp} respectively, where we list top-10 2-itemsets and all ($k>$2)-itemsets corresponding to the maximum clique.
 
 \begin{table}
 \begin{center}
@@ -403,11 +372,11 @@ $\mathbf{s_{L+}}$    & 0.32  & 0.06 \\
 \end{center}
 \caption[Top $s_{L+}$ results on the kidney failure cohort dataset.]{\label{tbl:ncbo_lp} Top semantically associated itemsets generated by $s_{L+}$ from the kidney failure cohort of the electronic health dataset.}
 \end{table}
-It is clear that, continuing the trend shown in the FoodMart analysis, the $s_{CT}$ result becomes increasingly concordant with the support-based method. For illustrating this point of view, we calculate the Kendall-$\tau$ score between the ranking of itemsets generated by $s_{CT}$, $s_{L+}$, and support as shown in Table~\ref{tbl:kendall}. We observe from the table that as the $s_{CT}$ converges to support, the $s_{L+}$ becomes even more distinct from it. The result is that the itemsets discovered by $s_{CT}$ contain mostly general terms that are repeatedly found in the patients' notes. Although the association is reasonable but hardly interesting. On the contrary, the $s_{L+}$ result is not affected by the dimension of data as well as the presence of items with massive support. It identifies itemsets of relatively low support but more closely bonded by indirect links.
+It is clear that, continuing the trend shown in the FoodMart analysis, the $s_{CT}$ result becomes increasingly concordant with the support-based method. For illustrating this point of view, we calculate the Kendall-$\tau$ score between the ranking of itemsets generated by $s_{CT}$, $s_{L+}$, and support as shown in Table~\ref{tbl:kendall}. We observe from the table that as $s_{CT}$ converges to support, $s_{L+}$ becomes even more distinct from it. The result is that the itemsets discovered by $s_{CT}$ contain mostly general terms that are repeatedly found in the patients' notes. The association is reasonable but hardly interesting. On the contrary, the $s_{L+}$ result is not affected by the dimension of data or the presence of items with massive support. It identifies itemsets of relatively low support but more closely bonded by indirect links.
 
-To demonstrate the scalability of the method based on the $s_{L+}$, we also conducted the same analysis on the data of the whole cohort after 2010. The data consisted 1 million rows and 10 thousand columns. We were able to produce the $s_{L+}$ based 2-itemsets in 6 hours. The top results are shown in Table~\ref{tbl:ncbo_lp_whole}.
+To demonstrate the scalability of the method based on the $s_{L+}$, we also conducted the same analysis on the data of the whole cohort after 2010. The data consisted of 1 million rows and 10 thousand columns. We were able to produce the $s_{L+}$ based 2-itemsets in 6 hours. The top results are shown in Table~\ref{tbl:ncbo_lp_whole}.
 
-The discovered $s_{L+}$ itemsets provide much valuable insights on the possible interrelationship between drugs. Some of them has been studied in the literature. For example, \emph{sevoflurane/remifentanil} can be used for anaesthesia; \emph{frovatriptan} and \emph{almotriptan} are both oral treatment of migraine headache; \emph{Etomidate} and \emph{Rocuronium} can be used for rapid sequence intubation; etc. This area of research is still very new and there are no good gold standards to compare our results against.  However, for single-item drugs that lead to kidney failure, SIDER\footnote{\url{http://sideeffects.embl.de/se/C0035078/all}} database lists drugs and their side-effects.  Most notably, multi-itemsets are difficult to identify, but our methods have found not only \emph{Ketoprofen} but it has also group other drugs like it (see the ($k>2$)-itemset shown in Table~\ref{tbl:ncbo_lp}, all of the items are anti-inflammatories). Our results are a matter of on-going evaluation with medical experts.
+The discovered $s_{L+}$ itemsets provide much valuable insights on the possible interrelationships between drugs. Some of them have been studied in the literature. For example, \emph{sevoflurane/remifentanil} can be used for anaesthesia; \emph{frovatriptan} and \emph{almotriptan} are both oral treatment of migraine headache; \emph{Etomidate} and \emph{Rocuronium} can be used for rapid sequence intubation; etc. This area of research is still very new and there are no good gold standards to compare our results against.  However, for single-item drugs that lead to kidney failure, SIDER\footnote{\url{http://sideeffects.embl.de/se/C0035078/all}} database lists drugs and their side-effects.  Most notably, multi-itemsets are difficult to identify, but our methods have found not only \emph{Ketoprofen} but it has also group other drugs like it (see the ($k>2$)-itemset shown in Table~\ref{tbl:ncbo_lp}, all of the items are anti-inflammatories). Our results are a matter of on-going evaluation with medical experts.
 
 
 \begin{table}
@@ -437,7 +406,7 @@ $\mathbf{s_{L+}}$      &   \textbf{Itemset}\\
 \section{Discussion}
 We have observed in the experiments that with the increase of the data size, the commute time based similarity $s_{CT}$ converges to support, while the inner product similarity $s_{L+}$ remains distinct. In this section, we study the cause of this phenomenon.
 
-The core attribute that affects the behavior of $s_{CT}$ and $s_{L+}$ is the node degree distribution of the graph. For graphs that are relatively uniform (the out degree distribution of the graph does not follow a skewed distribution), the $s_{CT}$ and $s_{L+}$ appear equally useful. However, for realistic data where the degree distribution follows a Zipf or power-law relationship, then commute time distance displays a bias toward high degree nodes. It is well known that real-world large graphs follow a power law, hence the degradation of $s_{CT}$ in such cases. %This is due to the fact that high degree nodes will have a much higher stationary probability (probability that a random walk will be at the high degree node at any given time) and consequently all the distances are skewed toward the largest nodes.
+The core attribute that affects the behavior of $s_{CT}$ and $s_{L+}$ is the node degree distribution of the graph. For graphs that are relatively uniform (the out degree distribution of the graph does not follow a skewed distribution), $s_{CT}$ and $s_{L+}$ appear equally useful. However, for realistic data where the degree distribution follows a Zipf or power-law relationship, the commute time distance displays a bias toward high degree nodes. It is well known that real-world large graphs follow a power law, hence the degradation of $s_{CT}$ in such cases. %This is due to the fact that high degree nodes will have a much higher stationary probability (probability that a random walk will be at the high degree node at any given time) and consequently all the distances are skewed toward the largest nodes.
 
 Figure~\ref{fig:distro} demonstrates the degree distributions of the three experiments datasets which gradually evolve into a power-law distribution. The electronic health dataset even exhibits a Zipf-like distribution as illustrated by the near linear pattern on the log-log plot.
 
@@ -477,7 +446,7 @@ $\mathbf{x}_i=\mathbf{U}^T\mathbf{e}_i$, which is then further scaled to $\mathb
 l_{ij}^{+}=\mathbf{x}_i'^T\mathbf{x}_j'.\notag
 \label{eq:innerprod}
 \end{equation}
-This means that we can construct an embedding which maps the vertices $v_i$ of the graph on points $x_i' \in \mathcal{R}^n$ such that the commute distances on the graph coincide with the Euclidean distances between the points $x_i'$, and the inner-product similarities between the points of $x_i'$ correspond to elements of the pseudoinverse of the graph Laplacian.
+This means that we can construct an embedding which maps the vertices $v_i$ of the graph on points $\mathbf{x}_i' \in \mathcal{R}^n$ such that the commute distances on the graph coincide with the Euclidean distances between the points $\mathbf{x}_i'$, and the inner-product similarities between the points of $\mathbf{x}_i'$ correspond to elements of the pseudoinverse of the graph Laplacian.
 
 In large graphs following a power law distribution, there are abundant subgraphs with a star structure, where a high degree node is in the middle connecting to a large number of leaves. It is therefore particularly pertinent to study the spectral properties of star graphs for a comprehensive understanding of $s_{CT}$ and $s_{L+}$. %Lemma~\ref{lem:star} outlines three properties of the Laplacian and pseudoinverse of the Laplacian of a star graph $S_n$ of order $n$.
 \begin{mylem}
@@ -504,11 +473,11 @@ For the proof of this Lemma, readers are referred to~\cite{Das2005Star} for deta
     \begin{blockarray}{cccccc}
             ~       &   \mathbf{v}_1  &   \mathbf{v}_2  &   \mathbf{v}_3& \mathbf{v}_4& \mathbf{v}_5  \\
         \begin{block}{r[rrccc]}
-            x_1   &   -0.89	&	0.45	&	0.00	&	0.00            &	0.00 \\
-            x_2   &   0.22	&	0.45	&	0.60	&	0.71	        &	0.71	\\
-            x_3   &   0.22	&	0.45	&	-0.72	&	-0.28 - 0.24i	&	-0.28 + 0.24i	\\
-            x_4   &   0.22	&	0.45	&	0.29	&	-0.22 - 0.22i	&	-0.22 + 0.22i	\\
-            x_5   &   0.22	&	0.45	&	-0.17	&	-0.21 + 0.46i	&	-0.21 - 0.46i	\\
+            \mathbf{x}_1   &   -0.89	&	0.45	&	0.00	&	0.00            &	0.00 \\
+            \mathbf{x}_2   &   0.22	&	0.45	&	0.60	&	0.71	        &	0.71	\\
+            \mathbf{x}_3   &   0.22	&	0.45	&	-0.72	&	-0.28 - 0.24i	&	-0.28 + 0.24i	\\
+            \mathbf{x}_4   &   0.22	&	0.45	&	0.29	&	-0.22 - 0.22i	&	-0.22 + 0.22i	\\
+            \mathbf{x}_5   &   0.22	&	0.45	&	-0.17	&	-0.21 + 0.46i	&	-0.21 - 0.46i	\\
         \end{block}
     \end{blockarray}
 \end{equation}}
@@ -536,11 +505,11 @@ Figure~\ref{star5} shows an example of a simple star graph with five nodes. The 
 
 The lower half of Figure~\ref{star5} shows the node vectors ($\mathbf{x}_1,\ldots,\mathbf{x}_5$) in the transformed space. As mentioned above, the commute time distance between nodes in the original graph becomes the Euclidean distance between nodes in the transformed space, and the elements of $\mathbf{L}^+$ is the inner product of the corresponding nodes in the transformed space.
 
-It is obvious that for a large graph with many local star structures, the commute time distance between any two center nodes is small since there are many zeros as the eigencomponents in their corresponding transformed node vectors (such as $\mathbf{x}_1'$ in the example). Together with the fact that the transformed node vectors $\mathbf{x}_i'$ are centered\footnotemark[1] ($\sum^n_{i=1}\mathbf{x}_i'=\mathbf{0}$), we can also conclude that for any leaf node connecting directly to two center nodes, the commute time distance is smaller between the leaf and the one with a larger degree.
+It is obvious that for a large graph with many local star structures, the commute time distance between any two center nodes is small since there are many zeros as the eigencomponents in their corresponding transformed node vectors (such as $\mathbf{x}_1'$ in the example). Together with the fact that the transformed node vectors $\mathbf{x}_i'$ are centered ($\sum^n_{i=1}\mathbf{x}_i'=\mathbf{0}$), we can also conclude that for any leaf node connecting directly to two center nodes, the commute time distance is smaller between the leaf and the one with a larger degree.
 
 
-\footnotetext[1]{This can be shown from $\sum^n_{i=1}\mathbf{x}_i'=\mathbf{\Lambda}^{1/2}\sum^n_{i=1}\mathbf{x}_i=\mathbf{\Lambda}^{1/2}\mathbf{U}^T\sum^n_{i=1}\mathbf{e}_i=\mathbf{\Lambda}^{1/2}\mathbf{U}^T\mathbf{e}$.
-And from $\mathbf{\Lambda}=\mathbf{U}^T\mathbf{L}^+\mathbf{U}$, we have $\mathbf{\Lambda}^{1/2}\mathbf{U}^T=\mathbf{\Lambda}^{-1/2}\mathbf{U}^T\mathbf{L}^+$. Therefore $\sum^n_{i=1}\mathbf{x}_i'=(\mathbf{\Lambda}^{1/2}\mathbf{U}^T)\mathbf{e}=(\mathbf{\Lambda}^{-1/2}\mathbf{U}^T\mathbf{L}^+)\mathbf{e}=\mathbf{0}$ since $\mathbf{L}^+\mathbf{e}=\mathbf{0}$.}
+The fact that transformed node vectors are centered can be shown from $\sum^n_{i=1}\mathbf{x}_i'=\mathbf{\Lambda}^{1/2}\sum^n_{i=1}\mathbf{x}_i=\mathbf{\Lambda}^{1/2}\mathbf{U}^T\sum^n_{i=1}\mathbf{e}_i=\mathbf{\Lambda}^{1/2}\mathbf{U}^T\mathbf{e}$.
+And from $\mathbf{\Lambda}=\mathbf{U}^T\mathbf{L}^+\mathbf{U}$, we have $\mathbf{\Lambda}^{1/2}\mathbf{U}^T=\mathbf{\Lambda}^{-1/2}\mathbf{U}^T\mathbf{L}^+$. Therefore $\sum^n_{i=1}\mathbf{x}_i'=(\mathbf{\Lambda}^{1/2}\mathbf{U}^T)\mathbf{e}=(\mathbf{\Lambda}^{-1/2}\mathbf{U}^T\mathbf{L}^+)\mathbf{e}=\mathbf{0}$ since $\mathbf{L}^+\mathbf{e}=\mathbf{0}$.
 
 \begin{comment}
 Now we have explained mathematically why the commute time reflects node degree distribution, meaning that popular states will crowd near the origin regardless of dissimilarity. The inner product similarity alleviates to some extent the bias of commute time similarity towards high degree nodes. This can be attributed to the fact that inner product encodes an ``angle" between vectors:
@@ -554,23 +523,23 @@ l_{ij}^{+}&=\mathbf{x}_i'^T\mathbf{x}_j'\notag\\
 As a crude example, if two words occur frequently in a text corpus, the expected time for a random walker to hit either from any other word will be low, thus they will have a small mutual commute time. But if they are usually mentioned together with different words, the angle between them may be large, implying decorrelation or anticorrelation.
 \end{comment}
 
-A more detailed example is shown in Figure~\ref{fig:example_ct_vs_lp}. A connection graph between people and movies is used to encode the information of movie viewerships where movies are illustrated as big solid circles and people as small circles. An arc is drawn between a movie and a person if the movie is watched by the person. From the graph, we observe that there exists three star substructures with A, B and C being center vertexes respectively.
+A more detailed example is shown in Figure~\ref{fig:example_ct_vs_lp}. A connection graph between people and movies is used to encode the information of movie viewerships where movies are illustrated as big solid circles and people as small circles. An arc is drawn between a movie and a person if the movie is watched by the person. From the graph, we observe that there exists three star substructures with A, B and C being center vertices respectively.
 
 \begin{figure}[tbh]
 \centering
 \includegraphics[width=.7\textwidth]{fig/example_ct_vs_lp.eps}
-\caption[]{\label{fig:example_ct_vs_lp}.}
+\caption[An example connection graph between people and movies]{\label{fig:example_ct_vs_lp}. An example connection graph between people and movies depicting the movie viewership.}
 \end{figure}
 
 Given such a graph, finding similar movies can be naturally solved by a graph-based similarity (such as $s_{CT}$ or $s_{L+}$). At the first glance, since movie A and B have more common viewers than A and C, we should conclude that A and B are more similar to each other than A and B. However, it is soon evident that the group of people who watch C also exclusively watch A. And while movie A and B are commonly viewed by more, it is simply because B is popular and in fact many more people who watch B neither watch A and C. While it might be very legitimate for a system to rank B higher than C in the recommendation to a person who has viewed A, the viewership distribution in this scenario suggests a closer bond between A and C in terms of relevance (imagine A and B are movies from completely different genres and C being a director's cut version of A).
 
-To capture such relevance, $s_{L+}$ would perform better than $s_{CT}$, as we have pointed out and show-cased in the experiments that commute time distance is biased towards high-degree nodes. This is especially pronounced in graphs with skewed degree distribution. The connection graph in this example is a bit skewed in that movie B has much more viewers than A and C. Indeed, the calculation below illustrates this point.
+To capture such relevance, $s_{L+}$ would perform better than $s_{CT}$, as we have pointed out and show-cased in the experiments that the commute time distance is biased towards high-degree nodes. This is especially pronounced in graphs with skewed degree distribution. The connection graph in this example is a bit skewed in that movie B has much more viewers than A and C. Indeed, the calculation below illustrates this point.
 
 $n(A,B)=0.535$, $n(A,C)=0.817$, $l^+(A,B)=-0.031$, $l^+(A,C)=0.098$. Therefore, $S_{CT}(A,B)>S_{CT}(A,C)$, while $S_{L+}(A,B)<S_{L+}(A,C)$.
 
-To give an intuition of the calculation of $s_{CT}$ and $s_{L+}$ in this example, Figure~\ref{fig:embededNodeVectors} shows a 3-D plot of the transformed node vectors, where $x_1'$ corresponds to node B in Figure~\ref{fig:example_ct_vs_lp}, $x_5'$ to A, $x_{13}'$ to C, and they are color-coded differently. Additionally, people who watch both A and C (blue nodes in the original graph) correspond to the transformed node vectors $x_2'-x_4'$; people who watch both A and B (red nodes in the original graph) correspond to $x_6'-x_{12}'$; and people who watch B only correspond to $x_{14}'-x_{26}'$.
+To give an intuition of the calculation of $s_{CT}$ and $s_{L+}$ in this example, Figure~\ref{fig:embededNodeVectors} shows a 3-D plot of the transformed node vectors, where $\mathbf{x}_1'$ corresponds to node B in Figure~\ref{fig:example_ct_vs_lp}, $\mathbf{x}_5'$ to A, $\mathbf{x}_{13}'$ to C, and they are color-coded differently. Additionally, people who watch both A and C (blue nodes in the original graph) correspond to the transformed node vectors $\mathbf{x}_2'-\mathbf{x}_4'$; people who watch both A and B (red nodes in the original graph) correspond to $\mathbf{x}_6'-\mathbf{x}_{12}'$; and people who watch B only correspond to $\mathbf{x}_{14}'-\mathbf{x}_{26}'$.
 
-It is obvious that $x_1'$, $x_5'$ and $x_{13}'$ appear much flatter than others because they are center nodes in their respective stars. Moreover, notice that last eigencomponents from all node vectors form an eigenvector $\mathbf{v}_{26}'$ corresponding to the largest eigenvalue of $\mathbf{L}^+$, which is the second eigenvalue of $\mathbf{L}$, therefore $\mathbf{v}_{26}'$ is the \emph{Fiedler vector} and can be used to partition the graph. The most straightforward way is to use the sign of the eigencomponents to partition the graph into two clusters: $\{x_1'-x_{12}'\}$ and $\{x_{13}'-x_{26}'\}$. The inner product similarity $s_{L+}$ accounts for this partition and is mainly decided by the product at these eigencomponents.
+It is obvious that $\mathbf{x}_1'$, $\mathbf{x}_5'$ and $\mathbf{x}_{13}'$ appear much flatter than others because they are center nodes in their respective stars. Moreover, notice that last eigencomponents from all node vectors form an eigenvector $\mathbf{v}_{26}'$ corresponding to the largest eigenvalue of $\mathbf{L}^+$, which is the second eigenvalue of $\mathbf{L}$, therefore $\mathbf{v}_{26}'$ is the \emph{Fiedler vector} and can be used to partition the graph. The most straightforward way is to use the sign of the eigencomponents to partition the graph into two clusters: $\{\mathbf{x}_1'-\mathbf{x}_{12}'\}$ and $\{\mathbf{x}_{13}'-\mathbf{x}_{26}'\}$. The inner product similarity $s_{L+}$ accounts for this partition and is mainly decided by the product at these eigencomponents.
 
 %This point can be illustrated by comparing the component $||\mathbf{x}_i'-\mathbf{x}_j'||^2$ in $s_{CT}$ and $\mathbf{x}_i'^T\mathbf{x}_j'$ in $s_{L+}$. Skewed graph with nodes having very large degrees yields skewed values in certain dimensions of $x_i'$ or $x_j'$, making $||\mathbf{x}_i'-\mathbf{x}_j'||^2$ inevitable large, but this is not necessarily the case for $\mathbf{x}_i'^T\mathbf{x}_j'$. For example, if two words are mentioned a lot in a text corpus, the expected time for a random walker to hit either from any word will be low, thus they will have a small mutual commute time. But if they are usually mentioned together with different words, the angle between them may be large, implying decorrelation or anticorrelation. To completely factor out artifacts of skewed distribution or biased sampling, the cosine correlations may be used.
 
